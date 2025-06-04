@@ -1,0 +1,7 @@
+{
+    "SECRET_KEY":"smtx",
+    "DATABASE_URL": "mysql+aiomysql://root:admin@localhost:3306/middleware_smartx",
+    "STORAGE_TAGS":true,
+    "STORAGE_DAYS":3,
+    "LOG_PATH":"Logs"
+}

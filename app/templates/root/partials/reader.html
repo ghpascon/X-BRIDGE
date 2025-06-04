@@ -1,0 +1,56 @@
+<div class="card card-body">
+  <!-- DEVICE -->
+  <h1>{{ device }}</h1>
+
+  <!-- BUTTONS -->
+  <div style="padding: 0%" class="d-flex">
+    <button
+      onclick="fetch('/rfid/start?device={{ device }}')"
+      class="btn btn-success"
+    >
+      Start
+    </button>
+    <button
+      onclick="fetch('/rfid/stop?device={{ device }}')"
+      class="btn btn-danger"
+      style="margin-left: 15px"
+    >
+      Stop
+    </button>
+    <button
+      onclick="fetch('/rfid/clear?device={{ device }}')"
+      class="btn btn-warning"
+      style="margin-left: 15px"
+    >
+      Clear
+    </button>
+  </div>
+
+  <!-- STATE -->
+  <div
+    class="d-flex align-items-center justify-content-between mb-3 gap-1 flex-wrap"
+  >
+    <h2 id="state_label_{{ device|replace(' ', '_') }}"></h2>
+  </div>
+</div>
+
+<script>
+  async function updateReadingState_{{ device|replace(' ', '_') }}() {
+    try {
+      const response = await fetch("/rfid/reader_state?device={{ device }}");
+      if (!response.ok) {
+        throw new Error("Erro na resposta da requisição");
+      }
+      const data = await response.json();
+      document.getElementById("state_label_{{ device|replace(' ', '_') }}").innerText = data.state;
+    } catch (error) {
+      console.error("Erro ao buscar estado do leitor:", error);
+    }
+  }
+
+  // Executa a atualização a cada 500ms
+  setInterval(updateReadingState_{{ device|replace(' ', '_') }}, 500);
+
+  // Atualiza imediatamente ao carregar
+  updateReadingState_{{ device|replace(' ', '_') }}();
+</script>

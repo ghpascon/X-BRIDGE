@@ -1,0 +1,76 @@
+{
+  "READER_TYPES": ["R700", "UR4"],
+  "READER": "R700",
+  "NAME": "R700_01",
+  "CONNECTION": "impinj-14-15-6c",
+  "START_READING": false,
+  "READING_CONFIG": {
+    "antennaConfigs": [
+      {
+        "antennaPort": 1,
+        "estimatedTagPopulation": 16,
+        "fastId": "enabled",
+        "inventorySearchMode": "dual-target",
+        "inventorySession": 0,
+        "receiveSensitivityDbm": -70,
+        "rfMode": 1002,
+        "transmitPowerCdbm": 3300
+      },
+      {
+        "antennaPort": 2,
+        "estimatedTagPopulation": 16,
+        "fastId": "enabled",
+        "inventorySearchMode": "dual-target",
+        "inventorySession": 0,
+        "receiveSensitivityDbm": -70,
+        "rfMode": 1002,
+        "transmitPowerCdbm": 3300
+      },
+      {
+        "antennaPort": 3,
+        "estimatedTagPopulation": 16,
+        "fastId": "enabled",
+        "inventorySearchMode": "dual-target",
+        "inventorySession": 0,
+        "receiveSensitivityDbm": -70,
+        "rfMode": 1002,
+        "transmitPowerCdbm": 3300
+      },
+      {
+        "antennaPort": 4,
+        "estimatedTagPopulation": 16,
+        "fastId": "enabled",
+        "inventorySearchMode": "dual-target",
+        "inventorySession": 0,
+        "receiveSensitivityDbm": -70,
+        "rfMode": 1002,
+        "transmitPowerCdbm": 3300
+      }
+    ],
+    "eventConfig": {
+      "common": {
+        "hostname": "disabled"
+      },
+      "tagInventory": {
+        "epc": "disabled",
+        "epcHex": "enabled",
+        "xpcHex": "disabled",
+        "tid": "disabled",
+        "tidHex": "enabled",
+        "antennaPort": "enabled",
+        "transmitPowerCdbm": "disabled",
+        "peakRssiCdbm": "enabled",
+        "frequency": "disabled",
+        "pc": "disabled",
+        "lastSeenTime": "disabled",
+        "phaseAngle": "disabled",
+        "tagReporting": {
+          "reportingIntervalSeconds": 0,
+          "tagCacheSize": 2048,
+          "antennaIdentifier": "antennaPort",
+          "tagIdentifier": "epc"
+        }
+      }
+    }
+  }
+}

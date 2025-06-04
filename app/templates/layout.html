@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <!-- Bootstrap CSS minificado -->
+    <link rel="stylesheet" href="/static/css/smartx.css">
+</head>
+<body class="d-flex flex-column min-vh-100 bg-light">
+    
+    <!-- Header -->
+<header class="bg-primary text-black py-3 mb-4 position-relative">
+    <img src="/static/images/smatx_logo.png" alt="Logo" class="img-fluid" style="position: absolute; top: 50%; left: 5%; transform: translateY(-50%);">
+    <div class="container d-flex justify-content-center align-items-center">
+        <h1>{{ title }}</h1>
+    </div>
+</header>
+    
+    <!-- Flash messages -->
+    <div class="container">
+        {% for alert in alerts %}
+        <div class="alert {{ alert.class }} alert-dismissible fade show" role="alert">
+            {{ alert.text }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <!-- Main content -->
+    <main class="container flex-fill">
+        {% block content %}
+        {% endblock %}
+    </main>
+    
+    <!-- Footer -->
+    <footer class="bg-dark text-white text-center py-3 mt-4">
+        <div class="container">
+            <p class="mb-0">{{ generate_footer() }}</p>
+        </div>
+    </footer>
+    
+    <!-- Bootstrap JS minificado -->
+    <script src="/static/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/number.js"></script>
+    
+</body>
+</html>
