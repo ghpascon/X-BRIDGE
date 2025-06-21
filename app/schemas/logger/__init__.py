@@ -1,1 +1,1 @@
-from .logger import log_error, log_info
+from .logger import logger_manager

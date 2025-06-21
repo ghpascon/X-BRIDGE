@@ -1,4 +1,3 @@
 {
-    "SECRET_KEY":"smtx",
-    "LOG_PATH":"Logs"
+    "SECRET_KEY":"smtx"
 }

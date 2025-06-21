@@ -5,7 +5,6 @@ from app.core.path import get_prefix_from_path
 from app.routers.rfid.commands import clear_tags, start_inventory, stop_inventory
 from app.schemas.api.device import device_responses, validate_device, state_responses
 from app.schemas.devices import devices
-from app.schemas.logger import log_error, log_info
 
 router_prefix = get_prefix_from_path(__file__)
 router = APIRouter(prefix=router_prefix, tags=[router_prefix])

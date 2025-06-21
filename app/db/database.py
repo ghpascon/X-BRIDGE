@@ -9,7 +9,7 @@ from app.models.rfid import DbTag
 from datetime import datetime, timedelta, timezone
 from sqlalchemy import delete
 from app import models  # Garante que os modelos estejam importados
-from app.schemas.logger import log_info, log_error  # <-- Aqui
+import logging
 from sqlalchemy.orm import DeclarativeMeta
 import csv
 import zipfile
@@ -30,14 +30,14 @@ class DatabaseEngine:
 
         result = self._initialize_engines_and_session()
         if isinstance(result, dict) and "error" in result:
-            log_error(
+            logging.error(
                 f"[DatabaseEngine.__init__] Erro ao inicializar: {result['error']}"
             )
 
     def _load_database_url(self, path="config/actions.json"):
         try:
             if not os.path.exists(path):
-                log_error(
+                logging.error(
                     f"[DatabaseEngine._load_database_url] Arquivo de configuração não encontrado: {path}"
                 )
                 return None
@@ -45,18 +45,18 @@ class DatabaseEngine:
                 data = json.load(f)
             url = data.get("DATABASE_URL")
             if not url:
-                log_error(
+                logging.error(
                     f"[DatabaseEngine._load_database_url] 'DATABASE_URL' não encontrada no arquivo: {path}"
                 )
                 return None
             return url
         except json.JSONDecodeError as e:
-            log_error(
+            logging.error(
                 f"[DatabaseEngine._load_database_url] Erro ao decodificar JSON do arquivo {path}: {e}"
             )
             return None
         except Exception as e:
-            log_error(
+            logging.error(
                 f"[DatabaseEngine._load_database_url] Erro inesperado ao carregar DATABASE_URL: {e}"
             )
             return None
@@ -66,7 +66,7 @@ class DatabaseEngine:
             self.database_url = self._load_database_url()
             if not self.database_url:
                 msg = "URL do banco de dados inválida ou não encontrada. Inicialização adiada."
-                log_error(f"[DatabaseEngine._initialize_engines_and_session] {msg}")
+                logging.error(f"[DatabaseEngine._initialize_engines_and_session] {msg}")
                 # Deixa atributos None e retorna erro
                 return {"error": msg}
 
@@ -107,12 +107,12 @@ class DatabaseEngine:
             )
 
             self.create_tables()
-            log_info(
+            logging.info(
                 "[DatabaseEngine._initialize_engines_and_session] Inicialização das engines e sessão realizada com sucesso."
             )
             return True
         except Exception as e:
-            log_error(
+            logging.error(
                 f"[DatabaseEngine._initialize_engines_and_session] Erro ao inicializar engines e sessão: {e}"
             )
             self.database_url = None
@@ -124,15 +124,15 @@ class DatabaseEngine:
 
     def create_tables(self):
         if self.sync_engine is None:
-            log_error(
+            logging.error(
                 "[DatabaseEngine.create_tables] sync_engine não inicializada. Ignorando criação de tabelas."
             )
             return
         try:
             Base.metadata.create_all(bind=self.sync_engine)
-            log_info("[DatabaseEngine.create_tables] Tabelas criadas ou já existentes.")
+            logging.info("[DatabaseEngine.create_tables] Tabelas criadas ou já existentes.")
         except Exception as e:
-            log_error(f"[DatabaseEngine.create_tables] Erro ao criar tabelas: {e}")
+            logging.error(f"[DatabaseEngine.create_tables] Erro ao criar tabelas: {e}")
             # NÃO levanta exceção
 
     def reload_database_url(self, new_url: str):
@@ -140,16 +140,16 @@ class DatabaseEngine:
             self.database_url = new_url
             result = self._initialize_engines_and_session()
             if result is True:
-                log_info(
+                logging.info(
                     "[DatabaseEngine.reload_database_url] URL do banco de dados recarregada com sucesso."
                 )
                 return True
             else:
                 # result contém o dict {"error": ...}
-                log_error(f"[DatabaseEngine.reload_database_url] {result['error']}")
+                logging.error(f"[DatabaseEngine.reload_database_url] {result['error']}")
                 return result
         except Exception as e:
-            log_error(
+            logging.error(
                 f"[DatabaseEngine.reload_database_url] Erro ao recarregar DATABASE_URL: {e}"
             )
             return {"error": str(e)}
@@ -157,7 +157,7 @@ class DatabaseEngine:
     @asynccontextmanager
     async def get_db(self):
         if self.SessionLocal is None:
-            log_error(
+            logging.error(
                 "[DatabaseEngine.get_db] Sessão não inicializada, não é possível obter conexão com o banco."
             )
             yield None
@@ -166,14 +166,14 @@ class DatabaseEngine:
             async with self.SessionLocal() as db:
                 yield db
         except Exception as e:
-            log_error(
+            logging.error(
                 f"[DatabaseEngine.get_db] Erro ao obter sessão do banco de dados: {e}"
             )
             yield None
 
     async def clear_db(self, days):
         if self.SessionLocal is None:
-            log_error(
+            logging.error(
                 "[DatabaseEngine.clear_db] Session not initialized, operation ignored."
             )
             return {"error": "Session not initialized"}
@@ -181,7 +181,7 @@ class DatabaseEngine:
         try:
             async with self.get_db() as db:
                 if db is None:
-                    log_error(
+                    logging.error(
                         "[DatabaseEngine.clear_db] Session returned None, operation aborted."
                     )
                     return {"error": "Session returned None"}
@@ -200,25 +200,25 @@ class DatabaseEngine:
                             await db.execute(stmt)
                             deleted_tables.append(cls.__tablename__)
                         except Exception as table_exc:
-                            log_error(
+                            logging.error(
                                 f"[DatabaseEngine.clear_db] Failed to clear table '{cls.__tablename__}': {table_exc}"
                             )
 
                 await db.commit()
-                log_info(
+                logging.info(
                     f"[DatabaseEngine.clear_db] Old records deleted up to {limit_date.isoformat()} from tables: {deleted_tables}"
                 )
                 return {"success": True, "deleted_tables": deleted_tables}
 
         except Exception as e:
-            log_error(f"[DatabaseEngine.clear_db] Error while clearing database: {e}")
+            logging.error(f"[DatabaseEngine.clear_db] Error while clearing database: {e}")
             return {"error": str(e)}
 
     async def get_report(self):
         try:
             async with self.get_db() as db:
                 if db is None:
-                    log_error("[get_report] Database session not available")
+                    logging.error("[get_report] Database session not available")
                     return Response(
                         content="Database session unavailable", status_code=503
                     )
@@ -232,7 +232,7 @@ class DatabaseEngine:
                         if isinstance(cls, DeclarativeMeta):
                             table_name = getattr(cls, "__tablename__", cls.__name__)
                             try:
-                                log_info(f"[get_report] Processing table: {table_name}")
+                                logging.info(f"[get_report] Processing table: {table_name}")
                                 result = await db.execute(select(cls))
                                 rows = result.scalars().all()
 
@@ -256,22 +256,22 @@ class DatabaseEngine:
                                 zip_file.writestr(
                                     f"{table_name}.csv", csv_buffer.read()
                                 )
-                                log_info(
+                                logging.info(
                                     f"[get_report] Exported {len(rows)} rows from table: {table_name}"
                                 )
                                 table_count += 1
                                 exported_tables.append(table_name)
 
                             except Exception as table_error:
-                                log_error(
+                                logging.error(
                                     f"[get_report] Failed to export table {table_name}: {table_error}"
                                 )
 
                 if table_count == 0:
-                    log_info("[get_report] No tables were exported. ZIP will be empty.")
+                    logging.info("[get_report] No tables were exported. ZIP will be empty.")
 
                 zip_buffer.seek(0)
-                log_info(
+                logging.info(
                     f"[get_report] Report generation completed. {table_count} tables exported: {exported_tables}"
                 )
 
@@ -282,7 +282,7 @@ class DatabaseEngine:
                 )
 
         except Exception as e:
-            log_error(f"[get_report] Failed to generate reports: {e}")
+            logging.error(f"[get_report] Failed to generate reports: {e}")
             return Response(content=f"Failed to get reports: {str(e)}", status_code=500)
 
 

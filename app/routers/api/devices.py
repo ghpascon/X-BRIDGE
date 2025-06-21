@@ -8,7 +8,6 @@ from app.schemas.api.device import (
     validate_device,
 )
 from app.schemas.devices import devices
-from app.schemas.logger import log_error, log_info
 
 router_prefix = get_prefix_from_path(__file__)
 router = APIRouter(prefix=router_prefix, tags=[router_prefix])

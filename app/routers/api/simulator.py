@@ -3,7 +3,7 @@ from fastapi.responses import JSONResponse
 
 from app.core.path import get_prefix_from_path
 from app.schemas.api.rfid import TagRequest, rfid_base_responses, InventoryRequest
-from app.schemas.logger import log_error
+import logging
 from app.schemas.rfid import rfid
 
 router_prefix = get_prefix_from_path(__file__)
@@ -16,7 +16,7 @@ async def simulator_tag(tag: TagRequest):
         await rfid.on_tag(tag.model_dump())
         return {"msg": "success"}
     except Exception as e:
-        log_error(f"Erro ao processar tag: {e}")
+        logging.error(f"Erro ao processar tag: {e}")
         return JSONResponse(status_code=500, content={"msg": str(e)})
 
 
@@ -30,5 +30,5 @@ async def simulator_inventory(inventory: InventoryRequest):
             await rfid.on_stop(inventory.device)
             return {"msg": f"{inventory.device} STOP"}
     except Exception as e:
-        log_error(f"Erro ao processar tag: {e}")
+        logging.error(f"Erro ao processar tag: {e}")
         return JSONResponse(status_code=500, content={"msg": str(e)})

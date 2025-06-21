@@ -4,7 +4,7 @@ import time
 import serial_asyncio
 
 from app.core.config import settings
-from app.schemas.logger import log_error, log_info
+import logging
 
 from .on_receive import OnReceive
 from .rfid import RfidCommands
@@ -28,7 +28,7 @@ class X714(asyncio.Protocol, OnReceive, RfidCommands):
     def connection_made(self, transport):
         self.transport = transport
         self.is_connected = True
-        log_info("✅ Conexão serial estabelecida com sucesso.")
+        logging.info("✅ Conexão serial estabelecida com sucesso.")
         asyncio.create_task(self.config_reader())
 
     def data_received(self, data):
@@ -41,7 +41,7 @@ class X714(asyncio.Protocol, OnReceive, RfidCommands):
             asyncio.create_task(self.on_receive(pacote))
 
     def connection_lost(self, exc):
-        log_error("⚠️ Conexão serial perdida.")
+        logging.error("⚠️ Conexão serial perdida.")
         self.transport = None
         self.is_connected = False
 
@@ -51,13 +51,13 @@ class X714(asyncio.Protocol, OnReceive, RfidCommands):
     def write(self, to_send, verbose=True):
         if self.transport:
             if verbose:
-                log_info(f"📤 Enviando: {to_send}")
+                logging.info(f"📤 Enviando: {to_send}")
             if isinstance(to_send, str):
                 to_send += "\n"
                 to_send = to_send.encode()  # converte string para bytes
             self.transport.write(to_send)
         else:
-            log_error("❌ Tentativa de envio falhou: conexão não estabelecida.")
+            logging.error("❌ Tentativa de envio falhou: conexão não estabelecida.")
 
     async def connect(self):
         """Loop de conexão/reconexão serial"""
@@ -71,11 +71,11 @@ class X714(asyncio.Protocol, OnReceive, RfidCommands):
                 await serial_asyncio.create_serial_connection(
                     loop, lambda: self, self.port, baudrate=self.baudrate
                 )
-                log_info("🟢 Conectado com sucesso.")
+                logging.info("🟢 Conectado com sucesso.")
                 await self.on_con_lost.wait()
                 print("🔄 Conexão perdida. Tentando reconectar...")
             except Exception as e:
-                log_error(f"❌ Erro ao conectar: {e}")
+                logging.error(f"❌ Erro ao conectar: {e}")
 
             print("⏳ Aguardando 3 segundos antes de tentar novamente...")
             await asyncio.sleep(3)

@@ -1,6 +1,6 @@
 import asyncio
 import aiohttp
-from app.schemas.logger import log_error
+import logging
 from app.schemas.validators.tag import WriteTagValidator
 
 from .on_event import OnEvent
@@ -76,7 +76,7 @@ class R700_IOT(OnEvent, ReaderHelpers, WriteCommands):
                     session, self.endpoint_gpo, payload=gpo_command, method="put"
                 )
         except Exception as e:
-            log_error(f"Failed to set GPO: {e}")
+            logging.error(f"Failed to set GPO: {e}")
 
     async def write_epc(self, tag_commands):
         """

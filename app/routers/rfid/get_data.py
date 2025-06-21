@@ -3,7 +3,6 @@ from fastapi import APIRouter, Request
 from app.core.path import get_prefix_from_path
 from app.db.database import database_engine
 from app.schemas.devices import devices
-from app.schemas.logger import log_error, log_info
 from app.schemas.rfid import rfid
 
 router = APIRouter(

@@ -1,7 +1,7 @@
 import asyncio
 import time
 
-from app.schemas.logger import log_error, log_info
+import logging
 
 
 class SetupReader:
@@ -126,7 +126,7 @@ class SetupReader:
             # END SETUP
             elif not self.wait_answer:
                 self.setup = True
-                log_info(f"[SETUP] ✅ Setup Concluido")
+                logging.info(f"[SETUP] ✅ Setup Concluido")
                 if self.config.get("START_READING"):
                     await self.start_inventory()
 

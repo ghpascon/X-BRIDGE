@@ -1,6 +1,6 @@
 import asyncio
 
-from app.schemas.logger import log_error, log_info
+import logging
 from app.schemas.validators.tag import WriteTagValidator
 
 
@@ -169,7 +169,7 @@ class WriteCommands:
                 await self.clear_tags()
 
         except Exception as e:
-            log_error(e)
+            logging.error(e)
 
     async def get_bytes_from_str(self, word: str) -> list[int]:
         """

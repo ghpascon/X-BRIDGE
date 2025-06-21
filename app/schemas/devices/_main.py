@@ -1,7 +1,7 @@
 import json
 import os
 
-from app.schemas.logger import log_error, log_info
+import logging
 
 from .add_device import AddDevice
 from .devices_commands import DevicesCommands
@@ -34,9 +34,9 @@ class Devices(AddDevice, DevicesCommands, ManageDevices):
             # Verifica se o diretório existe; se não, cria
             if not os.path.exists(devices_path):
                 os.makedirs(devices_path)
-                log_info(f"📁 Diretório criado: {devices_path}")
+                logging.info(f"📁 Diretório criado: {devices_path}")
         except Exception as e:
-            log_error(f"❌ Erro ao verificar/criar diretório '{devices_path}': {e}")
+            logging.error(f"❌ Erro ao verificar/criar diretório '{devices_path}': {e}")
             return
 
         for filename in os.listdir(devices_path):
@@ -52,9 +52,9 @@ class Devices(AddDevice, DevicesCommands, ManageDevices):
                     name = filename.replace(".json", "")
                     self.add_device(data, name)
                 except json.JSONDecodeError as e:
-                    log_error(f"❌ Erro ao carregar JSON: {e}")
+                    logging.error(f"❌ Erro ao carregar JSON: {e}")
                 except Exception as e:
-                    log_error(f"❌ Erro ao processar o arquivo '{filename}': {e}")
+                    logging.error(f"❌ Erro ao processar o arquivo '{filename}': {e}")
 
     async def get_device_types(self, path="config/device_examples"):
         try:

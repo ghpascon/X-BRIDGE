@@ -1,5 +1,5 @@
 import asyncio
-from app.schemas.logger import log_error, log_info
+import logging
 
 from ...rfid import rfid
 from .helpers import ReaderHelpers
@@ -47,7 +47,7 @@ class UR4(ReaderHelpers, OnEvent, SetupReader, WriteCommands):
                     asyncio.open_connection(self.ip, self.port), timeout=3
                 )
                 self.is_connected = True
-                log_info(f"✅ [CONECTADO] Conectado a {self.ip}:{self.port}")
+                logging.info(f"✅ [CONECTADO] Conectado a {self.ip}:{self.port}")
 
                 # Rode as tarefas de forma independente para monitorar desconexão
                 tasks = [
@@ -69,11 +69,11 @@ class UR4(ReaderHelpers, OnEvent, SetupReader, WriteCommands):
                     task.cancel()
 
                 self.is_connected = False
-                log_info("Conexão perdida, tentando reconectar...")
+                logging.info("Conexão perdida, tentando reconectar...")
 
             except Exception as e:
                 self.is_connected = False
-                log_error(f"❌ Erro: {e}. Tentando reconectar em 3 segundos...")
+                logging.error(f"❌ Erro: {e}. Tentando reconectar em 3 segundos...")
 
             await asyncio.sleep(3)
 
@@ -85,9 +85,9 @@ class UR4(ReaderHelpers, OnEvent, SetupReader, WriteCommands):
                 self.writer.write(data)
                 await self.writer.drain()
                 if verbose:
-                    log_info(f"[ENVIADO] {' '.join(f'{b:02x}' for b in data)}")
+                    logging.info(f"[ENVIADO] {' '.join(f'{b:02x}' for b in data)}")
             except Exception as e:
-                log_error(f"[ERRO ENVIO] {e}")
+                logging.error(f"[ERRO ENVIO] {e}")
                 self.is_connected = False
 
     async def start_inventory(self):

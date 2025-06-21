@@ -3,7 +3,7 @@ import json
 
 import aiohttp
 
-from app.schemas.logger import log_error
+import logging
 
 
 class ReaderHelpers:
@@ -50,7 +50,7 @@ class ReaderHelpers:
                     print(f"{endpoint} -> {response.status}")
                     return response.status == 204
         except Exception as e:
-            log_error(f"Error posting to {endpoint}: {e}")
+            logging.error(f"Error posting to {endpoint}: {e}")
             return False
 
     async def get_tag_list(self, session):
@@ -82,12 +82,12 @@ class ReaderHelpers:
                             asyncio.create_task(self.on_tag(tagEvent))
 
                     except (json.JSONDecodeError, UnicodeDecodeError) as parse_error:
-                        log_error(f"Warning: Failed to parse event: {parse_error}")
+                        logging.error(f"Warning: Failed to parse event: {parse_error}")
                     except Exception as e:
-                        log_error(f"Unexpected error: {e}")
+                        logging.error(f"Unexpected error: {e}")
 
         except aiohttp.ClientError as e:
-            log_error(f"Connection error: {e}")
+            logging.error(f"Connection error: {e}")
 
     async def get_tid_from_epc(self, epc):
         current_tags = list(self.tags)

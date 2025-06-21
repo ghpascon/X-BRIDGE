@@ -1,76 +1,60 @@
 import logging
-import os
 from datetime import datetime, timedelta
 from pathlib import Path
+import os
+import json
 
-from app.core.config import settings
+class LoggerManager:
+    def __init__(self):
+        self.log_dir = None
 
-# Cria diretório de logs
-log_dir = Path(settings.data.get("LOG_PATH"))
-log_dir.mkdir(exist_ok=True)
+    def load(self):
+        self.STORAGE_DAYS = 1
+        self.LOG_PATH = "Logs"
+        if os.path.exists("config/actions.json"):
+            with open("config/actions.json", "r") as f:
+                actions_data = json.load(f)
+                self.STORAGE_DAYS = actions_data.get("STORAGE_DAYS", 1)
+                self.LOG_PATH = actions_data.get("LOG_PATH", "Logs")
 
-cutoff_date = datetime.now() - timedelta(days=settings.data.get("STORAGE_DAYS"))
-for log_path in log_dir.glob("*.log"):
-    try:
-        # Extrai a data do nome do arquivo ignorando sufixos (_info ou _error)
-        # Exemplo de nome: "2025-05-19_info.log"
-        date_part = log_path.stem.split("_")[0]  # Pega só o "2025-05-19"
-        file_date = datetime.strptime(date_part, "%Y-%m-%d")
-        if file_date < cutoff_date:
-            os.remove(log_path)
-            print(f"Removido log antigo: {log_path}")
-    except Exception:
-        # Ignora arquivos com nomes que não correspondem ao formato esperado
-        pass
+        self.log_dir = Path(self.LOG_PATH)
+        self.log_dir.mkdir(exist_ok=True)
 
-# Define arquivos de log separados
-today_str = datetime.now().strftime("%Y-%m-%d")
-info_log_file = log_dir / f"{today_str}_info.log"
-error_log_file = log_dir / f"{today_str}_error.log"
+        log_filename = self.log_dir / f"{datetime.now().strftime('%Y-%m-%d')}.log"
 
-# Formatação do log
-formatter = logging.Formatter(
-    "[%(asctime)s] [%(levelname)s] %(message)s", "%Y-%m-%d %H:%M:%S"
-)
+        logger = logging.getLogger()
+        logger.setLevel(logging.INFO)
 
-# Logger principal
-logger = logging.getLogger("simple_logger")
-logger.setLevel(logging.DEBUG)
-logger.propagate = False
+        # Remove todos os handlers antigos
+        for handler in logger.handlers[:]:
+            logger.removeHandler(handler)
 
+        # Cria handler para arquivo
+        file_handler = logging.FileHandler(log_filename, mode='a', encoding='utf-8')
+        file_formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+        file_handler.setFormatter(file_formatter)
+        logger.addHandler(file_handler)
 
-# Filtros personalizados
-class InfoFilter(logging.Filter):
-    def filter(self, record):
-        return record.levelno >= logging.INFO and record.levelno < logging.ERROR
+        # Cria handler para o console
+        console_handler = logging.StreamHandler()
+        console_formatter = logging.Formatter('%(levelname)s - %(message)s')
+        console_handler.setFormatter(console_formatter)
+        logger.addHandler(console_handler)
 
+        logger.info(f"LOG_FILE -> {log_filename}")
 
-class ErrorFilter(logging.Filter):
-    def filter(self, record):
-        return record.levelno >= logging.ERROR
+    async def clear_old_logs(self):
+        storage_days = self.STORAGE_DAYS
+        cutoff_date = datetime.now() - timedelta(days=storage_days)
 
+        for log_path in self.log_dir.glob("*.log"):
+            try:
+                log_date = datetime.strptime(log_path.stem, "%Y-%m-%d")
+                if log_date < cutoff_date:
+                    log_path.unlink()
+            except ValueError:
+                continue  # Ignora arquivos com nome fora do padrão
+            except Exception as e:
+                print(f"Erro ao remover log {log_path.name}: {e}")
 
-if not logger.handlers:
-    # Handler para logs INFO (e WARNING)
-    info_handler = logging.FileHandler(info_log_file, encoding="utf-8")
-    info_handler.setLevel(logging.INFO)
-    info_handler.setFormatter(formatter)
-    info_handler.addFilter(InfoFilter())
-    logger.addHandler(info_handler)
-
-    # Handler para logs ERROR (e CRITICAL)
-    error_handler = logging.FileHandler(error_log_file, encoding="utf-8")
-    error_handler.setLevel(logging.ERROR)
-    error_handler.setFormatter(formatter)
-    error_handler.addFilter(ErrorFilter())
-    logger.addHandler(error_handler)
-
-    # Handler para console (DEBUG e acima)
-    console_handler = logging.StreamHandler()
-    console_handler.setLevel(logging.DEBUG)
-    console_handler.setFormatter(formatter)
-    logger.addHandler(console_handler)
-
-# Funções utilitárias para log
-log_info = logger.info
-log_error = logger.error
+logger_manager = LoggerManager()

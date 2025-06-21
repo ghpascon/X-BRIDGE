@@ -1,6 +1,6 @@
 import asyncio
 
-from app.schemas.logger import log_error, log_info
+import logging
 
 from ...rfid import rfid
 
@@ -37,7 +37,7 @@ class OnEvent:
 
         # CONNECTED ANTENNAS
         elif answer_command == 0x4F:
-            log_info(f"CONNECTED: {data[6]} -> {bin(data[6])}")
+            logging.info(f"CONNECTED: {data[6]} -> {bin(data[6])}")
 
     async def on_tag(self, data, verbose=True):
         if not len(data) == 37 or not self.is_reading:

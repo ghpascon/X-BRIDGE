@@ -10,7 +10,7 @@ from starlette.middleware.sessions import SessionMiddleware
 from app.async_func import create_tasks
 from app.core.config import settings
 from app.core.path import get_path
-from app.schemas.logger import log_error, log_info
+import logging
 
 
 # Include All Routers
@@ -37,9 +37,9 @@ def include_all_routers(current_path):
                     )
                     print(f"✅ Rota incluída: {module_name}")
                 else:
-                    log_error(f"⚠️  Arquivo {filename} não contém um 'router'")
+                    logging.warning(f"⚠️  Arquivo {filename} não contém um 'router'")
             except Exception as e:
-                log_error(f"❌ Erro ao importar {filename}: {e}")
+                logging.error(f"❌ Erro ao importar {filename}: {e}")
 
 
 # Async Handler
@@ -49,7 +49,7 @@ async def lifespan(app: FastAPI):
     try:
         yield
     except Exception as e:
-        print(f"Erro durante o lifespan: {e}")
+        logging.error(f"Erro durante o lifespan: {e}")
     finally:
         for t in tasks:
             t.cancel()
@@ -82,7 +82,7 @@ app.add_middleware(
 app.mount("/static", StaticFiles(directory=get_path("app/static")), name="static")
 
 include_all_routers("app/routers")
-log_info("Aplicação iniciada")
+logging.info("Aplicação iniciada")
 
 if __name__ == "__main__":
     import uvicorn

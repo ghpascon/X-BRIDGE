@@ -1,5 +1,3 @@
-from app.schemas.logger import log_error, log_info
-
 
 class RfidCommands:
     async def start_inventory(self):

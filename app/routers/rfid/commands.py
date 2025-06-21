@@ -4,7 +4,6 @@ from fastapi.responses import JSONResponse, RedirectResponse
 from app.core.path import get_prefix_from_path
 from app.schemas.api.device import device_responses, validate_device
 from app.schemas.devices import devices
-from app.schemas.logger import log_error, log_info
 
 router = APIRouter(
     prefix=get_prefix_from_path(__file__), tags=[get_prefix_from_path(__file__)]

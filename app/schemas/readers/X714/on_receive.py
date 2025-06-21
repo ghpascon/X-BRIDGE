@@ -1,6 +1,6 @@
 import asyncio
 
-from app.schemas.logger import log_error, log_info
+import logging
 
 from ...rfid import rfid
 
@@ -33,4 +33,4 @@ class OnReceive:
             asyncio.create_task(rfid.on_tag(current_tag))
 
         elif data.startswith("#set_cmd:"):
-            log_info(f"CONFIG -> {data[data.index(':')+1:]}")
+            logging.info(f"CONFIG -> {data[data.index(':')+1:]}")

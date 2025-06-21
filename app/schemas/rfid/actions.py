@@ -4,7 +4,7 @@ import os
 
 import aiohttp
 
-from ..logger import log_info, log_error
+import logging
 from app.db.database import database_engine
 
 from datetime import datetime
@@ -28,7 +28,7 @@ class RFIDAction:
             self.actions = {}
 
         database_engine._initialize_engines_and_session()
-        log_info(f"[ Actions ] -> {self.actions}")
+        logging.info(f"[ Actions ] -> {self.actions}")
 
     ### TAG
     async def on_tag_events(self, tag):
@@ -59,7 +59,7 @@ class RFIDAction:
 
                 await db.commit()
         except Exception as e:
-            log_error(f"Erro ao salvar tag: {e}")
+            logging.error(f"Erro ao salvar tag: {e}")
 
     async def post_tag(self, tag, endpoint):
         try:
@@ -68,7 +68,7 @@ class RFIDAction:
                 async with session.post(endpoint, json=payload) as response:
                     pass
         except Exception as e:
-            log_info(f"Erro ao enviar tag: {e}")
+            logging.info(f"Erro ao enviar tag: {e}")
 
     ### INVENTORY
     async def on_inventory_events(self, device, event):
@@ -94,7 +94,7 @@ class RFIDAction:
 
                 await db.commit()
         except Exception as e:
-            log_error(f"Erro ao salvar evento: {e}")
+            logging.error(f"Erro ao salvar evento: {e}")
 
     async def post_inventory(self, device, event, endpoint):
         try:
@@ -106,4 +106,4 @@ class RFIDAction:
                 async with session.post(endpoint, json=payload) as response:
                     pass
         except Exception as e:
-            log_info(f"Erro ao enviar inventory: {e}")
+            logging.info(f"Erro ao enviar inventory: {e}")

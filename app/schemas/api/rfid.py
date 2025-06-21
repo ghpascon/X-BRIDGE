@@ -30,6 +30,7 @@ class RfidRequest(BaseModel):
         "mysql+aiomysql://root:admin@localhost:3306/middleware_smartx"
     )
     STORAGE_DAYS: int = 7
+    LOG_PATH: str = Field("Logs")
 
 
 class InventoryRequest(BaseModel):
@@ -53,13 +54,12 @@ rfid_actions_responses = {
         "description": "Success",
         "content": {
             "application/json": {
-                "example": [
-                    {
+                "example": {
                         "HTTP_POST": "http://localhost:5001",
                         "DATABASE_URL": "mysql+aiomysql://root:admin@localhost:3306/middleware_smartx",
                         "STORAGE_DAYS": 7,
-                    }
-                ]
+                        "LOG_PATH": "Logs",
+                }
             }
         },
     },

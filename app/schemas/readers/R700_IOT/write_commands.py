@@ -2,9 +2,6 @@ import asyncio
 
 import aiohttp
 
-from app.core.config import settings
-from app.schemas.logger import log_error
-
 
 class WriteCommands:
     pass

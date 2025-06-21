@@ -1,6 +1,6 @@
 import asyncio
 
-from app.schemas.logger import log_error, log_info
+import logging
 
 
 class ReaderHelpers:
@@ -9,7 +9,7 @@ class ReaderHelpers:
             await asyncio.sleep(1)
             if self.writer.is_closing():
                 self.is_connected = False
-                log_info("[DESCONECTADO] Socket fechado.")
+                logging.info("[DESCONECTADO] Socket fechado.")
                 break
 
     async def receive_data(self):
@@ -35,7 +35,7 @@ class ReaderHelpers:
 
         except Exception as e:
             self.is_connected = False
-            log_error(f"[ERRO RECEBIMENTO] {e}")
+            logging.error(f"[ERRO RECEBIMENTO] {e}")
 
     async def get_temperature(self):
         while True:
@@ -46,7 +46,7 @@ class ReaderHelpers:
 
     async def decode_temperature(self, response_bytes):
         temperature = int(int((response_bytes[6] << 8) | response_bytes[7]) / 100)
-        log_info(f"TEMPERATURE: {temperature}")
+        logging.info(f"TEMPERATURE: {temperature}")
         return temperature
 
     async def get_gpi_state(self):

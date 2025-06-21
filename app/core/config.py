@@ -1,5 +1,6 @@
 import json
 import os
+from app.schemas.logger import logger_manager
 
 
 class Settings:
@@ -19,6 +20,8 @@ class Settings:
             with open("config/actions.json", "r") as f:
                 actions_data = json.load(f)
                 self.data["STORAGE_DAYS"] = actions_data.get("STORAGE_DAYS", 1)
+
+        logger_manager.load()
 
     def save(self):
         with open(self._config_path, "w") as f:

@@ -8,7 +8,6 @@ from app.schemas.api.rfid import (
     rfid_base_responses,
 )
 from app.schemas.devices import devices
-from app.schemas.logger import log_error, log_info
 from app.schemas.rfid import rfid
 from app.core.config import settings
 
@@ -24,7 +23,7 @@ async def get_actions():
         return JSONResponse(status_code=500, content={"msg": str(e)})
 
 
-@router.post("/set_actions", responses=rfid_base_responses)
+@router.post("/set_actions", responses=rfid_actions_responses)
 async def set_actions(data: RfidRequest):
     try:
         data = data.model_dump()

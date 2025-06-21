@@ -2,7 +2,7 @@ import asyncio
 
 from pydantic import ValidationError
 
-from ..logger import log_error, log_info
+import logging
 from ..validators.tag import TagSchema
 
 
@@ -33,14 +33,14 @@ class OnEvent:
                 await self.on_tag_events(current_tag)
 
         except ValidationError as e:
-            log_error(f"❌ Tag inválida: {e.json()}")
+            logging.error(f"❌ Tag inválida: {e.json()}")
 
     async def on_start(self, device):
-        log_info(f"[ START ] -> Reader: {device}")
+        logging.info(f"[ START ] -> Reader: {device}")
         await self.clear_tags(device)
         await self.on_inventory_events(device, True)
 
     async def on_stop(self, device):
-        log_info(f"[ STOP ] -> Reader: {device}")
+        logging.info(f"[ STOP ] -> Reader: {device}")
         await self.on_inventory_events(device, False)
         # await self.save_tags(device)

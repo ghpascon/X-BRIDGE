@@ -3,7 +3,7 @@ from datetime import datetime
 
 from ...db.database import database_engine
 from ...models.rfid import DbTag
-from ..logger import log_error, log_info
+import logging
 from .actions import RFIDAction
 from .on_event import OnEvent
 
@@ -19,7 +19,7 @@ class RFID(OnEvent, RFIDAction):
             self.tags = {}
             return
         self.tags = {k: v for k, v in self.tags.items() if v.get("device") != device}
-        log_info(f"[ CLEAR ] -> Reader: {device}")
+        logging.info(f"[ CLEAR ] -> Reader: {device}")
 
     async def save_tags(self, device):
         try:
@@ -44,10 +44,10 @@ class RFID(OnEvent, RFIDAction):
                     db.add(current_tag)
 
                 await db.commit()
-                log_info(f"[ SAVE TAGS ] -> {device}")
+                logging.info(f"[ SAVE TAGS ] -> {device}")
 
         except Exception as e:
-            log_error(f"Erro ao salvar tags: {e}")
+            logging.error(f"Erro ao salvar tags: {e}")
 
 
 rfid = RFID()
