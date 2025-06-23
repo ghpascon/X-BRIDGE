@@ -8,7 +8,7 @@ import logging
 from app.db.database import database_engine
 
 from datetime import datetime
-from app.models.rfid import DbInventory, DbTag
+from app.models.rfid import DbEvent, DbTag
 
 
 class RFIDAction:
@@ -63,31 +63,35 @@ class RFIDAction:
 
     async def post_tag(self, tag, endpoint):
         try:
-            payload = {"event_type": "tag", "event_data": tag}
+            payload = {
+                "event_type": "tag",
+                "event_data": {"device": tag.get("device"), "data": tag},
+            }            
             async with aiohttp.ClientSession() as session:
                 async with session.post(endpoint, json=payload) as response:
                     pass
         except Exception as e:
             logging.info(f"Erro ao enviar tag: {e}")
 
-    ### INVENTORY
-    async def on_inventory_events(self, device, event):
+    ### EVENTS
+    async def on_events(self, device, event_type, event_data):
         # DATABASE EVENT
-        asyncio.create_task(self.inventory_db(device, event))
+        asyncio.create_task(self.event_db(device, event_type, event_data))
 
         # POST EVENT
         http_post = self.actions.get("HTTP_POST")
         if http_post:
-            asyncio.create_task(self.post_inventory(device, event, http_post))
+            asyncio.create_task(self.post_event(device, event_type, event_data, http_post))
 
-    async def inventory_db(self, device, event):
+    async def event_db(self, device, event_type, event_data):
         try:
             time = datetime.now()
             async with database_engine.get_db() as db:
-                current_event = DbInventory(
+                current_event = DbEvent(
                     datetime=time,
                     device=device,
-                    state=event,
+                    event_type=event_type,
+                    event_data=str(event_data)
                 )
 
                 db.add(current_event)
@@ -96,11 +100,11 @@ class RFIDAction:
         except Exception as e:
             logging.error(f"Erro ao salvar evento: {e}")
 
-    async def post_inventory(self, device, event, endpoint):
+    async def post_event(self, device, event_type, event_data, endpoint):
         try:
             payload = {
-                "event_type": "inventory",
-                "event_data": {"device": device, "state": event},
+                "event_type": event_type,
+                "event_data": {"device": device, "data": event_data},
             }
             async with aiohttp.ClientSession() as session:
                 async with session.post(endpoint, json=payload) as response:

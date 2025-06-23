@@ -5,7 +5,6 @@ from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 from contextlib import asynccontextmanager
 from .session import Base
-from app.models.rfid import DbTag
 from datetime import datetime, timedelta, timezone
 from sqlalchemy import delete
 from app import models  # Garante que os modelos estejam importados

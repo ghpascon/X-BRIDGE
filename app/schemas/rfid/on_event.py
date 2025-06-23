@@ -38,9 +38,9 @@ class OnEvent:
     async def on_start(self, device):
         logging.info(f"[ START ] -> Reader: {device}")
         await self.clear_tags(device)
-        await self.on_inventory_events(device, True)
+        await self.on_events(device, "inventory", True)
 
     async def on_stop(self, device):
         logging.info(f"[ STOP ] -> Reader: {device}")
-        await self.on_inventory_events(device, False)
+        await self.on_events(device, "inventory", False)
         # await self.save_tags(device)

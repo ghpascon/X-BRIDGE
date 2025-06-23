@@ -15,10 +15,11 @@ class DbTag(Base):
     rssi = Column(Integer)
 
 
-class DbInventory(Base):
-    __tablename__ = "inventory"
+class DbEvent(Base):
+    __tablename__ = "events"
 
     id = Column(Integer, primary_key=True, index=True)
     datetime = Column(DateTime)
     device = Column(String(50))
-    state = Column(Boolean)
+    event_type = Column(String(50))
+    event_data = Column(String(200))
