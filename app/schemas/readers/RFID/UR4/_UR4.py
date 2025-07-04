@@ -1,7 +1,7 @@
 import asyncio
 import logging
 
-from ...rfid import rfid
+from ....rfid import rfid
 from .helpers import ReaderHelpers
 from .on_event import OnEvent
 from .setup_reader import SetupReader
@@ -10,6 +10,8 @@ from .write_commands import WriteCommands
 
 class UR4(ReaderHelpers, OnEvent, SetupReader, WriteCommands):
     def __init__(self, config, name):
+        self.is_rfid_reader = True
+        
         self.config = config
         self.device_name = name
 
@@ -107,7 +109,8 @@ class UR4(ReaderHelpers, OnEvent, SetupReader, WriteCommands):
         self.is_reading = False
         await rfid.on_stop(self.device_name)
 
-    async def set_gpo(self, state=False):
+    async def set_gpo(self, gpo_data:dict):
+        state = gpo_data.get('state', True)
         await self.send_data(
             [
                 0xA5,

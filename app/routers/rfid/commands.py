@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import JSONResponse, RedirectResponse
 
 from app.core.path import get_prefix_from_path
-from app.schemas.api.device import device_responses, validate_device
+from app.schemas.api.device import validate_device
 from app.schemas.devices import devices
 
 router = APIRouter(
@@ -52,34 +52,41 @@ async def clear_tags(device: str):
     await devices.clear_tags(device)
     return {"msg": f"{device} clear tags"}
 
+@router.post("/set_gpo/{device}/{gpo_pin}/{state}/{control}/{time}")
+async def set_gpo(device: str, gpo_pin: int, state: bool, control: str, time: int = 1000):
+    try:
+        # 1. Validação do dispositivo
+        try:
+            status, msg = validate_device(device=device, need_connected=False)
+            if not status:
+                raise HTTPException(status_code=422, detail=msg)
+        except Exception as e:
+            raise HTTPException(status_code=400, detail=f"{str(e)}")
 
-# @router.get("/set_gpo")
-# async def set_gpo(request: Request):
-#     state = request.query_params.get("state")
+        # 2. Monta os dados e executa o comando
+        try:
+            gpo_data = {
+                "gpo_pin": gpo_pin,
+                "state": state,
+                "control": control,
+                "time": time
+            }
 
-#     await reader.set_gpo(state=="true")
+            result = await devices.set_gpo(device, gpo_data)
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"{str(e)}")
 
-#     return {"message": "GPO command received", "state": state}
+        # 3. Resposta final
+        if result:
+            print(f"SET_GPO -> {device} - {state}")
+            return {"msg": f"GPO {device}, {state}"}
+        else:
+            print(f"{device} não possui GPO configurado")
+            return JSONResponse(status_code=404, content={"msg": f"Dispositivo {device} não possui GPO"})
 
-# @router.post("/write_epc")
-# async def write_epc(
-#     target_identifier: str = Form(...),
-#     target_value: Optional[str] = Form(None),
-#     new_epc: str = Form(...),
-#     password: str = Form(...)
-# ):
-#     if target_identifier == "None":
-#         target_value = None
+    except HTTPException as http_err:
+        raise http_err
 
-#     alerts = await reader.write_epc(
-#         {
-#             "target_identifier": target_identifier,
-#             "target_value": target_value,
-#             "new_epc": new_epc,
-#             "password": password,
-#         }
-#     )
-#     print(alerts)
-#     if alerts:
-#         return RedirectResponse(f"/?msg={alerts[0]} &classe=alert-danger", 303)
-#     return RedirectResponse("/", 303)
+    except Exception as e:
+        return JSONResponse(status_code=500, content={"msg": f"Erro interno inesperado: {str(e)}"})
+

@@ -2,31 +2,49 @@
   <!-- DEVICE -->
   <h1>{{ device }}</h1>
 
+  {% if is_rfid_reader(device) %}
   <!-- BUTTONS -->
- <div style="padding: 0%" class="d-flex">
-  <button
-    onclick="fetch('{{ url_for('start_inventory', device=device) }}', { method: 'POST' })"
-    class="btn btn-success"
-  >
-    Start
-  </button>
+  <div style="padding: 0%" class="d-flex">
+    <button
+      onclick="fetch('{{ url_for('start_inventory', device=device) }}', { method: 'POST' })"
+      class="btn btn-success"
+    >
+      Start
+    </button>
 
-  <button
-    onclick="fetch('{{ url_for('stop_inventory', device=device) }}', { method: 'POST' })"
-    class="btn btn-danger"
-    style="margin-left: 15px"
-  >
-    Stop
-  </button>
+    <button
+      onclick="fetch('{{ url_for('stop_inventory', device=device) }}', { method: 'POST' })"
+      class="btn btn-danger"
+      style="margin-left: 15px"
+    >
+      Stop
+    </button>
 
-  <button
-    onclick="fetch('{{ url_for('clear_tags', device=device) }}', { method: 'POST' })"
-    class="btn btn-warning"
-    style="margin-left: 15px"
-  >
-    Clear 
-  </button>
-</div>
+    <button
+      onclick="fetch('{{ url_for('clear_tags', device=device) }}', { method: 'POST' })"
+      class="btn btn-warning"
+      style="margin-left: 15px"
+    >
+      Clear
+    </button>
+
+    <!-- GPO -->
+    <button
+      onclick="fetch('{{ url_for('set_gpo', device=device, gpo_pin=1, state='true', control='static', time=1000) }}', { method: 'POST' })"
+      class="btn btn-success"
+      style="margin-left: 15px"
+    >
+      GPO TRUE
+    </button>
+    <button
+      onclick="fetch('{{ url_for('set_gpo', device=device, gpo_pin=1, state='false', control='static', time=1000) }}', { method: 'POST' })"
+      class="btn btn-danger"
+      style="margin-left: 15px"
+    >
+      GPO FALSE
+    </button>
+  </div>
+  {% endif %}
 
   <!-- STATE -->
   <div
@@ -39,20 +57,18 @@
 <script>
   async function updateReadingState_{{ device|replace(' ', '_') }}() {
     try {
-      const response = await fetch("{{ url_for('get_reader_state') }}?device={{ device }}");
+      const response = await fetch("{{ url_for('get_reader_state', device=device) }}");
       if (!response.ok) {
-        throw new Error("Erro na resposta da requisição");
+        throw new Error("Request failed");
       }
       const data = await response.json();
       document.getElementById("state_label_{{ device|replace(' ', '_') }}").innerText = data.state;
     } catch (error) {
-      console.error("Erro ao buscar estado do leitor:", error);
+      console.error("Error fetching reader state:", error);
     }
   }
 
-  // Executa a atualização a cada 500ms
+  // Update every 500ms
   setInterval(updateReadingState_{{ device|replace(' ', '_') }}, 500);
-
-  // Atualiza imediatamente ao carregar
   updateReadingState_{{ device|replace(' ', '_') }}();
 </script>

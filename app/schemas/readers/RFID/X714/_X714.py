@@ -12,6 +12,8 @@ from .rfid import RfidCommands
 
 class X714(asyncio.Protocol, OnReceive, RfidCommands):
     def __init__(self, config, name):
+        self.is_rfid_reader = True
+        
         self.config = config
         self.port = self.config.get("CONNECTION")
         self.baudrate = self.config.get("BAUDRATE")

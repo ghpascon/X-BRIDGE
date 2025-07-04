@@ -7,33 +7,34 @@ import sys
 from app.core.path import get_path
 
 
-async def create_tasks(modulo_dir):
-    package_path = os.path.abspath(get_path(modulo_dir))
+async def create_tasks(module_dir):
+    package_path = os.path.abspath(get_path(module_dir))
     sys.path.insert(
         0, os.path.dirname(package_path)
-    )  # garante que o Python ache o pacote
+    )  # Ensure Python can locate the package
     package_name = os.path.basename(package_path)
 
     tasks = []
 
-    for arquivo in os.listdir(modulo_dir):
-        full_path = os.path.join(modulo_dir, arquivo)
+    for file in os.listdir(module_dir):
+        full_path = os.path.join(module_dir, file)
 
-        if arquivo == "__pycache__":
+        if file == "__pycache__":
             continue
 
-        if os.path.isdir(full_path) and not arquivo.startswith("."):
-            # Recurse and add tasks from subdirectories
+        if os.path.isdir(full_path) and not file.startswith("."):
+            # Recursively add tasks from subdirectories
             sub_tasks = await create_tasks(full_path)
             tasks.extend(sub_tasks)
 
-        elif arquivo.endswith(".py") and arquivo != "__init__.py":
-            nome_modulo = f"{package_name}.{arquivo[:-3]}"  # nome em notação de ponto
-            modulo = importlib.import_module(nome_modulo)
+        elif file.endswith(".py") and file != "__init__.py":
+            module_name = f"{package_name}.{file[:-3]}"  # Convert to dot notation
+            module = importlib.import_module(module_name)
 
-            for nome, func in inspect.getmembers(modulo, inspect.iscoroutinefunction):
-                if func.__module__ == modulo.__name__:
+            # Add all coroutine functions defined in the module
+            for name, func in inspect.getmembers(module, inspect.iscoroutinefunction):
+                if func.__module__ == module.__name__:
                     tasks.append(asyncio.create_task(func()))
-                    print(f"✅ Adicionado {arquivo} - {nome}() -> tasks")
+                    print(f"✅ Added {file} - {name}() -> tasks")
 
     return tasks

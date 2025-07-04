@@ -10,6 +10,8 @@ from .write_commands import WriteCommands
 
 class R700_IOT(OnEvent, ReaderHelpers, WriteCommands):
     def __init__(self, config, name):
+        self.is_rfid_reader = True
+
         self.config = config
         self.name = name
         self.urlBase = f'https://{self.config.get("CONNECTION")}/api/v1'
@@ -57,7 +59,7 @@ class R700_IOT(OnEvent, ReaderHelpers, WriteCommands):
                         continue
 
                 for i in range(1, 4):
-                    await self.set_gpo(i, "high")
+                    await self.set_gpo({"gpo_pin":i, "state":True})
 
                 self.is_connected = True
                 await self.get_tag_list(session)
@@ -65,9 +67,8 @@ class R700_IOT(OnEvent, ReaderHelpers, WriteCommands):
     async def clear_tags(self):
         self.tags = {}
 
-    async def set_gpo(self, i, state="low", control="static", time=1000):
-        print(f"Set GPO {i}, {state}, {control}")
-        gpo_command = await self.get_gpo_command(i, state, control, time)
+    async def set_gpo(self, gpo_data: dict):
+        gpo_command = await self.get_gpo_command(gpo_data)
         try:
             async with aiohttp.ClientSession(
                 auth=self.auth, connector=aiohttp.TCPConnector(ssl=False)

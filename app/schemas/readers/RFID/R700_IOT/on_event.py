@@ -1,7 +1,7 @@
 import asyncio
 
-from ....core.config import settings
-from ...rfid import rfid
+from .....core.config import settings
+from ....rfid import rfid
 
 
 class OnEvent:

@@ -1,5 +1,5 @@
 {
-    "HTTP_POST": "http://localhost:5001",
+    "HTTP_POST": null,
     "DATABASE_URL": "mysql+aiomysql://root:admin@localhost:3306/middleware_smartx",
     "STORAGE_DAYS": 7,
     "LOG_PATH": "Logs"

@@ -44,3 +44,8 @@ class OnEvent:
         logging.info(f"[ STOP ] -> Reader: {device}")
         await self.on_events(device, "inventory", False)
         # await self.save_tags(device)
+
+    async def on_event(self, device, event_type, event_data):
+        logging.info(f"[ EVENT ] {device} - {event_type} - {event_data}")
+        await self.on_events(device, event_type, event_data)
+        # await self.save_tags(device)

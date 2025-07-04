@@ -96,7 +96,7 @@ class SetupReader:
             # SET GPO
             elif self.setup_step == 13 and not self.wait_answer:
                 print(f"[SETUP] Step -> {self.setup_step}")
-                await self.set_gpo(False)
+                await self.set_gpo({"state":False})
                 self.wait_answer = True
 
             # POWER 1

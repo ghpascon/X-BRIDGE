@@ -40,21 +40,18 @@ async def get_tags():
     return tags_info
 
 
-@router.get("/reader_state")
-async def get_reader_state(request: Request):
-    device = request.query_params.get("device")
-
+@router.get("/reader_state/{device}")
+async def get_reader_state(request: Request, device: str):
     if device not in devices.devices:
-        return {"state": f"❌ Dispositivo {device} não encontrado"}
+        return {"state": f"❌ Device '{device}' not found"}
 
     if not devices.devices[device].is_connected:
-        state = "❌ Leitor desconectado"
+        state = "❌ Reader disconnected"
     elif devices.devices[device].is_reading:
-        state = "🔍 Realizando leitura das Tags"
+        state = "🔍 Reading tags"
     else:
-        state = "🛑 Aguardando leitura..."
+        state = "🛑 Waiting for reading..."
     return {"state": state}
-
 
 @router.get("/get_report")
 async def get_report(request: Request):

@@ -5,30 +5,54 @@ class AddDevice:
     def add_device(self, data, name="default"):
         reader = data.get("READER")
 
-        # Garante nome único
+        # Ensure unique device name
         unique_name = self._generate_unique_name(name)
 
-        print(f"🔍 Adicionando dispositivo: {unique_name}")
-        print(f"📡 Tipo de leitor: {reader}")
+        print(f"🔍 Adding device: {unique_name}")
+        print(f"📡 Reader type: {reader}")
 
+        ### R700
         if reader == "R700_IOT":
-            from ..readers.R700_IOT import R700_IOT
-
+            from ..readers.RFID.R700_IOT import R700_IOT
             self.devices[unique_name] = R700_IOT(data, name)
+
+        ### UR4
         elif reader == "UR4":
-            from ..readers.UR4 import UR4
-
+            from ..readers.RFID.UR4 import UR4
             self.devices[unique_name] = UR4(data, name)
-        elif reader == "X714":
-            from ..readers.X714 import X714
 
+        ### X714
+        elif reader == "X714":
+            from ..readers.RFID.X714 import X714
             self.devices[unique_name] = X714(data, name)
+
+        ### TCP 
+        elif reader == "TCP":
+            from ..readers.OTHERS.TCP import TCP
+            self.devices[unique_name] = TCP(data, name)
+
+        ### 
         else:
             print(
-                f"⚠️ Leitor '{reader}' não reconhecido. Dispositivo '{unique_name}' não adicionado."
+                f"⚠️ Unknown reader type '{reader}'. Device '{unique_name}' was not added."
             )
+            return  # Exit early if device is invalid
 
-        print(f"✅ Dispositivo '{unique_name}' adicionado com sucesso.")
+        print(f"✅ Device '{unique_name}' added successfully.")
 
     def get_device_list(self):
-        return [device for device in self.devices]
+        return list(self.devices.keys())
+
+    def is_rfid_reader(self, device):
+        try:
+            return self.devices.get(device).is_rfid_reader
+        except:
+            return False
+
+    def _generate_unique_name(self, base_name):
+        name = base_name
+        count = 1
+        while name in self.devices:
+            name = f"{base_name}_{count}"
+            count += 1
+        return name

@@ -96,17 +96,22 @@ class ReaderHelpers:
                 return self.tags.get(tag).get("tid")
         return None
 
-    async def get_gpo_command(self, i=1, state="low", control="static", time=1000):
+    async def get_gpo_command(self, gpo_data: dict):
+        gpo_pin = gpo_data.get('gpo_pin',1)
+        state = 'high' if gpo_data.get('state',True) else 'low'
+        control = gpo_data.get('control','static')
+        time = gpo_data.get('time',1000)
+
         if control == "static":
             gpo_command = {
-                "gpoConfigurations": [{"gpo": i, "state": state, "control": control}]
+                "gpoConfigurations": [{"gpo": gpo_pin, "state": state, "control": control}]
             }
 
         elif control == "pulsed":
             gpo_command = {
                 "gpoConfigurations": [
                     {
-                        "gpo": i,
+                        "gpo": gpo_pin,
                         "state": state,
                         "pulseDurationMilliseconds": time,
                         "control": control,

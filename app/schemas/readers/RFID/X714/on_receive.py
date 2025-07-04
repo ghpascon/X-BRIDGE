@@ -2,7 +2,7 @@ import asyncio
 
 import logging
 
-from ...rfid import rfid
+from ....rfid import rfid
 
 
 class OnReceive:

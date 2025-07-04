@@ -1,19 +1,19 @@
 import asyncio
 import importlib
 import os
+import logging
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.sessions import SessionMiddleware
 
 from app.async_func import create_tasks
 from app.core.config import settings
 from app.core.path import get_path
-import logging
 
-
-# Include All Routers
+# Include all routers dynamically
 def include_all_routers(current_path):
     routes_path = os.path.join(os.path.dirname(__file__), get_path(current_path))
 
@@ -35,21 +35,20 @@ def include_all_routers(current_path):
                     app.include_router(
                         module.router, include_in_schema=prefix.startswith("/api")
                     )
-                    print(f"✅ Rota incluída: {module_name}")
+                    logging.info(f"✅ Route loaded: {module_name}")
                 else:
-                    logging.warning(f"⚠️  Arquivo {filename} não contém um 'router'")
+                    logging.warning(f"⚠️  File {filename} does not contain a 'router'")
             except Exception as e:
-                logging.error(f"❌ Erro ao importar {filename}: {e}")
+                logging.error(f"❌ Error loading {filename}: {e}")
 
-
-# Async Handler
+# Async lifespan handler
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     tasks = await create_tasks(get_path("app/async_func"))
     try:
         yield
     except Exception as e:
-        logging.error(f"Erro durante o lifespan: {e}")
+        logging.error(f"Error during lifespan: {e}")
     finally:
         for t in tasks:
             t.cancel()
@@ -57,36 +56,48 @@ async def lifespan(app: FastAPI):
             try:
                 await t
             except asyncio.CancelledError:
-                print(f"Tarefa {i} finalizada com sucesso.")
+                print(f"Task {i} successfully cancelled.")
             except Exception as e:
-                print(f"Erro ao cancelar a tarefa {i}: {e}")
+                print(f"Error while cancelling task {i}: {e}")
 
-
-# APP
+# Load Swagger markdown description
 with open("SWAGGER.md", "r", encoding="utf-8") as f:
     markdown_description = f.read()
 
+# FastAPI app instance
 app = FastAPI(
-    lifespan=lifespan, title="RFID Middleware", description=markdown_description
+    lifespan=lifespan,
+    title="RFID Middleware",
+    description=markdown_description
 )
 
+# Session middleware
 app.add_middleware(
     SessionMiddleware,
     secret_key=settings.data.get("SECRET_KEY"),
-    session_cookie="session",  # Nome do cookie
-    https_only=True,  # Garante HTTPS (ideal em produção)
-    same_site="lax",  # Proteção contra CSRF básica
-    max_age=3600,  # Tempo de vida da sessão em segundos
+    session_cookie="session",
+    https_only=True,        # Recommended for production
+    same_site="lax",        # Basic CSRF protection
+    max_age=3600            # Session lifetime (seconds)
 )
 
+# Global 404 handler
+@app.exception_handler(404)
+async def not_found_handler(request: Request, exc):
+    return RedirectResponse(url=request.app.url_path_for("root"))
+
+# Static files
 app.mount("/static", StaticFiles(directory=get_path("app/static")), name="static")
 
+# Include routers
 include_all_routers("app/routers")
-logging.info("Aplicação iniciada")
+logging.info("✅ Application started successfully.")
 
+# Uvicorn startup
 if __name__ == "__main__":
     import uvicorn
 
+    # Optional: Open browser automatically
     # import webbrowser
     # import threading
     # def open_browser():
@@ -94,7 +105,3 @@ if __name__ == "__main__":
     # threading.Timer(1.0, open_browser).start()
 
     uvicorn.run(app, host="0.0.0.0", port=5000)
-
-# python -m app.db.database
-# python -m uvicorn main:app --reload
-# python -m uvicorn main:app --host 0.0.0.0 --port $PORT
