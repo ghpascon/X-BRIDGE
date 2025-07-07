@@ -78,7 +78,7 @@ async def api_set_gpo(device: str, data: SetGpoRequest):
     "/get_device_state/{device}",
     responses=state_responses,
     summary="Get device state",
-    description="Returns the current reading state (`idle` or `running`) of the specified device."
+    description="Returns the current reading state (`connected` or `running`) of the specified device."
 )
 async def get_device_state(device: str):
     try:
@@ -86,10 +86,10 @@ async def get_device_state(device: str):
         if not status:
             raise HTTPException(status_code=422, detail=msg)
 
-        if not devices.devices.get(device).is_reading:
-            return {"state": "idle"}
-        else:
+        if hasattr(devices.devices.get(device), "is_reading") and devices.devices.get(device).is_reading:
             return {"state": "running"}
+        else:
+            return {"state": "connected"}
 
     except HTTPException:
         raise

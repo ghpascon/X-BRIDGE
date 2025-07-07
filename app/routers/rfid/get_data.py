@@ -16,7 +16,8 @@ async def get_tags():
     current_tags = dict(rfid.tags)  # Cópia do dicionário atual
 
     total = {
-        "device": "Total",
+        "timestamp": "Total",
+        "device": "",
         "epc": "",
         "tid": "",
         "ant": "",
@@ -29,6 +30,7 @@ async def get_tags():
         if tag_data is None:
             continue
         current_tag = {
+            "timestamp": tag_data.get("timestamp"),
             "device": tag_data.get("device"),
             "epc": tag_data.get("epc"),
             "tid": tag_data.get("tid"),
@@ -40,18 +42,27 @@ async def get_tags():
     return tags_info
 
 
+@router.get("/get_events")
+async def get_events():
+    return list(rfid.events)
+
+
 @router.get("/reader_state/{device}")
 async def get_reader_state(request: Request, device: str):
     if device not in devices.devices:
-        return {"state": f"❌ Device '{device}' not found"}
+        return -1
 
-    if not devices.devices[device].is_connected:
-        state = "❌ Reader disconnected"
-    elif devices.devices[device].is_reading:
-        state = "🔍 Reading tags"
+    reader = devices.devices[device]
+
+    if not reader.is_connected:
+        state = 0
+    elif hasattr(reader, "is_reading") and reader.is_reading:
+        state = 2
     else:
-        state = "🛑 Waiting for reading..."
+        state = 1
+
     return {"state": state}
+
 
 @router.get("/get_report")
 async def get_report(request: Request):

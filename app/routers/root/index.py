@@ -7,7 +7,7 @@ router = APIRouter(prefix="", tags=["Root"])
 
 
 @router.get("/", response_class=HTMLResponse)
-async def root(request: Request, msg: str = None, classe: str = "alert-primary"):
+async def index(request: Request, msg: str = None, classe: str = "alert-primary"):
     alerts = []
 
     if msg is not None and not len(msg) == 0:

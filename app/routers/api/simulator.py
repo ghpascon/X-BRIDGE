@@ -51,7 +51,9 @@ async def simulator_inventory(inventory: InventoryRequest):
 )
 async def simulator_event(event: EventRequest):
     try:
-        await rfid.on_event(**event.model_dump())
+        event_json = event.model_dump()
+        await rfid.on_event(**event_json)
+        return {"msg": f"Received event: {event_json}"}
     except Exception as e:
         logging.error(f"Error while processing event simulation: {e}")
         raise HTTPException(status_code=500, detail=str(e))

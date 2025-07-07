@@ -1,0 +1,137 @@
+{# TAGS #}
+<div
+  class="table-wrapper"
+  style="
+    margin-top: 10px;
+    max-height: 30vh;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+  "
+>
+  <table class="table table-striped mb-0">
+    <thead class="table-dark" style="position: sticky; top: 0; z-index: 1">
+      <tr id="tags-header">
+        <!-- Cabeçalho dinâmico -->
+      </tr>
+    </thead>
+    <tbody id="tags-body">
+      <!-- Corpo dinâmico -->
+    </tbody>
+  </table>
+</div>
+
+{# EVENTS #}
+<div
+  class="table-wrapper"
+  style="
+    margin-top: 10px;
+    max-height: 30vh;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+  "
+>
+  <table class="table table-striped mb-0">
+    <thead class="table-dark" style="position: sticky; top: 0; z-index: 1">
+      <tr id="events-header">
+        <!-- Cabeçalho dinâmico -->
+      </tr>
+    </thead>
+    <tbody id="events-body">
+      <!-- Corpo dinâmico -->
+    </tbody>
+  </table>
+</div>
+
+<script>
+  // Função que atualiza ambos a cada 500ms
+  function att_table() {
+    fetchTags();
+    fetchEvents();
+  }
+
+  // Executa imediatamente e repete a cada 500ms
+  att_table();
+  setInterval(att_table, 500);
+
+  async function fetchTags() {
+    try {
+      const response = await fetch("{{ url_for('get_tags') }}");
+      const data = await response.json();
+
+      const header = document.getElementById("tags-header");
+      const tbody = document.getElementById("tags-body");
+
+      // Só cria o header se ainda estiver vazio
+      if (header.children.length === 0 && data.length > 0) {
+        const keys = Object.keys(data[0]);
+        keys.forEach((key) => {
+          const th = document.createElement("th");
+          th.textContent = key.charAt(0).toUpperCase() + key.slice(1);
+          header.appendChild(th);
+        });
+      }
+
+      // Limpa o corpo da tabela
+      tbody.innerHTML = "";
+
+      // Preenche o corpo com os dados
+      data.forEach((item) => {
+        const row = document.createElement("tr");
+
+        if (
+          Object.values(item).some((val) =>
+            String(val).toLowerCase().includes("total")
+          )
+        ) {
+          row.classList.add("table-dark");
+        }
+
+        row.innerHTML = Object.values(item)
+          .map((value) => `<td>${value}</td>`)
+          .join("");
+
+        tbody.appendChild(row);
+      });
+    } catch (error) {
+      console.error("Erro ao buscar tags:", error);
+    }
+  }
+
+  async function fetchEvents() {
+    try {
+      const response = await fetch("{{ url_for('get_events') }}");
+      const data = await response.json();
+
+      const header = document.getElementById("events-header");
+      const tbody = document.getElementById("events-body");
+
+      // Só cria o header se ainda estiver vazio
+      if (header.children.length === 0 && data.length > 0) {
+        const keys = Object.keys(data[0]);
+        keys.forEach((key) => {
+          const th = document.createElement("th");
+          th.textContent = key.charAt(0).toUpperCase() + key.slice(1);
+          header.appendChild(th);
+        });
+      }
+
+      // Limpa o corpo da tabela
+      tbody.innerHTML = "";
+
+      // Preenche o corpo com os dados
+      data.forEach((item) => {
+        const row = document.createElement("tr");
+
+        row.innerHTML = Object.values(item)
+          .map((value) => `<td>${value}</td>`)
+          .join("");
+
+        tbody.appendChild(row);
+      });
+    } catch (error) {
+      console.error("Erro ao buscar tags:", error);
+    }
+  }
+</script>

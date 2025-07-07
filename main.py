@@ -1,6 +1,4 @@
 import asyncio
-import importlib
-import os
 import logging
 from contextlib import asynccontextmanager
 
@@ -11,35 +9,8 @@ from starlette.middleware.sessions import SessionMiddleware
 
 from app.async_func import create_tasks
 from app.core.config import settings
-from app.core.path import get_path
+from app.core.path import get_path, include_all_routers
 
-# Include all routers dynamically
-def include_all_routers(current_path):
-    routes_path = os.path.join(os.path.dirname(__file__), get_path(current_path))
-
-    for filename in os.listdir(routes_path):
-        if not filename == "__pycache__" and not "." in filename:
-            include_all_routers(current_path + "/" + filename)
-        if filename.endswith(".py") and filename != "__init__.py":
-            module_name = filename[:-3]
-            file_path = os.path.join(routes_path, filename)
-
-            spec = importlib.util.spec_from_file_location(
-                f"app.routes.{module_name}", file_path
-            )
-            module = importlib.util.module_from_spec(spec)
-            try:
-                spec.loader.exec_module(module)
-                if hasattr(module, "router"):
-                    prefix = getattr(module.router, "prefix", "") or ""
-                    app.include_router(
-                        module.router, include_in_schema=prefix.startswith("/api")
-                    )
-                    logging.info(f"✅ Route loaded: {module_name}")
-                else:
-                    logging.warning(f"⚠️  File {filename} does not contain a 'router'")
-            except Exception as e:
-                logging.error(f"❌ Error loading {filename}: {e}")
 
 # Async lifespan handler
 @asynccontextmanager
@@ -84,13 +55,13 @@ app.add_middleware(
 # Global 404 handler
 @app.exception_handler(404)
 async def not_found_handler(request: Request, exc):
-    return RedirectResponse(url=request.app.url_path_for("root"))
+    return RedirectResponse(url=request.app.url_path_for("index"))
 
 # Static files
 app.mount("/static", StaticFiles(directory=get_path("app/static")), name="static")
 
 # Include routers
-include_all_routers("app/routers")
+include_all_routers("app/routers", app)
 logging.info("✅ Application started successfully.")
 
 # Uvicorn startup

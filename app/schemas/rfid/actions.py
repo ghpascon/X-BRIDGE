@@ -7,9 +7,8 @@ import aiohttp
 import logging
 from app.db.database import database_engine
 
-from datetime import datetime
 from app.models.rfid import DbEvent, DbTag
-
+from datetime import datetime
 
 class RFIDAction:
     async def set_actions(self, data=None, action_path="config/actions.json"):
@@ -42,10 +41,9 @@ class RFIDAction:
 
     async def tag_db(self, tag):
         try:
-            time = datetime.now()
             async with database_engine.get_db() as db:
                 current_tag = DbTag(
-                    datetime=time,
+                    timestamp=tag.get("timestamp"),
                     device=tag.get("device"),
                     epc=tag.get("epc"),
                     tid=tag.get("tid"),
@@ -64,8 +62,10 @@ class RFIDAction:
     async def post_tag(self, tag, endpoint):
         try:
             payload = {
+                "device": tag.get("device"),
                 "event_type": "tag",
-                "event_data": {"device": tag.get("device"), "data": tag},
+                "event_data": tag,
+                "timestamp":tag.get("timestamp"),
             }            
             async with aiohttp.ClientSession() as session:
                 async with session.post(endpoint, json=payload) as response:
@@ -74,21 +74,28 @@ class RFIDAction:
             logging.info(f"Erro ao enviar tag: {e}")
 
     ### EVENTS
-    async def on_events(self, device, event_type, event_data):
+    async def on_events(self, device, event_type, event_data, timestamp):
+        # SAVE IN MEMORY
+        self.events.appendleft({
+            "timestamp":timestamp,
+            "device": device,
+            "event_type": event_type,
+            "event_data": event_data,
+        })
+
         # DATABASE EVENT
-        asyncio.create_task(self.event_db(device, event_type, event_data))
+        asyncio.create_task(self.event_db(device, event_type, event_data, timestamp))
 
         # POST EVENT
         http_post = self.actions.get("HTTP_POST")
         if http_post:
-            asyncio.create_task(self.post_event(device, event_type, event_data, http_post))
+            asyncio.create_task(self.post_event(device, event_type, event_data, timestamp, http_post))
 
-    async def event_db(self, device, event_type, event_data):
+    async def event_db(self, device, event_type, event_data, timestamp):
         try:
-            time = datetime.now()
             async with database_engine.get_db() as db:
                 current_event = DbEvent(
-                    datetime=time,
+                    timestamp=timestamp,
                     device=device,
                     event_type=event_type,
                     event_data=str(event_data)
@@ -100,11 +107,13 @@ class RFIDAction:
         except Exception as e:
             logging.error(f"Erro ao salvar evento: {e}")
 
-    async def post_event(self, device, event_type, event_data, endpoint):
+    async def post_event(self, device, event_type, event_data, timestamp, endpoint):
         try:
             payload = {
+                "timestamp":timestamp,
+                "device": device,
                 "event_type": event_type,
-                "event_data": {"device": device, "data": event_data},
+                "event_data": event_data,
             }
             async with aiohttp.ClientSession() as session:
                 async with session.post(endpoint, json=payload) as response:

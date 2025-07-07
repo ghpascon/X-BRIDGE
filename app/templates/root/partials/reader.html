@@ -58,17 +58,58 @@
   async function updateReadingState_{{ device|replace(' ', '_') }}() {
     try {
       const response = await fetch("{{ url_for('get_reader_state', device=device) }}");
-      if (!response.ok) {
-        throw new Error("Request failed");
-      }
+      if (!response.ok) throw new Error("Request failed");
+
       const data = await response.json();
-      document.getElementById("state_label_{{ device|replace(' ', '_') }}").innerText = data.state;
+
+      let labelText = "";
+      let btnClass = "btn-secondary"; // padrão
+
+      switch (data.state) {
+        case -1:
+          labelText = "❌ Device not found";
+          btnClass = "btn-danger";
+          break;
+        case 0:
+          labelText = "❌ Disconnected";
+          btnClass = "btn-danger";
+          break;
+        case 1:
+          labelText = "✅ Connected";
+          btnClass = "btn-success";
+          break;
+        case 2:
+          labelText = "🔍 Reading tags";
+          btnClass = "btn-warning";
+          break;
+        default:
+          labelText = "⚠️ Unknown state";
+          btnClass = "btn-secondary";
+      }
+
+      const label = document.getElementById("state_label_{{ device|replace(' ', '_') }}");
+      const button = document.getElementById("toggle-btn-{{ device|replace(' ', '_') }}");
+
+      label.innerText = labelText;
+
+      // Remove classes de cor anteriores (modifique conforme as classes que você usa)
+      button.classList.remove(
+        "btn-primary",
+        "btn-success",
+        "btn-warning",
+        "btn-danger",
+        "btn-secondary"
+      );
+      // Adiciona a classe correta
+      button.classList.add(btnClass);
+
     } catch (error) {
       console.error("Error fetching reader state:", error);
+      document.getElementById("state_label_{{ device|replace(' ', '_') }}").innerText = "⚠️ Error";
     }
   }
 
-  // Update every 500ms
-  setInterval(updateReadingState_{{ device|replace(' ', '_') }}, 500);
-  updateReadingState_{{ device|replace(' ', '_') }}();
+        // Update every 500ms
+        setInterval(updateReadingState_{{ device|replace(' ', '_') }}, 500);
+        updateReadingState_{{ device|replace(' ', '_') }}();
 </script>

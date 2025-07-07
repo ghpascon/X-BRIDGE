@@ -1,6 +1,8 @@
 import sys
 from pathlib import Path
-
+import importlib
+import os
+import logging
 
 def get_path(relative_path: str) -> Path:
     """
@@ -44,3 +46,31 @@ def get_prefix_from_path(current_file: str, base_dir: str = "routers") -> str:
     prefix_string = "/" + "/".join(prefix_parts)
     prefix_string = prefix_string.replace(".py", "")
     return prefix_string
+
+# Include all routers dynamically
+def include_all_routers(current_path, app):
+    routes_path = os.path.join(os.path.dirname(__file__), get_path(current_path))
+
+    for filename in os.listdir(routes_path):
+        if not filename == "__pycache__" and not "." in filename:
+            include_all_routers(current_path + "/" + filename, app)
+        if filename.endswith(".py") and filename != "__init__.py":
+            module_name = filename[:-3]
+            file_path = os.path.join(routes_path, filename)
+
+            spec = importlib.util.spec_from_file_location(
+                f"app.routes.{module_name}", file_path
+            )
+            module = importlib.util.module_from_spec(spec)
+            try:
+                spec.loader.exec_module(module)
+                if hasattr(module, "router"):
+                    prefix = getattr(module.router, "prefix", "") or ""
+                    app.include_router(
+                        module.router, include_in_schema=prefix.startswith("/api")
+                    )
+                    logging.info(f"✅ Route loaded: {module_name}")
+                else:
+                    logging.warning(f"⚠️  File {filename} does not contain a 'router'")
+            except Exception as e:
+                logging.error(f"❌ Error loading {filename}: {e}")
