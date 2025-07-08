@@ -1,6 +1,6 @@
 import asyncio
 import time
-
+import serial.tools.list_ports
 import serial_asyncio
 
 from app.core.config import settings
@@ -27,10 +27,13 @@ class X714(asyncio.Protocol, OnReceive, RfidCommands):
         self.is_connected = False
         self.is_reading = False
 
+        self.is_auto = (self.port == "AUTO") 
+
+
     def connection_made(self, transport):
         self.transport = transport
         self.is_connected = True
-        logging.info("✅ Conexão serial estabelecida com sucesso.")
+        logging.info("✅ Serial connection successfully established.")
         asyncio.create_task(self.config_reader())
 
     def data_received(self, data):
@@ -38,12 +41,12 @@ class X714(asyncio.Protocol, OnReceive, RfidCommands):
 
         while b"\n" in self.rx_buffer:
             idx = self.rx_buffer.index(b"\n")
-            pacote = self.rx_buffer[:idx]
+            packet = self.rx_buffer[:idx]
             self.rx_buffer = self.rx_buffer[idx + 1 :]
-            asyncio.create_task(self.on_receive(pacote))
+            asyncio.create_task(self.on_receive(packet))
 
     def connection_lost(self, exc):
-        logging.error("⚠️ Conexão serial perdida.")
+        logging.error("⚠️ Serial connection lost.")
         self.transport = None
         self.is_connected = False
 
@@ -53,31 +56,55 @@ class X714(asyncio.Protocol, OnReceive, RfidCommands):
     def write(self, to_send, verbose=True):
         if self.transport:
             if verbose:
-                logging.info(f"📤 Enviando: {to_send}")
+                logging.info(f"📤 Sending: {to_send}")
             if isinstance(to_send, str):
                 to_send += "\n"
-                to_send = to_send.encode()  # converte string para bytes
+                to_send = to_send.encode()  # convert string to bytes
             self.transport.write(to_send)
         else:
-            logging.error("❌ Tentativa de envio falhou: conexão não estabelecida.")
+            logging.error("❌ Send attempt failed: connection not established.")
 
     async def connect(self):
-        """Loop de conexão/reconexão serial"""
+        """Serial connection/reconnection loop"""
         loop = asyncio.get_running_loop()
 
         while True:
             self.on_con_lost = asyncio.Event()
 
+            # If AUTO mode, try to detect port by VID/PID
+            if self.is_auto:
+                print("🔍 Auto-detecting port by VID=0001 and PID=0001...")
+                ports = serial.tools.list_ports.comports()
+                found_port = None
+                for p in ports:
+                    # p.vid and p.pid are integers (e.g. 0x0001 == 1 decimal)
+                    if p.vid == 0x0001 and p.pid == 0x0001:
+                        found_port = p.device
+                        print(f"✅ Detected port: {found_port}")
+                        break
+
+                if found_port is None:
+                    print("⚠️ No port with VID=0001 and PID=0001 found.")
+                    print("⏳ Retrying in 3 seconds...")
+                    await asyncio.sleep(3)
+                    continue  # try to detect again in next loop
+                else:
+                    self.port = found_port
+
             try:
-                print(f"🔌 Tentando conectar em {self.port} a {self.baudrate} bps...")
+                print(f"🔌 Trying to connect to {self.port} at {self.baudrate} bps...")
                 await serial_asyncio.create_serial_connection(
                     loop, lambda: self, self.port, baudrate=self.baudrate
                 )
-                logging.info("🟢 Conectado com sucesso.")
+                logging.info("🟢 Successfully connected.")
                 await self.on_con_lost.wait()
-                print("🔄 Conexão perdida. Tentando reconectar...")
+                print("🔄 Connection lost. Attempting to reconnect...")
             except Exception as e:
-                logging.error(f"❌ Erro ao conectar: {e}")
+                logging.error(f"❌ Connection error: {e}")
 
-            print("⏳ Aguardando 3 segundos antes de tentar novamente...")
+            # If in AUTO mode, reset port to "AUTO" to force detection next loop
+            if self.is_auto:
+                self.port = "AUTO"
+
+            print("⏳ Waiting 3 seconds before retrying...")
             await asyncio.sleep(3)
