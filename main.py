@@ -3,7 +3,8 @@ import logging
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request
-from fastapi.responses import RedirectResponse
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import RedirectResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.sessions import SessionMiddleware
 
@@ -53,13 +54,29 @@ app.add_middleware(
 )
 
 
-# Global 404 handler
+# HANDLRES
 @app.exception_handler(404)
 async def not_found_handler(request: Request, exc):
     fast_alerts.add_alert(f"Invalid Route: {request.url}")
     return RedirectResponse(url=request.app.url_path_for("index"))
 
-
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    print("🚨 RequestValidationError:")
+    print("URL:", request.url)
+    print("Method:", request.method)
+    print("Headers:", dict(request.headers))
+    body = await request.body()
+    print("Raw Body:", body.decode('utf-8', errors='ignore'))
+    print("Errors:", exc.errors())
+    return JSONResponse(
+        status_code=422,
+        content={
+            "detail": exc.errors(),
+            "body": body.decode('utf-8', errors='ignore'),
+            "message": "Invalid request received"
+        }
+    )
 # Static files
 app.mount("/static", StaticFiles(directory=get_path("app/static")), name="static")
 
@@ -70,12 +87,13 @@ logging.info("✅ Application started successfully.")
 # Uvicorn startup
 if __name__ == "__main__":
     import uvicorn
+    port = 5000
 
-    # Optional: Open browser automatically
+    # # Optional: Open browser automatically
     # import webbrowser
     # import threading
     # def open_browser():
-    #     webbrowser.open_new("http://localhost:5000")
+    #     webbrowser.open_new(f"http://localhost:{port}")
     # threading.Timer(1.0, open_browser).start()
 
-    uvicorn.run(app, host="0.0.0.0", port=5000)
+    uvicorn.run(app, host="0.0.0.0", port=port)

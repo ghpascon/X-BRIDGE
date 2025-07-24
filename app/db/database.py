@@ -204,9 +204,9 @@ class DatabaseEngine:
                 deleted_tables = []
 
                 for cls in Base.__subclasses__():
-                    if isinstance(cls, DeclarativeMeta) and hasattr(cls, "datetime"):
+                    if isinstance(cls, DeclarativeMeta) and hasattr(cls, "timestamp"):
                         try:
-                            stmt = delete(cls).where(cls.datetime < limit_date)
+                            stmt = delete(cls).where(cls.timestamp < limit_date)
                             await db.execute(stmt)
                             deleted_tables.append(cls.__tablename__)
                         except Exception as table_exc:

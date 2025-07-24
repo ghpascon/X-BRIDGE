@@ -15,6 +15,14 @@ manual_hidden = [
     "uvicorn.loops.auto",
 ]
 
+# Inclui todos os submódulos do "serial.tools" manualmente
+try:
+    serial_tools_hidden = collect_submodules("serial.tools")
+    print(f"[INFO] Found serial_asyncio submodules: {serial_tools_hidden}")
+except Exception as e:
+    print(f"[WARN] Could not collect serial_asyncio submodules: {e}")
+    serial_tools_hidden = []
+
 # Inclui todos os submódulos do serial_asyncio manualmente
 try:
     serial_asyncio_hidden = collect_submodules("serial_asyncio")
@@ -59,10 +67,10 @@ extra_data = [
 
 # === Executa o PyInstaller ===
 PyInstaller.__main__.run(
-    [ENTRY_SCRIPT, f"--name={APP_NAME}", "--onedir", "--console"]
+    [ENTRY_SCRIPT, f"--name={APP_NAME}", "--onefile", "--console"]
     + [
         f"--hidden-import={h}"
-        for h in hiddenimports + manual_hidden + serial_asyncio_hidden
+        for h in hiddenimports + manual_hidden + serial_asyncio_hidden + serial_tools_hidden
     ]
     + [f"--add-data={d}" for d in extra_data]
 )

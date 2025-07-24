@@ -5,7 +5,6 @@ from app.core.path import get_prefix_from_path
 from app.schemas.api.rfid import (
     RfidRequest,
     rfid_actions_responses,
-    rfid_base_responses,
 )
 from app.schemas.devices import devices
 from app.schemas.events import events

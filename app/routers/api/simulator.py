@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException
 
 from app.core.path import get_prefix_from_path
 from app.schemas.api.rfid import (
-    TagRequest,
+    TagRequestSimulator,
     rfid_base_responses,
     InventoryRequest,
     EventRequest,
@@ -20,7 +20,7 @@ router = APIRouter(prefix=router_prefix, tags=[router_prefix])
     summary="Simulate RFID tag read",
     description="Simulates an RFID tag being read and sends the data to the tag processing logic.",
 )
-async def simulator_tag(tag: TagRequest):
+async def simulator_tag(tag: TagRequestSimulator):
     try:
         await events.on_tag(tag.model_dump())
         return {"msg": "success"}

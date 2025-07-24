@@ -1,0 +1,35 @@
+{
+  "READER": "X714",
+  "CONNECTION": "AUTO",
+  "VID": 1,
+  "PID": 1,
+  "BAUDRATE": 115200,
+  "ANT": {
+    "1": {
+      "active": true,
+      "power": 22,
+      "rssi": -100
+    },
+    "2": {
+      "active": false,
+      "power": 22,
+      "rssi": -100
+    },
+    "3": {
+      "active": false,
+      "power": 22,
+      "rssi": -100
+    },
+    "4": {
+      "active": false,
+      "power": 22,
+      "rssi": -100
+    }
+  },
+  "SESSION": 1,
+  "START_READING": false,
+  "GPI_START": false,
+  "IGNORE_READ": false,
+  "ALWAYS_SEND": true,
+  "SIMPLE_SEND": false
+}

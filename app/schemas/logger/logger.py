@@ -59,4 +59,5 @@ class LoggerManager:
                 print(f"Erro ao remover log {log_path.name}: {e}")
 
 
+
 logger_manager = LoggerManager()

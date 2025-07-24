@@ -1,5 +1,6 @@
-from fastapi import APIRouter, HTTPException, Request
+from fastapi import APIRouter, HTTPException, Request, Body
 from fastapi.responses import RedirectResponse
+from typing import List, Union
 
 from app.core.path import get_prefix_from_path
 from app.routers.rfid.commands import (
@@ -9,8 +10,10 @@ from app.routers.rfid.commands import (
     set_gpo,
 )
 from app.schemas.api.device import device_responses, validate_device, state_responses
-from app.schemas.api.rfid import SetGpoRequest, gpo_responses
+from app.schemas.api.rfid import SetGpoRequest, gpo_responses, rfid_base_responses, TagRequest, EventRequest
 from app.schemas.devices import devices
+from app.schemas.events import events
+import asyncio
 
 router_prefix = get_prefix_from_path(__file__)
 router = APIRouter(prefix=router_prefix, tags=[router_prefix])
@@ -61,6 +64,37 @@ async def api_clear_all_tags():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@router.post(
+    "/receive_tags",
+    summary="Receive tags from external devices",
+    description="Receives either a single tag or a list of tags",
+)
+async def receive_tags(tags: Union[TagRequest, List[TagRequest]] = Body(...)):
+    tags = tags if isinstance(tags, list) else [tags]
+    for tag in tags:
+        try:
+            await events.on_tag(tag.model_dump()) 
+        except Exception as e:
+            raise HTTPException(status_code=400, detail=str(e)) 
+
+    return {"msg": "success"}
+
+@router.post(
+    "/receive_events",
+    summary="Receive events from external devices",
+    description="Receives either a single event or a list of events",
+)
+async def receive_events(events_received: Union[EventRequest, List[EventRequest]] = Body(...)):
+    print(events_received)
+    events_received = events_received if isinstance(events_received, list) else [events_received]
+    print(events_received)
+    for event in events_received:
+        event = event.model_dump()
+        if event.get("event_type") == "tag":
+            asyncio.create_task(events.on_tag(event.get("event_data")))
+        else:
+            asyncio.create_task(events.on_event(**event))
+    return {"msg": "success"}
 
 @router.post(
     "/set_gpo/{device}",

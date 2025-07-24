@@ -14,8 +14,8 @@ async def connect_devices():
 
 async def daily_clear_db():
     while True:
-        await logger_manager.clear_old_logs()
         await database_engine.clear_db(settings.data.get("STORAGE_DAYS"))
+        await logger_manager.clear_old_logs()
 
         # Calcula a próxima meia-noite em horário de Brasília (UTC-3)
         now = datetime.now(timezone(timedelta(hours=-3)))

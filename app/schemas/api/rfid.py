@@ -3,8 +3,37 @@ from typing import Optional, Any
 
 from pydantic import BaseModel, Field, ValidationInfo, field_validator
 
-
 class TagRequest(BaseModel):
+    device: str = Field(default="DEVICE_01")
+    epc: str = Field(default="000000000000000000000001")
+    tid: Optional[str] = Field(default="000000000000000000000002")
+    ant: Optional[int] = Field(default=1)
+    rssi: Optional[int] = Field(default=-80)
+
+    @field_validator("epc", "tid")
+    def validate_epc_length_and_hex(cls, v, info):
+        if v is None:
+            return v
+        if len(v) != 24:
+            raise ValueError(f"{info.field_name} must have exactly 24 characters")
+        if not re.fullmatch(r"[0-9a-fA-F]{24}", v):
+            raise ValueError(f"{info.field_name} must contain only hexadecimal characters (0-9, a-f)")
+        return v
+
+    @field_validator("rssi")
+    def validate_rssi(cls, v):
+        if v is None:
+            return -80
+        if not isinstance(v, int):
+            raise ValueError("rssi must be an integer")
+        return -abs(v)  # força negativo
+
+    @field_validator("ant")
+    def validate_ant(cls, v):
+        return v if v is not None else 1
+    
+
+class TagRequestSimulator(BaseModel):
     device: Optional[str] = Field("DEVICE_01")
     epc: str = Field("000000000000000000000001")
     tid: Optional[str] = Field("000000000000000000000002")
