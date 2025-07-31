@@ -41,7 +41,8 @@ class Actions:
     ### TAG
     async def on_tag_events(self, tag):
         # DATABASE TAG
-        asyncio.create_task(self.tag_db(tag))
+        if self.actions.get("DATABASE_URL") is not None:
+            asyncio.create_task(self.tag_db(tag))
 
         # POST TAG
         http_post = self.actions.get("HTTP_POST")
@@ -117,7 +118,8 @@ class Actions:
         )
 
         # DATABASE EVENT
-        asyncio.create_task(self.event_db(device, event_type, event_data, timestamp))
+        if self.actions.get("DATABASE_URL") is not None:
+            asyncio.create_task(self.event_db(device, event_type, event_data, timestamp))
 
         # POST EVENT
         http_post = self.actions.get("HTTP_POST")

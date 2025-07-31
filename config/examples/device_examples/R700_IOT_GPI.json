@@ -1,6 +1,6 @@
 {
   "READER": "R700_IOT",
-  "CONNECTION": "impinj-15-d4-2d",
+  "CONNECTION": "impinj-14-15-6c",
   "START_READING": false,
   "READING_CONFIG": {
     "antennaConfigs": [
@@ -9,8 +9,8 @@
         "estimatedTagPopulation": 16,
         "fastId": "enabled",
         "inventorySearchMode": "dual-target",
-        "inventorySession": 0,
-        "receiveSensitivityDbm": -70,
+        "inventorySession": 1,
+        "receiveSensitivityDbm": -80,
         "rfMode": 1002,
         "transmitPowerCdbm": 3300
       },
@@ -19,8 +19,8 @@
         "estimatedTagPopulation": 16,
         "fastId": "enabled",
         "inventorySearchMode": "dual-target",
-        "inventorySession": 0,
-        "receiveSensitivityDbm": -70,
+        "inventorySession": 1,
+        "receiveSensitivityDbm": -80,
         "rfMode": 1002,
         "transmitPowerCdbm": 3300
       },
@@ -29,8 +29,8 @@
         "estimatedTagPopulation": 16,
         "fastId": "enabled",
         "inventorySearchMode": "dual-target",
-        "inventorySession": 0,
-        "receiveSensitivityDbm": -70,
+        "inventorySession": 1,
+        "receiveSensitivityDbm": -80,
         "rfMode": 1002,
         "transmitPowerCdbm": 3300
       },
@@ -39,8 +39,8 @@
         "estimatedTagPopulation": 16,
         "fastId": "enabled",
         "inventorySearchMode": "dual-target",
-        "inventorySession": 0,
-        "receiveSensitivityDbm": -70,
+        "inventorySession": 1,
+        "receiveSensitivityDbm": -80,
         "rfMode": 1002,
         "transmitPowerCdbm": 3300
       }
@@ -79,7 +79,7 @@
         "lastSeenTime": "disabled",
         "phaseAngle": "disabled",
         "tagReporting": {
-          "reportingIntervalSeconds": 0,
+          "reportingIntervalSeconds": 5,
           "tagCacheSize": 2048,
           "antennaIdentifier": "antennaPort",
           "tagIdentifier": "epc"
