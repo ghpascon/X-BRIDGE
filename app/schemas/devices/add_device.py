@@ -49,9 +49,7 @@ class AddDevice:
 
         ###
         else:
-            print(
-                f"⚠️ Unknown reader type '{reader}'. Device '{unique_name}' was not added."
-            )
+            print(f"⚠️ Unknown reader type '{reader}'. Device '{unique_name}' was not added.")
             return  # Exit early if device is invalid
 
         print(f"✅ Device '{unique_name}' added successfully.")

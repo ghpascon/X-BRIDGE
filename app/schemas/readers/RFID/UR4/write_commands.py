@@ -1,6 +1,6 @@
 import asyncio
-
 import logging
+
 from app.schemas.validators.tag import WriteTagValidator
 
 
@@ -58,9 +58,7 @@ class WriteCommands:
             # STOP READING BEFORE WRITE
             if self.is_reading:
                 await self.send_data([0xA5, 0x5A, 0x00, 0x08, 0x8C, 0x00, 0x0D, 0x0A])
-                await self.send_data(
-                    [0xA5, 0x5A, 0x00, 0x09, 0x8D, 0x01, 0x00, 0x0D, 0x0A]
-                )
+                await self.send_data([0xA5, 0x5A, 0x00, 0x09, 0x8D, 0x01, 0x00, 0x0D, 0x0A])
                 await asyncio.sleep(0.5)
 
             # NO TARGET
@@ -160,9 +158,7 @@ class WriteCommands:
             # RESUME READING AFTER WRITE
             if self.is_reading:
                 await asyncio.sleep(0.5)
-                await self.send_data(
-                    [0xA5, 0x5A, 0x00, 0x0A, 0x82, 0x00, 0x00, 0x00, 0x0D, 0x0A]
-                )
+                await self.send_data([0xA5, 0x5A, 0x00, 0x0A, 0x82, 0x00, 0x00, 0x00, 0x0D, 0x0A])
 
             if clear:
                 await asyncio.sleep(0.3)

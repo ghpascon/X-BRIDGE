@@ -3,6 +3,7 @@ import os
 os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
 
 import pygame
+
 from .path import get_path
 
 # Initialize pygame mixer
@@ -24,7 +25,7 @@ else:
 
 async def beep():
     """
-    Plays a simple beep sound.    
+    Plays a simple beep sound.
     """
     if sound is not None:
         try:

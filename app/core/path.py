@@ -1,8 +1,8 @@
+import importlib
+import logging
+import os
 import sys
 from pathlib import Path
-import importlib
-import os
-import logging
 
 
 def get_path(relative_path: str) -> Path:
@@ -15,14 +15,10 @@ def get_path(relative_path: str) -> Path:
     """
     if getattr(sys, "frozen", False):
         # Quando o aplicativo é executado como executável (PyInstaller)
-        base_path = Path(
-            sys._MEIPASS
-        )  # O diretório temporário onde o executável é descompactado
+        base_path = Path(sys._MEIPASS)  # O diretório temporário onde o executável é descompactado
     else:
         # Quando o aplicativo está sendo executado do código-fonte
-        base_path = (
-            Path(sys.argv[0]).resolve().parent
-        )  # O diretório onde o script foi executado
+        base_path = Path(sys.argv[0]).resolve().parent  # O diretório onde o script foi executado
 
     return base_path / relative_path
 
@@ -70,29 +66,24 @@ def include_all_routers(current_path, app):
                 spec.loader.exec_module(module)
                 if hasattr(module, "router"):
                     prefix = getattr(module.router, "prefix", "") or ""
-                    app.include_router(
-                        module.router, include_in_schema=prefix.startswith("/api")
-                    )
+                    app.include_router(module.router, include_in_schema=prefix.startswith("/api"))
                     # Show path relative to 'routers' directory
                     try:
                         routers_dir = Path(routes_path).resolve()
-                        relative_path = file_path.resolve().relative_to(
-                            routers_dir.parent
-                        )
+                        relative_path = file_path.resolve().relative_to(routers_dir.parent)
                     except Exception:
                         relative_path = file_path.name
                     logging.info(f"✅ Route loaded: {relative_path}")
                 else:
-                    logging.warning(
-                        f"⚠️  File {relative_path} does not contain a 'router'"
-                    )
+                    logging.warning(f"⚠️  File {relative_path} does not contain a 'router'")
             except Exception as e:
                 logging.error(f"❌ Error loading {relative_path}: {e}")
+
 
 def load_swagger_description(swagger_file_path: str) -> str:
     """
     Loads the Swagger markdown description from file.
-    
+
     Returns:
         The markdown content as a string, or a default message if file not found
     """

@@ -30,14 +30,14 @@
 
     <!-- GPO -->
     <button
-      onclick="fetch('{{ url_for('set_gpo', device=device, gpo_pin=1, state='true', control='static', time=1000) }}', { method: 'POST' })"
+      onclick="fetch('{{ url_for('writegpo') }}', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ device: '{{ device }}', gpo_pin: 1, state: true, control: 'static', time: 1000 }) })"
       class="btn btn-success"
       style="margin-left: 15px"
     >
       GPO TRUE
     </button>
     <button
-      onclick="fetch('{{ url_for('set_gpo', device=device, gpo_pin=1, state='false', control='static', time=1000) }}', { method: 'POST' })"
+      onclick="fetch('{{ url_for('writegpo') }}', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ device: '{{ device }}', gpo_pin: 1, state: false, control: 'static', time: 1000 }) })"
       class="btn btn-danger"
       style="margin-left: 15px"
     >
@@ -57,7 +57,7 @@
 <script>
   async function updateReadingState_{{ device|replace(' ', '_') }}() {
     try {
-      const response = await fetch("{{ url_for('get_reader_state', device=device) }}");
+      const response = await fetch("{{ url_for('get_device_state', device=device) }}");
       if (!response.ok) throw new Error("Request failed");
 
       const data = await response.json();

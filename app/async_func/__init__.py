@@ -9,9 +9,7 @@ from app.core.path import get_path
 
 async def create_tasks(module_dir):
     package_path = os.path.abspath(get_path(module_dir))
-    sys.path.insert(
-        0, os.path.dirname(package_path)
-    )  # Ensure Python can locate the package
+    sys.path.insert(0, os.path.dirname(package_path))  # Ensure Python can locate the package
     package_name = os.path.basename(package_path)
 
     tasks = []

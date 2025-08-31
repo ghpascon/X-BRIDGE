@@ -1,24 +1,5 @@
-from typing import Tuple
-
-from ..devices import devices
-
-
-def validate_device(
-    device: str, need_connected: bool = True
-) -> Tuple[bool, str | dict]:
-    """
-    Validate if the device exists and optionally if it is connected.
-    """
-    if device not in devices.get_device_list():
-        return False, "Invalid Device"
-
-    if not devices.devices.get(device).is_connected and need_connected:
-        return False, "Device is not connected"
-
-    return True, {"msg": "success"}
-
-
 # === Swagger Response Examples ===
+from .models import load_example_from_json
 
 device_list_responses = {
     200: {
@@ -51,9 +32,7 @@ device_responses = {
     },
     500: {
         "description": "Unexpected internal error.",
-        "content": {
-            "application/json": {"example": {"detail": "Internal Server Error"}}
-        },
+        "content": {"application/json": {"example": {"detail": "Internal Server Error"}}},
     },
 }
 
@@ -76,9 +55,7 @@ config_responses = {
     },
     500: {
         "description": "Internal server error.",
-        "content": {
-            "application/json": {"example": {"detail": "Internal Server Error"}}
-        },
+        "content": {"application/json": {"example": {"detail": "Internal Server Error"}}},
     },
 }
 
@@ -116,8 +93,54 @@ state_responses = {
     },
     500: {
         "description": "Internal server error.",
+        "content": {"application/json": {"example": {"detail": "Internal Server Error"}}},
+    },
+}
+
+
+gpo_responses = {
+    200: {
+        "description": "GPO command executed successfully",
+        "content": {"application/json": {"example": {"msg": "GPO DEVICE_01, True"}}},
+    },
+    400: {
+        "description": "Invalid device",
+        "content": {"application/json": {"example": {"detail": "Invalid device"}}},
+    },
+    404: {
+        "description": "No GPO found for device",
+        "content": {"application/json": {"example": {"msg": "No Gpo"}}},
+    },
+    422: {
+        "description": "Validation error",
+        "content": {"application/json": {"example": {"detail": "Invalid device"}}},
+    },
+    500: {
+        "description": "Internal Server Error",
+        "content": {"application/json": {"example": {"msg": "Exception message"}}},
+    },
+}
+
+rfid_base_responses = {
+    200: {
+        "description": "Operation successful",
+        "content": {"application/json": {"example": {"msg": "success"}}},
+    },
+    422: {
+        "description": "Validation error",
+        "content": {"application/json": {"example": {"detail": "error"}}},
+    },
+}
+
+rfid_actions_responses = {
+    200: {
+        "description": "RFID action settings returned successfully",
         "content": {
-            "application/json": {"example": {"detail": "Internal Server Error"}}
+            "application/json": {"example": load_example_from_json("config/examples/actions.json")}
         },
+    },
+    422: {
+        "description": "Invalid input or action",
+        "content": {"application/json": {"example": {"detail": "error"}}},
     },
 }

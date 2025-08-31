@@ -1,5 +1,5 @@
 import threading
-from typing import List, Dict
+from typing import Dict, List
 
 
 class FastAlerts:
@@ -7,15 +7,20 @@ class FastAlerts:
         self.alerts: List[Dict[str, str]] = []
         self._lock = threading.Lock()
         self._valid_styles = {
-            'alert-primary', 'alert-secondary', 'alert-success', 
-            'alert-danger', 'alert-warning', 'alert-info', 
-            'alert-light', 'alert-dark'
+            "alert-primary",
+            "alert-secondary",
+            "alert-success",
+            "alert-danger",
+            "alert-warning",
+            "alert-info",
+            "alert-light",
+            "alert-dark",
         }
 
     def add_alert(self, detail: str, style: str = "alert-primary"):
         """
         Add an alert message with a specified Bootstrap style.
-        
+
         Parameters:
         - detail (str): The message content to display.
         - style (str): Bootstrap alert style. One of the following:
@@ -27,13 +32,13 @@ class FastAlerts:
             - 'alert-info'      (light blue for information)
             - 'alert-light'     (light background)
             - 'alert-dark'      (dark background)
-            
+
         Note: If an invalid style is provided, defaults to 'alert-primary'.
         """
         # Valida o style, usa primary como fallback se inválido
         if style not in self._valid_styles:
             style = "alert-primary"
-        
+
         with self._lock:
             self.alerts.append({"detail": detail, "style": style})
 

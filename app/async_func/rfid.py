@@ -1,12 +1,12 @@
 import asyncio
-from datetime import datetime, timedelta, timezone
-from app.schemas.logger import logger_manager
 import logging
+from datetime import datetime, timedelta, timezone
 
 from app.core.config import settings
 from app.db.database import database_engine
 from app.schemas.devices import devices
 from app.schemas.events import events
+from app.schemas.logger import logger_manager
 
 
 async def connect_devices():
@@ -45,9 +45,7 @@ async def daily_clear_db():
 
             # Calculate the next midnight in Brasília time (UTC-3)
             now = datetime.now(timezone(timedelta(hours=-3)))
-            next_run = (now + timedelta(days=1)).replace(
-                hour=0, minute=0, second=0, microsecond=0
-            )
+            next_run = (now + timedelta(days=1)).replace(hour=0, minute=0, second=0, microsecond=0)
             wait_seconds = (next_run - now).total_seconds()
 
             logging.info(

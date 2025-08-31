@@ -1,12 +1,9 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import JSONResponse
 
 from app.core.path import get_prefix_from_path
-from app.schemas.api.device import (
-    config_responses,
-    device_list_responses,
-    validate_device,
-)
+from app.schemas.api.models import SetGpoRequest, validate_device
+from app.schemas.api.responses import config_responses, device_list_responses, gpo_responses
 from app.schemas.devices import devices
 
 router_prefix = get_prefix_from_path(__file__)
@@ -112,3 +109,81 @@ async def delete_device(device_name: str):
         raise
     except Exception:
         raise HTTPException(status_code=500, detail="Internal server error")
+
+
+@router.post(
+    "/write_gpo",
+    responses=gpo_responses,
+    summary="Write GPO state",
+    description="Sends a GPO command to the device using JSON payload.",
+    name="writegpo",
+)
+async def write_gpo(data: SetGpoRequest):
+    try:
+        payload = data.model_dump()
+        device = payload.get("device", "")
+        # 1. Validação do dispositivo
+        try:
+            status, msg = validate_device(device=device, need_connected=False)
+            if not status:
+                raise HTTPException(status_code=422, detail=msg)
+        except Exception as e:
+            raise HTTPException(status_code=400, detail=f"{str(e)}")
+
+        # 2. Monta os dados a partir do JSON e executa o comando
+        try:
+            gpo_data = {
+                "gpo_pin": payload.get("gpo_pin", 1),
+                "state": payload.get("state", True),
+                "control": payload.get("control", "static"),
+                "time": payload.get("time", 1000),
+            }
+
+            result = await devices.write_gpo(device, gpo_data)
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"{str(e)}")
+
+        # 3. Resposta final
+        if result:
+            print(f"write_gpo -> {device} - {gpo_data['state']}")
+            return {"msg": f"GPO {device}, {gpo_data['state']}"}
+        else:
+            print(f"{device} não possui GPO configurado")
+            return JSONResponse(
+                status_code=404, content={"msg": f"Dispositivo {device} não possui GPO"}
+            )
+
+    except HTTPException as http_err:
+        raise http_err
+    except Exception as e:
+        return JSONResponse(status_code=500, content={"msg": f"Erro interno inesperado: {str(e)}"})
+
+
+@router.get(
+    "/get_device_state/{device}",
+    summary="Get device state",
+    description=(
+        "Returns the current state of the device as both a numeric code and a description.\n"
+        "-1: Device not found | 0: Disconnected | 1: Connected | 2: Reading"
+    ),
+)
+async def get_device_state(request: Request, device: str):
+    """Return device state with numeric code and human-readable description."""
+    if device not in devices.devices:
+        state = -1
+        description = "Device not found"
+        return {"state": state, "description": description}
+
+    reader = devices.devices[device]
+
+    if not reader.is_connected:
+        state = 0
+        description = "Disconnected"
+    elif hasattr(reader, "is_reading") and reader.is_reading:
+        state = 2
+        description = "Reading"
+    else:
+        state = 1
+        description = "Connected"
+
+    return {"state": state, "description": description}

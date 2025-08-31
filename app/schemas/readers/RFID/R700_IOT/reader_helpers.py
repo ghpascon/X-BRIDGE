@@ -1,9 +1,8 @@
 import asyncio
 import json
+import logging
 
 import aiohttp
-
-import logging
 
 
 class ReaderHelpers:
@@ -25,28 +24,20 @@ class ReaderHelpers:
             session, self.endpoint_start, payload=self.config.get("READING_CONFIG")
         )
 
-    async def post_to_reader(
-        self, session, endpoint, payload=None, method="post", timeout=3
-    ):
+    async def post_to_reader(self, session, endpoint, payload=None, method="post", timeout=3):
         try:
             if session is None:
                 async with aiohttp.ClientSession(
                     auth=self.auth, connector=aiohttp.TCPConnector(ssl=False)
                 ) as session:
-                    await self.post_to_reader(
-                        session, endpoint, payload, method, timeout
-                    )
+                    await self.post_to_reader(session, endpoint, payload, method, timeout)
                     return
             if method == "post":
-                async with session.post(
-                    endpoint, json=payload, timeout=timeout
-                ) as response:
+                async with session.post(endpoint, json=payload, timeout=timeout) as response:
                     print(f"{endpoint} -> {response.status}")
                     return response.status == 204
             elif method == "put":
-                async with session.put(
-                    endpoint, json=payload, timeout=timeout
-                ) as response:
+                async with session.put(endpoint, json=payload, timeout=timeout) as response:
                     print(f"{endpoint} -> {response.status}")
                     return response.status == 204
         except Exception as e:
@@ -70,9 +61,7 @@ class ReaderHelpers:
                         jsonEvent = json.loads(string)
 
                         if "inventoryStatusEvent" in jsonEvent:
-                            status = jsonEvent["inventoryStatusEvent"][
-                                "inventoryStatus"
-                            ]
+                            status = jsonEvent["inventoryStatusEvent"]["inventoryStatus"]
                             if status == "running":
                                 asyncio.create_task(self.on_start())
                             else:
@@ -104,9 +93,7 @@ class ReaderHelpers:
 
         if control == "static":
             gpo_command = {
-                "gpoConfigurations": [
-                    {"gpo": gpo_pin, "state": state, "control": control}
-                ]
+                "gpoConfigurations": [{"gpo": gpo_pin, "state": state, "control": control}]
             }
 
         elif control == "pulsed":

@@ -1,5 +1,4 @@
 import asyncio
-
 import logging
 
 
@@ -54,9 +53,7 @@ class ReaderHelpers:
             await asyncio.sleep(0.1)
             if not self.setup:
                 continue
-            await self.send_data(
-                [0xA5, 0x5A, 0x00, 0x09, 0xA1, 0x0A, 0x00, 0x0D, 0x0A], False
-            )
+            await self.send_data([0xA5, 0x5A, 0x00, 0x09, 0xA1, 0x0A, 0x00, 0x0D, 0x0A], False)
 
     async def ensure_reading_command(self):
         while True:
@@ -67,12 +64,8 @@ class ReaderHelpers:
                 )
 
                 continue
-            await self.send_data(
-                [0xA5, 0x5A, 0x00, 0x08, 0x8C, 0x00, 0x0D, 0x0A], False
-            )
-            await self.send_data(
-                [0xA5, 0x5A, 0x00, 0x09, 0x8D, 0x01, 0x00, 0x0D, 0x0A], False
-            )
+            await self.send_data([0xA5, 0x5A, 0x00, 0x08, 0x8C, 0x00, 0x0D, 0x0A], False)
+            await self.send_data([0xA5, 0x5A, 0x00, 0x09, 0x8D, 0x01, 0x00, 0x0D, 0x0A], False)
 
     async def get_tid_from_epc(self, epc):
         current_tags = list(self.tags)

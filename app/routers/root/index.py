@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Request
-from fastapi.responses import HTMLResponse
 from fastapi.openapi.docs import get_swagger_ui_html
+from fastapi.responses import HTMLResponse
+
 from app.core.config import settings
 from app.core.templates import templates
 

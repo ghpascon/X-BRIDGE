@@ -1,9 +1,9 @@
 import asyncio
-
 import logging
 
-from ....events import events
 from app.schemas.validators.tag import TagSchema
+
+from ....events import events
 
 
 class OnReceive:
@@ -15,6 +15,4 @@ class OnReceive:
             tag = TagSchema(device=self.name, epc=data, tid=None, ant=None, rssi=None)
             await events.on_tag(tag.model_dump())
         except:
-            await events.on_event(
-                device=self.name, event_type=self.event_type, event_data=data
-            )
+            await events.on_event(device=self.name, event_type=self.event_type, event_data=data)

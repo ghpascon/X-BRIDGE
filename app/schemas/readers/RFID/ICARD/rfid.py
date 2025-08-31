@@ -1,4 +1,5 @@
 import asyncio
+
 from app.schemas.events import events
 
 
@@ -19,9 +20,7 @@ class RfidCommands:
     async def inventory_cmd(self):
         if not self.is_reading:
             return
-        cmd = bytes(
-            [0x09, 0x00, 0x01, 0x04, self.session, 0x00, 0x80, 0x0A, 0x00, 0x00]
-        )
+        cmd = bytes([0x09, 0x00, 0x01, 0x04, self.session, 0x00, 0x80, 0x0A, 0x00, 0x00])
         self.write(cmd, False)
 
     async def start_inventory(self):

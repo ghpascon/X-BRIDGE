@@ -1,10 +1,11 @@
 import asyncio
+import logging
 import time
+
 import serial.tools.list_ports
 import serial_asyncio
 
 from app.core.config import settings
-import logging
 
 from .on_receive import OnReceive
 
@@ -41,11 +42,7 @@ class SERIAL(asyncio.Protocol, OnReceive):
         self.last_byte_time = now
 
         # Cancela tarefa anterior de timeout
-        if (
-            hasattr(self, "_timeout_task")
-            and self._timeout_task
-            and not self._timeout_task.done()
-        ):
+        if hasattr(self, "_timeout_task") and self._timeout_task and not self._timeout_task.done():
             self._timeout_task.cancel()
 
         # Cria nova tarefa de timeout
@@ -54,9 +51,7 @@ class SERIAL(asyncio.Protocol, OnReceive):
             if self.last_byte_time and (time.time() - self.last_byte_time) >= 0.3:
                 if self.rx_buffer:
                     self.rx_buffer.clear()
-                    logging.warning(
-                        "⚠️ Buffer cleared due to 300ms timeout without receiving data."
-                    )
+                    logging.warning("⚠️ Buffer cleared due to 300ms timeout without receiving data.")
 
         self._timeout_task = asyncio.create_task(timeout_clear())
 
@@ -64,9 +59,7 @@ class SERIAL(asyncio.Protocol, OnReceive):
         while b"\n" in self.rx_buffer or b"\r" in self.rx_buffer:
             # Encontra posição do primeiro delimitador
             positions = [
-                p
-                for p in [self.rx_buffer.find(b"\n"), self.rx_buffer.find(b"\r")]
-                if p != -1
+                p for p in [self.rx_buffer.find(b"\n"), self.rx_buffer.find(b"\r")] if p != -1
             ]
             pos = min(positions)
 

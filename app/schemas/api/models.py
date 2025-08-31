@@ -1,8 +1,23 @@
+import json
 import re
-from typing import Optional, Any
+from typing import Any, Optional, Tuple
 
 from pydantic import BaseModel, Field, ValidationInfo, field_validator
-import json
+
+from ..devices import devices
+
+
+def validate_device(device: str, need_connected: bool = True) -> Tuple[bool, str | dict]:
+    """
+    Validate if the device exists and optionally if it is connected.
+    """
+    if device not in devices.get_device_list():
+        return False, "Invalid Device"
+
+    if not devices.devices.get(device).is_connected and need_connected:
+        return False, "Device is not connected"
+
+    return True, {"msg": "success"}
 
 
 def load_example_from_json(path: str) -> dict:
@@ -88,59 +103,8 @@ class EventRequest(BaseModel):
 
 
 class SetGpoRequest(BaseModel):
+    device: str = Field("DEVICE01")
     gpo_pin: Optional[int] = Field(1)
     state: Optional[bool] = Field(True)
     control: Optional[str] = Field("static")
     time: Optional[int] = Field(1000)
-
-
-# === Swagger Response Models ===
-
-gpo_responses = {
-    200: {
-        "description": "GPO command executed successfully",
-        "content": {"application/json": {"example": {"msg": "GPO DEVICE_01, True"}}},
-    },
-    400: {
-        "description": "Invalid device",
-        "content": {"application/json": {"example": {"detail": "Invalid device"}}},
-    },
-    404: {
-        "description": "No GPO found for device",
-        "content": {"application/json": {"example": {"msg": "No Gpo"}}},
-    },
-    422: {
-        "description": "Validation error",
-        "content": {"application/json": {"example": {"detail": "Invalid device"}}},
-    },
-    500: {
-        "description": "Internal Server Error",
-        "content": {"application/json": {"example": {"msg": "Exception message"}}},
-    },
-}
-
-rfid_base_responses = {
-    200: {
-        "description": "Operation successful",
-        "content": {"application/json": {"example": {"msg": "success"}}},
-    },
-    422: {
-        "description": "Validation error",
-        "content": {"application/json": {"example": {"detail": "error"}}},
-    },
-}
-
-rfid_actions_responses = {
-    200: {
-        "description": "RFID action settings returned successfully",
-        "content": {
-            "application/json": {
-                "example": load_example_from_json("config/examples/actions.json")
-            }
-        },
-    },
-    422: {
-        "description": "Invalid input or action",
-        "content": {"application/json": {"example": {"detail": "error"}}},
-    },
-}

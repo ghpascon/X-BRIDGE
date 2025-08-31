@@ -18,7 +18,9 @@ class RfidCommands:
         antennas = self.config.get("ANT")
         for antenna in antennas:
             ant = antennas.get(antenna)
-            ant_cmd = f"|set_ant:{antenna},{ant.get('active')},{ant.get('power')},{abs(ant.get('rssi'))}"
+            ant_cmd = (
+                f"|set_ant:{antenna},{ant.get('active')},{ant.get('power')},{abs(ant.get('rssi'))}"
+            )
             set_cmd += ant_cmd
 
         # SESSION

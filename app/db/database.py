@@ -1,24 +1,24 @@
-import os
-import json
 import csv
-import zipfile
+import json
 import logging
-from datetime import datetime, timedelta, timezone
+import os
+import zipfile
 from contextlib import asynccontextmanager
-from io import StringIO, BytesIO
-from typing import Dict, Any, Optional, Union, List
+from datetime import datetime, timedelta, timezone
+from io import BytesIO, StringIO
+from typing import Any, Dict, List, Optional, Union
 
-from sqlalchemy import create_engine, delete
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
-from sqlalchemy.orm import sessionmaker, DeclarativeMeta
-from sqlalchemy.pool import NullPool
-from sqlalchemy.future import select
 from fastapi import Response
 from fastapi.responses import StreamingResponse
+from sqlalchemy import create_engine, delete
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
+from sqlalchemy.future import select
+from sqlalchemy.orm import DeclarativeMeta, sessionmaker
+from sqlalchemy.pool import NullPool
 
-from .session import Base
 from app import models  # Ensure models are imported
 
+from .session import Base
 
 # Constants
 DEFAULT_CONFIG_PATH = "config/actions.json"
@@ -37,10 +37,11 @@ SYNC_DRIVER_MAPPING = {
 class DatabaseEngine:
     """
     Database engine manager for handling both sync and async database operations.
-    
+
     This class manages SQLAlchemy engines, sessions, and provides utilities for
     database operations like clearing old records and generating reports.
     """
+
     def __init__(self) -> None:
         """Initialize DatabaseEngine with default values and attempt to connect."""
         self.database_url: Optional[str] = None
@@ -51,17 +52,15 @@ class DatabaseEngine:
 
         result = self._initialize_engines_and_session()
         if isinstance(result, dict) and "error" in result:
-            logging.error(
-                f"[DatabaseEngine.__init__] Failed to initialize: {result['error']}"
-            )
+            logging.error(f"[DatabaseEngine.__init__] Failed to initialize: {result['error']}")
 
     def _load_database_url(self, path: str = DEFAULT_CONFIG_PATH) -> Optional[str]:
         """
         Load database URL from configuration file.
-        
+
         Args:
             path: Path to configuration file
-            
+
         Returns:
             Database URL string or None if not found/invalid
         """
@@ -71,19 +70,19 @@ class DatabaseEngine:
                     f"[DatabaseEngine._load_database_url] Configuration file not found: {path}"
                 )
                 return None
-                
+
             with open(path, "r", encoding="utf-8") as f:
                 data = json.load(f)
-                
+
             url = data.get("DATABASE_URL")
             if not url:
                 logging.error(
                     f"[DatabaseEngine._load_database_url] 'DATABASE_URL' not found in file: {path}"
                 )
                 return None
-                
+
             return url
-            
+
         except json.JSONDecodeError as e:
             logging.error(
                 f"[DatabaseEngine._load_database_url] JSON decode error in file {path}: {e}"
@@ -98,7 +97,7 @@ class DatabaseEngine:
     def _initialize_engines_and_session(self) -> Union[bool, Dict[str, str]]:
         """
         Initialize database engines and session factory.
-        
+
         Returns:
             True if successful, dict with error message if failed
         """
@@ -166,7 +165,7 @@ class DatabaseEngine:
             )
             self._reset_engines()
             return {"error": str(e)}
-    
+
     def _reset_engines(self) -> None:
         """Reset all engine and session attributes to None."""
         self.database_url = None
@@ -178,7 +177,7 @@ class DatabaseEngine:
     def create_tables(self) -> None:
         """
         Create database tables if they don't exist.
-        
+
         Uses sync engine to create tables. Logs errors but doesn't raise exceptions.
         """
         if self.sync_engine is None:
@@ -186,12 +185,10 @@ class DatabaseEngine:
                 "[DatabaseEngine.create_tables] Sync engine not initialized. Skipping table creation."
             )
             return
-            
+
         try:
             Base.metadata.create_all(bind=self.sync_engine)
-            logging.info(
-                "[DatabaseEngine.create_tables] Tables created or already exist."
-            )
+            logging.info("[DatabaseEngine.create_tables] Tables created or already exist.")
         except Exception as e:
             logging.error(f"[DatabaseEngine.create_tables] Error creating tables: {e}")
             # Don't raise exception to allow application to continue
@@ -199,10 +196,10 @@ class DatabaseEngine:
     def reload_database_url(self, new_url: str) -> Union[bool, Dict[str, str]]:
         """
         Reload database configuration with a new URL.
-        
+
         Args:
             new_url: New database URL to use
-            
+
         Returns:
             True if successful, dict with error message if failed
         """
@@ -219,16 +216,14 @@ class DatabaseEngine:
                 logging.error(f"[DatabaseEngine.reload_database_url] {result['error']}")
                 return result
         except Exception as e:
-            logging.error(
-                f"[DatabaseEngine.reload_database_url] Error reloading DATABASE_URL: {e}"
-            )
+            logging.error(f"[DatabaseEngine.reload_database_url] Error reloading DATABASE_URL: {e}")
             return {"error": str(e)}
 
     @asynccontextmanager
     async def get_db(self):
         """
         Async context manager for database sessions.
-        
+
         Yields:
             AsyncSession or None if session creation fails
         """
@@ -238,30 +233,26 @@ class DatabaseEngine:
             )
             yield None
             return
-            
+
         try:
             async with self.SessionLocal() as db:
                 yield db
         except Exception as e:
-            logging.error(
-                f"[DatabaseEngine.get_db] Error getting database session: {e}"
-            )
+            logging.error(f"[DatabaseEngine.get_db] Error getting database session: {e}")
             yield None
 
     async def clear_db(self, days: int) -> Dict[str, Any]:
         """
         Clear old records from database tables.
-        
+
         Args:
             days: Number of days to keep (older records will be deleted)
-            
+
         Returns:
             Dict with success status and deleted tables list, or error message
         """
         if self.SessionLocal is None:
-            logging.error(
-                "[DatabaseEngine.clear_db] Session not initialized, operation ignored."
-            )
+            logging.error("[DatabaseEngine.clear_db] Session not initialized, operation ignored.")
             return {"error": "Session not initialized"}
 
         try:
@@ -274,9 +265,7 @@ class DatabaseEngine:
 
                 # Calculate cutoff date
                 limit_date = datetime.now(timezone.utc) - timedelta(days=days)
-                limit_date = limit_date.replace(
-                    hour=0, minute=0, second=0, microsecond=0
-                )
+                limit_date = limit_date.replace(hour=0, minute=0, second=0, microsecond=0)
 
                 deleted_tables: List[str] = []
 
@@ -299,15 +288,13 @@ class DatabaseEngine:
                 return {"success": True, "deleted_tables": deleted_tables}
 
         except Exception as e:
-            logging.error(
-                f"[DatabaseEngine.clear_db] Error while clearing database: {e}"
-            )
+            logging.error(f"[DatabaseEngine.clear_db] Error while clearing database: {e}")
             return {"error": str(e)}
 
     async def get_report(self) -> Union[StreamingResponse, Response]:
         """
         Generate a ZIP file containing CSV exports of all database tables.
-        
+
         Returns:
             StreamingResponse with ZIP file or Response with error message
         """
@@ -315,9 +302,7 @@ class DatabaseEngine:
             async with self.get_db() as db:
                 if db is None:
                     logging.error("[DatabaseEngine.get_report] Database session not available")
-                    return Response(
-                        content="Database session unavailable", status_code=503
-                    )
+                    return Response(content="Database session unavailable", status_code=503)
 
                 zip_buffer = BytesIO()
                 table_count = 0
@@ -346,18 +331,13 @@ class DatabaseEngine:
                                 # Write data rows
                                 for row in rows:
                                     writer.writerow(
-                                        [
-                                            getattr(row, col.name)
-                                            for col in cls.__table__.columns
-                                        ]
+                                        [getattr(row, col.name) for col in cls.__table__.columns]
                                     )
 
                                 # Add CSV to ZIP
                                 csv_buffer.seek(0)
-                                zip_file.writestr(
-                                    f"{table_name}.csv", csv_buffer.read()
-                                )
-                                
+                                zip_file.writestr(f"{table_name}.csv", csv_buffer.read())
+
                                 logging.info(
                                     f"[DatabaseEngine.get_report] Exported {len(rows)} rows from table: {table_name}"
                                 )
@@ -382,7 +362,9 @@ class DatabaseEngine:
                 return StreamingResponse(
                     zip_buffer,
                     media_type="application/zip",
-                    headers={"Content-Disposition": f"attachment; filename={DEFAULT_REPORT_FILENAME}"},
+                    headers={
+                        "Content-Disposition": f"attachment; filename={DEFAULT_REPORT_FILENAME}"
+                    },
                 )
 
         except Exception as e:

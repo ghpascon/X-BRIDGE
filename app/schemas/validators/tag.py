@@ -14,14 +14,12 @@ class TagSchema(BaseModel):
     @field_validator("epc", "tid")
     def validate_epc_length_and_hex(cls, v, field):
         if v is None:
-            return v
+            return v.lower()
         if len(v) != 24:
             raise ValueError(f"{field.name} must have exactly 24 characters")
         if not re.fullmatch(r"[0-9a-fA-F]{24}", v):
-            raise ValueError(
-                f"{field.name} must contain only hexadecimal characters (0-9, a-f)"
-            )
-        return v
+            raise ValueError(f"{field.name} must contain only hexadecimal characters (0-9, a-f)")
+        return v.lower()
 
 
 class WriteTagValidator(BaseModel):
@@ -31,12 +29,8 @@ class WriteTagValidator(BaseModel):
     target_value: Optional[str] = Field(
         None, description="Current value of the identifier (24 hexadecimal characters)"
     )
-    new_epc: str = Field(
-        ..., description="New EPC value to write (24 hexadecimal characters)"
-    )
-    password: str = Field(
-        ..., description="Password to access the tag (8 hexadecimal characters)"
-    )
+    new_epc: str = Field(..., description="New EPC value to write (24 hexadecimal characters)")
+    password: str = Field(..., description="Password to access the tag (8 hexadecimal characters)")
 
     @field_validator("target_identifier")
     def validate_identifier(cls, v):
@@ -55,9 +49,7 @@ class WriteTagValidator(BaseModel):
         if len(v) != 24:
             raise ValueError(f"{field.name} must have exactly 24 characters")
         if not re.fullmatch(r"[0-9a-fA-F]{24}", v):
-            raise ValueError(
-                f"{field.name} must contain only hexadecimal characters (0-9, a-f)"
-            )
+            raise ValueError(f"{field.name} must contain only hexadecimal characters (0-9, a-f)")
         return v.upper()
 
     @field_validator("password")
@@ -65,7 +57,5 @@ class WriteTagValidator(BaseModel):
         if len(v) != 8:
             raise ValueError(f"{field.name} must have exactly 8 characters")
         if not re.fullmatch(r"[0-9a-fA-F]{8}", v):
-            raise ValueError(
-                f"{field.name} must contain only hexadecimal characters (0-9, a-f)"
-            )
+            raise ValueError(f"{field.name} must contain only hexadecimal characters (0-9, a-f)")
         return v.upper()  # Opcional: retorna sempre em maiúsculas

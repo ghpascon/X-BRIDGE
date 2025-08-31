@@ -11,8 +11,8 @@ class DevicesCommands:
     async def clear_tags(self, device: str | None = None):
         await events.clear_tags(device)
 
-    async def set_gpo(self, device: str, gpo_data: dict):
-        if hasattr(self.devices[device], "set_gpo"):
-            await self.devices[device].set_gpo(gpo_data)
+    async def write_gpo(self, device: str, gpo_data: dict):
+        if hasattr(self.devices[device], "write_gpo"):
+            await self.devices[device].write_gpo(gpo_data)
             return True
         return False

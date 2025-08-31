@@ -1,12 +1,12 @@
 import asyncio
-
 import logging
+from collections import deque
+
+from app.db.database import database_engine
+from app.models.rfid import DbTag
+
 from .actions import Actions
 from .on_event import OnEvent
-
-from collections import deque
-from app.models.rfid import DbTag
-from app.db.database import database_engine
 
 
 class Events(OnEvent, Actions):

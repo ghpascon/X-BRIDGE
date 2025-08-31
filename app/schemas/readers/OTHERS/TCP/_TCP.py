@@ -28,9 +28,7 @@ class TCP(Helpers):
                     asyncio.open_connection(self.ip, self.port), timeout=3
                 )
                 self.is_connected = True
-                logging.info(
-                    f"✅ [CONNECTED] {self.device_name} - {self.ip}:{self.port}"
-                )
+                logging.info(f"✅ [CONNECTED] {self.device_name} - {self.ip}:{self.port}")
 
                 # Start the receive and monitor tasks
                 tasks = [
@@ -39,18 +37,14 @@ class TCP(Helpers):
                 ]
 
                 # Wait until one of the tasks completes (e.g. disconnection)
-                done, pending = await asyncio.wait(
-                    tasks, return_when=asyncio.FIRST_COMPLETED
-                )
+                done, pending = await asyncio.wait(tasks, return_when=asyncio.FIRST_COMPLETED)
 
                 # Cancel any remaining tasks
                 for task in pending:
                     task.cancel()
 
                 self.is_connected = False
-                logging.info(
-                    f"🔌 [DISCONNECTED] {self.device_name} - Attempting reconnection..."
-                )
+                logging.info(f"🔌 [DISCONNECTED] {self.device_name} - Attempting reconnection...")
 
             except Exception as e:
                 self.is_connected = False

@@ -1,6 +1,8 @@
 import asyncio
-import aiohttp
 import logging
+
+import aiohttp
+
 from app.schemas.validators.tag import WriteTagValidator
 
 from .on_event import OnEvent
@@ -49,9 +51,9 @@ class R700_IOT(OnEvent, ReaderHelpers, WriteCommands):
                     await asyncio.sleep(1)
                     continue
 
-                if self.config.get("START_READING") or self.config.get(
-                    "READING_CONFIG"
-                ).get("startTriggers"):
+                if self.config.get("START_READING") or self.config.get("READING_CONFIG").get(
+                    "startTriggers"
+                ):
                     success = await self.start_inventory(session)
                     if not success:
                         print("Failed to start inventory")
@@ -61,7 +63,7 @@ class R700_IOT(OnEvent, ReaderHelpers, WriteCommands):
                     self.is_reading = True
 
                 for i in range(1, 4):
-                    await self.set_gpo({"gpo_pin": i, "state": False})
+                    await self.write_gpo({"gpo_pin": i, "state": False})
 
                 self.is_connected = True
                 await self.get_tag_list(session)
@@ -69,7 +71,7 @@ class R700_IOT(OnEvent, ReaderHelpers, WriteCommands):
     async def clear_tags(self):
         self.tags = {}
 
-    async def set_gpo(self, gpo_data: dict):
+    async def write_gpo(self, gpo_data: dict):
         gpo_command = await self.get_gpo_command(gpo_data)
         try:
             async with aiohttp.ClientSession(

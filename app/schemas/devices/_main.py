@@ -1,7 +1,6 @@
 import json
-import os
-
 import logging
+import os
 
 from .add_device import AddDevice
 from .devices_commands import DevicesCommands

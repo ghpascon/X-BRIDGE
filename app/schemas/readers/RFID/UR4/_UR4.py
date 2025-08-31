@@ -62,9 +62,7 @@ class UR4(ReaderHelpers, OnEvent, SetupReader, WriteCommands):
                 ]
 
                 # Aguarde até que uma das tarefas termine (ex: desconexão)
-                done, pending = await asyncio.wait(
-                    tasks, return_when=asyncio.FIRST_COMPLETED
-                )
+                done, pending = await asyncio.wait(tasks, return_when=asyncio.FIRST_COMPLETED)
 
                 # Cancela todas as tarefas restantes
                 for task in pending:
@@ -95,9 +93,7 @@ class UR4(ReaderHelpers, OnEvent, SetupReader, WriteCommands):
     async def start_inventory(self):
         if self.is_reading:
             return
-        await self.send_data(
-            [0xA5, 0x5A, 0x00, 0x0A, 0x82, 0x00, 0x00, 0x00, 0x0D, 0x0A]
-        )
+        await self.send_data([0xA5, 0x5A, 0x00, 0x0A, 0x82, 0x00, 0x00, 0x00, 0x0D, 0x0A])
         self.is_reading = True
         await events.on_start(self.device_name)
 
@@ -109,7 +105,7 @@ class UR4(ReaderHelpers, OnEvent, SetupReader, WriteCommands):
         self.is_reading = False
         await events.on_stop(self.device_name)
 
-    async def set_gpo(self, gpo_data: dict):
+    async def write_gpo(self, gpo_data: dict):
         state = gpo_data.get("state", True)
         await self.send_data(
             [

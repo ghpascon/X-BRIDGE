@@ -1,15 +1,14 @@
 import asyncio
 import json
+import logging
 import os
 
 import aiohttp
 
-import logging
-from app.db.database import database_engine
-
-from app.models.rfid import DbEvent, DbTag
-from app.core.indicator import beep
 from app.core.config import settings
+from app.core.indicator import beep
+from app.db.database import database_engine
+from app.models.rfid import DbEvent, DbTag
 
 
 class Actions:
@@ -24,9 +23,7 @@ class Actions:
     async def set_actions(self, data=None, action_path="config/actions.json"):
         if data is not None:
             self.actions = data
-            os.makedirs(
-                os.path.dirname(action_path), exist_ok=True
-            )  # Garante que a pasta exista
+            os.makedirs(os.path.dirname(action_path), exist_ok=True)  # Garante que a pasta exista
             with open(action_path, "w") as f:
                 json.dump(self.actions, f, indent=4)
 
@@ -115,9 +112,7 @@ class Actions:
 
         # DATABASE EVENT
         if self.actions.get("DATABASE_URL") is not None:
-            asyncio.create_task(
-                self.event_db(device, event_type, event_data, timestamp)
-            )
+            asyncio.create_task(self.event_db(device, event_type, event_data, timestamp))
 
         # POST EVENT
         http_post = self.actions.get("HTTP_POST")

@@ -1,9 +1,10 @@
-from pydantic import ValidationError
-
 import logging
-from ..validators.tag import TagSchema
 from datetime import datetime
+
+from pydantic import ValidationError
 from pyepc import SGTIN
+
+from ..validators.tag import TagSchema
 
 
 class OnEvent:
@@ -17,10 +18,7 @@ class OnEvent:
                 tag_exist = True
 
             if tag_exist:
-                if (
-                    tag_validado.rssi is None
-                    or self.tags[tag_validado.epc].get("rssi") is not None
-                ):
+                if tag_validado.rssi is None or self.tags[tag_validado.epc].get("rssi") is not None:
                     return
                 if tag_validado.rssi <= self.tags[tag_validado.epc].get("rssi"):
                     return
@@ -62,7 +60,5 @@ class OnEvent:
             return
 
         timestamp = datetime.now()
-        logging.info(
-            f"[ EVENT ] - {timestamp} - {device} - {event_type} - {event_data}"
-        )
+        logging.info(f"[ EVENT ] - {timestamp} - {device} - {event_type} - {event_data}")
         await self.on_events(device, event_type, event_data, timestamp)

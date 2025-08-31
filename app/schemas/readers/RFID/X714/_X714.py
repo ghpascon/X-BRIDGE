@@ -1,10 +1,11 @@
 import asyncio
+import logging
 import time
+
 import serial.tools.list_ports
 import serial_asyncio
 
 from app.core.config import settings
-import logging
 
 from .on_receive import OnReceive
 from .rfid import RfidCommands

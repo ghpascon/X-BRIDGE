@@ -1,10 +1,11 @@
 import asyncio
+import logging
 import time
+
 import serial.tools.list_ports
 import serial_asyncio
 
 from app.core.config import settings
-import logging
 
 from .on_receive import OnReceive
 from .rfid import RfidCommands
@@ -52,11 +53,7 @@ class ICARD(asyncio.Protocol, OnReceive, RfidCommands):
         self.last_byte_time = now
 
         # Cancela tarefa anterior de timeout
-        if (
-            hasattr(self, "_timeout_task")
-            and self._timeout_task
-            and not self._timeout_task.done()
-        ):
+        if hasattr(self, "_timeout_task") and self._timeout_task and not self._timeout_task.done():
             self._timeout_task.cancel()
 
         # Cria uma nova tarefa de timeout dentro da própria função
@@ -66,9 +63,7 @@ class ICARD(asyncio.Protocol, OnReceive, RfidCommands):
             if self.last_byte_time and (time.time() - self.last_byte_time) >= 0.3:
                 if self.rx_buffer:
                     self.rx_buffer.clear()
-                    logging.warning(
-                        "⚠️ Buffer cleared due to 300ms timeout without receiving data."
-                    )
+                    logging.warning("⚠️ Buffer cleared due to 300ms timeout without receiving data.")
 
         self._timeout_task = asyncio.create_task(timeout_clear())
 
