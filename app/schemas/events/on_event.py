@@ -129,7 +129,6 @@ class OnEvent:
         """Handle reader connection."""
         await self.on_event(device, "connection_event", True)
 
-
     async def on_disconnect(self, device: str) -> None:
         """Handle reader disconnection."""
         await self.on_event(device, "connection_event", False)

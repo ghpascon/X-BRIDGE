@@ -219,6 +219,8 @@ if __name__ == "__main__":
 
     # Inicia o servidor uvicorn
     try:
-        uvicorn.run(app, host=host, port=port, access_log=False, log_level="critical", log_config=None)
+        uvicorn.run(
+            app, host=host, port=port, access_log=False, log_level="critical", log_config=None
+        )
     except Exception as e:
         logging.error(f"Falha ao iniciar servidor: {e}")

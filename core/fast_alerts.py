@@ -67,4 +67,5 @@ class FastAlerts:
     def add_error(self, detail: str):
         self.add_alert(detail=detail, style="alert-danger")
 
+
 fast_alerts = FastAlerts()

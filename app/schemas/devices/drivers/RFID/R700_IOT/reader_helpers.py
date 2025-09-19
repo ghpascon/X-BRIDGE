@@ -27,7 +27,9 @@ class ReaderHelpers:
     async def post_to_reader(self, session, endpoint, payload=None, method="post", timeout=3):
         try:
             if session is None:
-                async with httpx.AsyncClient(auth=self.auth, verify=False, timeout=timeout) as client:
+                async with httpx.AsyncClient(
+                    auth=self.auth, verify=False, timeout=timeout
+                ) as client:
                     return await self.post_to_reader(client, endpoint, payload, method, timeout)
 
             if method == "post":
@@ -86,11 +88,7 @@ class ReaderHelpers:
         return None
 
     async def get_gpo_command(
-        self,
-        pin: int = 1,
-        state: bool | str = True,
-        control: str = "static",
-        time: int = 1000
+        self, pin: int = 1, state: bool | str = True, control: str = "static", time: int = 1000
     ) -> dict:
         """
         Gera o payload de configuração de GPO para o leitor RFID.
@@ -115,9 +113,7 @@ class ReaderHelpers:
         state = "high" if state is True else "low" if state is False else str(state)
 
         if control == "static":
-            gpo_command = {
-                "gpoConfigurations": [{"gpo": pin, "state": state, "control": control}]
-            }
+            gpo_command = {"gpoConfigurations": [{"gpo": pin, "state": state, "control": control}]}
         elif control == "pulsed":
             gpo_command = {
                 "gpoConfigurations": [

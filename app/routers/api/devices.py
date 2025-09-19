@@ -1,3 +1,5 @@
+import logging
+
 from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import JSONResponse
 
@@ -5,7 +7,6 @@ from app.core.path import get_prefix_from_path
 from app.schemas.api.models import SetGpoRequest, validate_device
 from app.schemas.api.responses import config_responses, device_list_responses, gpo_responses
 from app.schemas.devices import devices
-import logging
 
 router_prefix = get_prefix_from_path(__file__)
 router = APIRouter(prefix=router_prefix, tags=[router_prefix])

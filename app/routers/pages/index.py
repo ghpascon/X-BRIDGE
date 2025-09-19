@@ -13,7 +13,7 @@ async def index(request: Request):
     return templates.TemplateResponse(
         "index/main.html",
         {"request": request, "title": settings.data.get("TITLE", "SMARTX")},
-        media_type="text/html; charset=utf-8"
+        media_type="text/html; charset=utf-8",
     )
 
 
@@ -26,4 +26,3 @@ async def docs():
         swagger_css_url="/static/docs/swagger-ui.css",
         swagger_favicon_url="/static/images/logo.png",
     )
-

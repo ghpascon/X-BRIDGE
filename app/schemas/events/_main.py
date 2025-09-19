@@ -14,9 +14,9 @@ class Events(OnEvent, Actions):
         """
         Initialize the Events manager.
         """
-        self.tags = {}                       # Active tags currently detected
-        self.events = deque(maxlen=20)       # Store the last 20 events
-        self.actions = {}                    # Registered actions
+        self.tags = {}  # Active tags currently detected
+        self.events = deque(maxlen=20)  # Store the last 20 events
+        self.actions = {}  # Registered actions
         asyncio.run(self.set_actions(None))  # Initialize actions
 
     async def clear_tags(self, device: str | None = None):

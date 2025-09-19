@@ -1,7 +1,8 @@
 import asyncio
 import json
-import os
 import logging
+import os
+
 
 class ManageDevices:
     def __init__(self):

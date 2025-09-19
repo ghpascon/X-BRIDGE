@@ -2,11 +2,12 @@ import asyncio
 import logging
 
 from app.schemas.events import events
+
 from .helpers import ReaderHelpers
 from .on_event import OnEvent
 from .setup_reader import SetupReader
 from .write_commands import WriteCommands
-from app.schemas.events import events
+
 
 class UR4(ReaderHelpers, OnEvent, SetupReader, WriteCommands):
     def __init__(self, config, name):
@@ -98,7 +99,9 @@ class UR4(ReaderHelpers, OnEvent, SetupReader, WriteCommands):
     async def start_inventory(self, test_mode=False, verbose=True):
         if self.is_reading:
             return
-        await self.send_data([0xA5, 0x5A, 0x00, 0x0A, 0x82, 0x00, 0x00, 0x00, 0x0D, 0x0A], verbose=verbose)
+        await self.send_data(
+            [0xA5, 0x5A, 0x00, 0x0A, 0x82, 0x00, 0x00, 0x00, 0x0D, 0x0A], verbose=verbose
+        )
         if test_mode:
             return
         self.is_reading = True
@@ -108,18 +111,15 @@ class UR4(ReaderHelpers, OnEvent, SetupReader, WriteCommands):
         if not self.is_reading:
             return
         await self.send_data([0xA5, 0x5A, 0x00, 0x08, 0x8C, 0x00, 0x0D, 0x0A], verbose=verbose)
-        await self.send_data([0xA5, 0x5A, 0x00, 0x09, 0x8D, 0x01, 0x00, 0x0D, 0x0A], verbose=verbose)
+        await self.send_data(
+            [0xA5, 0x5A, 0x00, 0x09, 0x8D, 0x01, 0x00, 0x0D, 0x0A], verbose=verbose
+        )
         if test_mode:
-            return      
+            return
         self.is_reading = False
         await events.on_stop(self.device_name)
 
-    async def write_gpo(
-        self,
-        state: bool | str = True,
-        *args,
-        **kwargs
-    ):
+    async def write_gpo(self, state: bool | str = True, *args, **kwargs):
         # Normaliza o estado para 0/1
         state_value = 0x01 if state else 0x00
 

@@ -5,7 +5,7 @@ from typing import List
 
 POETRY = "poetry"
 CONCURRENCY = int(os.environ.get("FORMAT_CONCURRENCY", "6"))
-SHOW_TOOL_OUTPUT = True 
+SHOW_TOOL_OUTPUT = True
 
 
 def find_python_files(root_path: str) -> List[str]:

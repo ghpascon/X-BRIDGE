@@ -1,7 +1,4 @@
-from datetime import datetime
-from typing import Optional
-
-from sqlalchemy import Column, DateTime, Index, Integer, String
+from sqlalchemy import Column, DateTime, Integer, String
 from sqlalchemy.sql import func
 
 from app.db.session import Base

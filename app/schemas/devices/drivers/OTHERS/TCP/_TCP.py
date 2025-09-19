@@ -1,8 +1,10 @@
 import asyncio
 import logging
 
-from .helpers import Helpers
 from app.schemas.events import events
+
+from .helpers import Helpers
+
 
 class TCP(Helpers):
     def __init__(self, config, name):
@@ -60,7 +62,7 @@ class TCP(Helpers):
     async def write(self, data: str, verbose=True):
         if self.is_connected and self.writer:
             try:
-                data = data + '\n'
+                data = data + "\n"
                 self.writer.write(data.encode())
                 await self.writer.drain()
                 if verbose:

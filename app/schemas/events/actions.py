@@ -2,15 +2,15 @@ import asyncio
 import json
 import logging
 import os
+from datetime import datetime
 
-import httpx  
+import httpx
 
 from app.core.config import settings
 from app.core.indicator import beep
 from app.db.database import database_engine
 from app.models.rfid import DbEvent, DbTag
 
-from datetime import datetime
 
 class Actions:
     async def get_actions_example(self, path="config/examples/actions.json"):
@@ -68,7 +68,7 @@ class Actions:
         try:
             ts = tag.get("timestamp")
             if isinstance(ts, datetime):
-                ts = ts.isoformat()  
+                ts = ts.isoformat()
                 tag["timestamp"] = ts
 
             payload = {

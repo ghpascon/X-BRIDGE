@@ -8,10 +8,7 @@ class Helpers:
     async def monitor_connection(self):
         while self.is_connected:
             await asyncio.sleep(3)
-            if (
-                (self.writer and self.writer.is_closing()) or
-                (self.reader and self.reader.at_eof())
-            ):                
+            if (self.writer and self.writer.is_closing()) or (self.reader and self.reader.at_eof()):
                 self.is_connected = False
                 logging.info("[DISCONNECTED] Socket closed.")
                 break

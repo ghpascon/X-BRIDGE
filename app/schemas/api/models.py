@@ -1,11 +1,11 @@
 import json
+import logging
 import re
 from typing import Any, Optional, Tuple
 
 from pydantic import BaseModel, Field, ValidationInfo, field_validator
 
 from ..devices import devices
-import logging
 
 
 def validate_device(device: str, need_connected: bool = True) -> Tuple[bool, str | dict]:
@@ -109,6 +109,7 @@ class SetGpoRequest(BaseModel):
     state: Optional[bool] = Field(True)
     control: Optional[str] = Field("static")
     time: Optional[int] = Field(1000)
+
 
 class TagListSimulator(BaseModel):
     device: str = Field("DEVICE01")

@@ -1,9 +1,9 @@
 import json
 import logging
 import os
+from collections import deque
 from datetime import datetime, timedelta
 from pathlib import Path
-from collections import deque
 
 
 class LoggerManager:
@@ -49,7 +49,9 @@ class LoggerManager:
 
         # --- Handler para memória/self.logs ---
         def memory_emit(record):
-            log_entry = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s").format(record)
+            log_entry = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s").format(
+                record
+            )
             self.on_log(log_entry)
 
         memory_handler = logging.Handler()

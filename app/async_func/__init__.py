@@ -1,9 +1,10 @@
 import asyncio
 import importlib
 import inspect
+import logging
 import os
 import sys
-import logging
+
 from app.core.path import get_path
 
 

@@ -1,4 +1,5 @@
 import asyncio
+import logging
 from typing import List, Union
 
 from fastapi import APIRouter, Body, Request
@@ -7,7 +8,6 @@ from app.core.path import get_prefix_from_path
 from app.db.database import database_engine
 from app.schemas.api.models import EventRequest
 from app.schemas.events import events
-import logging
 
 router = APIRouter(prefix=get_prefix_from_path(__file__), tags=[get_prefix_from_path(__file__)])
 

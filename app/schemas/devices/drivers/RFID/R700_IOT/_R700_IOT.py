@@ -1,14 +1,15 @@
 import asyncio
 import logging
 
-import httpx  
+import httpx
 
+from app.schemas.events import events
 from app.schemas.validators.tag import WriteTagValidator
 
 from .on_event import OnEvent
 from .reader_helpers import ReaderHelpers
 from .write_commands import WriteCommands
-from app.schemas.events import events
+
 
 class R700_IOT(OnEvent, ReaderHelpers, WriteCommands):
     def __init__(self, config, name):
@@ -25,7 +26,7 @@ class R700_IOT(OnEvent, ReaderHelpers, WriteCommands):
         self.endpoint_write = f"{self.urlBase}/profiles/inventory/tag-access"
 
         self.interface_config = {"rfidInterface": "rest"}
-        self.auth = httpx.BasicAuth("root", "impinj")  
+        self.auth = httpx.BasicAuth("root", "impinj")
 
         self.tags_to_write = {}
 
@@ -74,13 +75,14 @@ class R700_IOT(OnEvent, ReaderHelpers, WriteCommands):
         self.tags = {}
 
     async def write_gpo(
-            self,
-            pin: int = 1,
-            state: bool | str = True,
-            control: str = "static",
-            time: int = 1000, 
-            *args, **kwargs
-        ):
+        self,
+        pin: int = 1,
+        state: bool | str = True,
+        control: str = "static",
+        time: int = 1000,
+        *args,
+        **kwargs,
+    ):
         gpo_command = await self.get_gpo_command(pin=pin, state=state, control=control, time=time)
         try:
             async with httpx.AsyncClient(auth=self.auth, verify=False, timeout=10.0) as session:

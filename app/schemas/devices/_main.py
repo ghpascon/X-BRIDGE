@@ -7,11 +7,10 @@ from .devices_commands import DevicesCommands
 from .manage_devices import ManageDevices
 
 
-
 class Devices(AddDevice, DevicesCommands, ManageDevices):
     """
-    The Devices class manages device configurations, 
-    loading them from JSON files, and providing utility 
+    The Devices class manages device configurations,
+    loading them from JSON files, and providing utility
     functions to handle device data.
     """
 
@@ -28,7 +27,7 @@ class Devices(AddDevice, DevicesCommands, ManageDevices):
         """
         Generate a unique device name based on the given base name.
         If the name already exists, add an incrementing index.
-        
+
         Args:
             base_name (str): Suggested name for the device.
 

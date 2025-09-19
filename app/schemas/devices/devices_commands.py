@@ -12,13 +12,13 @@ class DevicesCommands:
         await events.clear_tags(device)
 
     async def write_gpo(
-            self, 
-            device: str, 
-            pin: int = 1,
-            state: bool | str = True,
-            control: str = "static",
-            time: int = 1000,
-        ):
+        self,
+        device: str,
+        pin: int = 1,
+        state: bool | str = True,
+        control: str = "static",
+        time: int = 1000,
+    ):
         if hasattr(self.devices[device], "write_gpo"):
             await self.devices[device].write_gpo(pin=pin, state=state, control=control, time=time)
             return True

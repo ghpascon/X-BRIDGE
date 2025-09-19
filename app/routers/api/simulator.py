@@ -1,11 +1,15 @@
 import logging
 
-
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import JSONResponse
 
 from app.core.path import get_prefix_from_path
-from app.schemas.api.models import EventRequest, InventoryRequest, TagRequestSimulator, TagListSimulator
+from app.schemas.api.models import (
+    EventRequest,
+    InventoryRequest,
+    TagListSimulator,
+    TagRequestSimulator,
+)
 from app.schemas.api.responses import rfid_base_responses
 from app.schemas.events import events
 
@@ -27,8 +31,9 @@ async def simulator_tag(tag: TagRequestSimulator):
         logging.error(f"Error while processing tag: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+
 @router.post(
-    "/tag_list", 
+    "/tag_list",
     summary="Simulate RFID sequential tag list",
     description="Simulates an RFID tag list being read and sends the data to the tag processing logic.",
 )
@@ -37,19 +42,23 @@ async def tag_list(tag_generator: TagListSimulator):
     qtd = tag_generator.qtd
 
     try:
-        base_value = int(start_epc, 16)  
+        base_value = int(start_epc, 16)
     except ValueError:
-        return JSONResponse(content={"error": "EPC inválido, deve ser apenas hexadecimal"}, status_code=400)
+        return JSONResponse(
+            content={"error": "EPC inválido, deve ser apenas hexadecimal"}, status_code=400
+        )
 
     for i in range(qtd):
         epc_value = base_value + i
-        epc_hex = f"{epc_value:024x}" 
-        await events.on_tag({
-            "device": tag_generator.device,
-            "epc": epc_hex,
-        })
+        epc_hex = f"{epc_value:024x}"
+        await events.on_tag(
+            {
+                "device": tag_generator.device,
+                "epc": epc_hex,
+            }
+        )
 
-    return JSONResponse(content={"detail":f"{qtd} tags ok"})
+    return JSONResponse(content={"detail": f"{qtd} tags ok"})
 
 
 @router.post(

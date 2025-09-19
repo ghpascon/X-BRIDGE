@@ -1,9 +1,8 @@
 import asyncio
 import logging
 
-from app.schemas.validators.tag import TagSchema
-
 from app.schemas.events import events
+from app.schemas.validators.tag import TagSchema
 
 
 class OnReceive:

@@ -1,8 +1,9 @@
 import json
+import logging
 import os
 
 from app.schemas.logger import logger_manager
-import logging
+
 
 class Settings:
     def __init__(self, config_path="config/config.json"):
@@ -35,11 +36,11 @@ class Settings:
     def save(self):
         """Save current configuration to file."""
         try:
-            
+
             logging.info("Salvando em:", self._config_path)
             with open(self._config_path, "w", encoding="utf8") as f:
                 json.dump(self.data, f, indent=4, ensure_ascii=False)
-            
+
         except Exception as e:
             logging.error(f"Erro ao salvar config: {e}")
 

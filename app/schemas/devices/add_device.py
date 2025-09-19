@@ -1,4 +1,6 @@
 import logging
+
+
 class AddDevice:
     def __init__(self):
         self.devices = {}
@@ -50,7 +52,9 @@ class AddDevice:
 
         ###
         else:
-            logging.warning(f"⚠️ Unknown reader type '{reader}'. Device '{unique_name}' was not added.")
+            logging.warning(
+                f"⚠️ Unknown reader type '{reader}'. Device '{unique_name}' was not added."
+            )
             return  # Exit early if device is invalid
 
         logging.info(f"✅ Device '{unique_name}' added successfully.")
