@@ -6,7 +6,7 @@ from fastapi.responses import JSONResponse
 from app.core.path import get_prefix_from_path
 from app.schemas.api.models import (
     EventRequest,
-    InventoryRequest,
+    BooleanDeviceRequest,
     TagListSimulator,
     TagRequestSimulator,
 )
@@ -62,12 +62,32 @@ async def tag_list(tag_generator: TagListSimulator):
 
 
 @router.post(
+    "/connection",
+    responses=rfid_base_responses,
+    summary="Simulate connection state",
+    description="Simulates the connection state change for the specified device.",
+)
+async def simulator_connection(connection: BooleanDeviceRequest):
+    try:
+        if connection.state:
+            await events.on_connect(connection.device)
+            return {"msg": f"{connection.device} CONNECTED"}
+        else:
+            await events.on_disconnect(connection.device)
+            return {"msg": f"{connection.device} DISCONNECTED"}
+    except Exception as e:
+        logging.error(f"Error while processing connection simulation: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+
+@router.post(
     "/inventory",
     responses=rfid_base_responses,
     summary="Simulate inventory state",
     description="Starts or stops the inventory simulation for the specified device.",
 )
-async def simulator_inventory(inventory: InventoryRequest):
+async def simulator_inventory(inventory: BooleanDeviceRequest):
     try:
         if inventory.state:
             await events.on_start(inventory.device)
@@ -78,6 +98,7 @@ async def simulator_inventory(inventory: InventoryRequest):
     except Exception as e:
         logging.error(f"Error while processing inventory simulation: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+
 
 
 @router.post(

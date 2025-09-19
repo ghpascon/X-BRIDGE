@@ -92,7 +92,7 @@ class ActionsRequest(BaseModel):
     LOG_PATH: str = Field("Logs")
 
 
-class InventoryRequest(BaseModel):
+class BooleanDeviceRequest(BaseModel):
     device: str = Field("DEVICE01")
     state: bool = True
 

@@ -1,51 +1,50 @@
 <img src="/static/images/logo.png" alt="Logo" class="img-fluid" style="height: 50px;" />
 
-# 📡 RFID MIDDLEWARE
+# 📡 SMART CONNECTOR
 [**HOME**](/)
 
-O **RFID Middleware smartx** é uma solução desenvolvida para **gestão de leitores RFID**, oferecendo **alta performance**, **escalabilidade** e **flexibilidade** na integração com sistemas.
+**SMART CONNECTOR** is a solution developed for **RFID reader management**, offering **high performance**, **scalability**, and **flexibility** in system integration.
 
 ---
 
-## � Como Funciona
+## ⚙️ How It Works
 
-O middleware atua como uma **camada intermediária** entre os leitores RFID físicos e seus sistemas de gestão, oferecendo:
+The middleware acts as an **intermediate layer** between physical RFID readers and your management systems, providing:
 
-### 🔌 **Conectividade Universal**
-- Suporte a múltiplos protocolos: **TCP/IP**, **Serial**, **USB**
-- Conexões simultâneas com múltiplos dispositivos
+### 🔌 **Universal Connectivity**
+- Support for multiple protocols: **TCP/IP**, **Serial**, **USB**
+- Simultaneous connections with multiple devices
 
-### 📊 **Processamento Inteligente**
-- **Filtragem automática** de tags duplicadas
-- **Validação** de dados EPC/TID em tempo real
-- **Controle de antenas** e configuração de potência
-- **Monitoramento de RSSI** para análise de proximidade
+### 📊 **Smart Processing**
+- **Automatic filtering** of duplicate tags  
+- **Real-time validation** of EPC/TID data  
+- **Antenna control** and power configuration  
+- **RSSI monitoring** for proximity analysis  
 
-### 🔄 **Integração Flexível**
-- **HTTP POST** para APIs REST
-- **Banco de dados** MySQL/PostgreSQL/SQLite
-- **WebHooks** personalizados
-- **Logs estruturados** para auditoria
+### 🔄 **Flexible Integration**
+- **HTTP POST** for REST APIs  
+- **Database support**: MySQL / PostgreSQL / SQLite  
+- **Custom WebHooks**  
+- **Structured logs** for auditing  
 
 ---
 
 ### 🧪 **Simulator** (`/api/simulator/`)
 
-**Ideal para:**
-- ✅ Testes de integração sem hardware físico
-- ✅ Desenvolvimento de aplicações
-- ✅ Validação de fluxos de dados
-- ✅ Treinamento de equipes
+**Perfect for:**
+- ✅ Integration testing without physical hardware  
+- ✅ Application development  
+- ✅ Data flow validation  
+- ✅ Team training  
 
 ---
 
-## 🔄 **Fluxo de Funcionamento**
+## 🔄 **Operating Flow**
 
-1. **Configuração**: Defina dispositivos e integrações via API
-2. **Conexão**: O middleware conecta automaticamente aos leitores
-3. **Leitura**: Tags são capturadas e processadas em tempo real
-4. **Integração**: Dados são enviados para sistemas configurados
-5. **Monitoramento**: Logs e relatórios para acompanhamento
+1. **Configuration**: Define devices and integrations via API  
+2. **Connection**: The middleware automatically connects to RFID readers  
+3. **Reading**: Tags are captured and processed in real time  
+4. **Integration**: Data is sent to configured systems  
+5. **Monitoring**: Logs and reports for tracking  
 
 ---
-
