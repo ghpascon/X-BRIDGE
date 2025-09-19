@@ -101,13 +101,14 @@ def git_commit_all():
         "-m", "Merged remote changes, remote takes priority"
     ], repo_path, check=False)
 
-    # Force push to remote main
-    push_result = run_git_command(["push", "-u", "origin", branch, "--force"], repo_path, check=False)
-    if isinstance(push_result, subprocess.CalledProcessError):
-        print("Push failed, trying again after ensuring remote exists...")
-        ensure_remote(repo_path)
-        run_git_command(["push", "-u", "origin", branch, "--force"], repo_path)
-    print(f"Force-pushed changes to remote branch '{branch}'.")
+    # First try a normal push
+    push_result = run_git_command(["push", "-u", "origin", branch], repo_path, check=False)
+    if isinstance(push_result, subprocess.CalledProcessError) or push_result.returncode != 0:
+        print("Normal push failed. Retrying with force...")
+        run_git_command(["push", "-u", "origin", branch, "--force"], repo_path, check=False)
+        print(f"Force-pushed changes to remote branch '{branch}'.")
+    else:
+        print(f"Pushed changes to remote branch '{branch}' successfully.")
 
 if __name__ == "__main__":
     git_commit_all()
