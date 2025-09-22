@@ -6,8 +6,9 @@ from app.schemas.validators.tag import TagSchema
 
 
 class OnReceive:
-    async def on_receive(self, data):
-        logging.info(f"{self.name} -> 📥 Received Data: {data}")
+    async def on_receive(self, data, verbose = False):
+        if verbose:
+            logging.info(f"{self.name} -> 📥 Received Data: {data}")
 
         # CHECK IF IS RFID TAG or OTHER EVENT
         try:

@@ -2,7 +2,7 @@
   "READER": "X714",
   "CONNECTION": "AUTO",
   "VID": 1,
-  "PID": 1,
+  "PID": 4,
   "BAUDRATE": 115200,
   "BUZZER": true,
   "ANT": {

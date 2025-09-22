@@ -1,14 +1,25 @@
-import os
+# To run with Poetry:
+# poetry run python build_exe.py
 
+
+import os
 import PyInstaller.__main__
 from PyInstaller.utils.hooks import collect_all, collect_submodules
 
-# === CONFIGURAÇÕES DO USUÁRIO ===
-ENTRY_SCRIPT = "main.py"  # Script principal
-APP_NAME = "main"  # Nome do executável final
-EXTRA_FOLDERS = ["app"]  # Pastas adicionais para incluir no build
+# === USER CONFIGURATION ===
+EXE_PATH = "C:/Users/DELL/Desktop/PYTHON_BUILDS"  # Base folder to store builds
+ENTRY_SCRIPT = "main.py"  # Main script
+APP_NAME = "main"  # Final executable name
+EXTRA_FOLDERS = ["app"]  # Extra folders to include in the build
 
-# === Hidden imports adicionais ===
+# === Define output folder ===
+host_folder = os.path.basename(os.getcwd())  # name of the current working directory
+output_dir = os.path.join(EXE_PATH, host_folder)
+
+# Create folders if they don't exist
+os.makedirs(output_dir, exist_ok=True)
+
+# === Extra hidden imports ===
 manual_hidden = [
     "uvicorn.config",
     "uvicorn.main",
@@ -16,7 +27,7 @@ manual_hidden = [
 ]
 
 
-# === Coleta submódulos do serial e serial_asyncio ===
+# === Collect submodules for serial and serial_asyncio ===
 def safe_collect_submodules(pkg_name):
     try:
         subs = collect_submodules(pkg_name)
@@ -30,11 +41,11 @@ def safe_collect_submodules(pkg_name):
 serial_tools_hidden = safe_collect_submodules("serial.tools")
 serial_asyncio_hidden = safe_collect_submodules("serial_asyncio")
 
-# Unifica todos os hidden imports
+# Merge all hidden imports
 all_manual_hidden = manual_hidden + serial_tools_hidden + serial_asyncio_hidden
 
 
-# === Funções auxiliares ===
+# === Helper functions ===
 def read_poetry_dependencies(file_path="pyproject.toml"):
     import tomli  # Python 3.11+
 
@@ -43,7 +54,7 @@ def read_poetry_dependencies(file_path="pyproject.toml"):
     deps = data.get("project", {}).get("dependencies", [])
     packages = []
     for dep in deps:
-        # Remove extras e versões, pega só o nome do pacote
+        # Remove extras and versions, keep only the package name
         pkg = dep.split(" ", 1)[0].split("[", 1)[0]
         packages.append(pkg)
     return packages
@@ -58,24 +69,30 @@ def collect_all_from_packages(packages):
             binaries += b
             hiddenimports += h
         except Exception as e:
-            print(f"[WARN] Falha ao coletar '{pkg}': {e}")
+            print(f"[WARN] Failed to collect '{pkg}': {e}")
             exit()
     return datas, binaries, hiddenimports
 
 
-# === Lê pacotes do pyproject.toml ===
+# === Read packages from pyproject.toml ===
 packages = read_poetry_dependencies()
 datas, binaries, hiddenimports = collect_all_from_packages(packages)
 
-# === Adiciona pastas extras como dados ===
+# === Add extra folders as data ===
 extra_data = [f"{folder}{os.sep};{folder}" for folder in EXTRA_FOLDERS if os.path.exists(folder)]
 
-# === Executa o PyInstaller ===
+
+# === Run PyInstaller ===
 PyInstaller.__main__.run(
-    [ENTRY_SCRIPT, f"--name={APP_NAME}", "--onefile", "--noconsole"]
+    [
+        ENTRY_SCRIPT,
+        f"--name={APP_NAME}",
+        "--onefile",
+        "--noconsole",
+        f"--distpath={output_dir}",          # Executable output
+        f"--workpath={output_dir}/build",    # Build folder
+    ]
     + [f"--hidden-import={h}" for h in hiddenimports + all_manual_hidden]
     + [f"--add-data={d}" for d in extra_data]
 )
 
-# Para rodar com Poetry:
-# poetry run python build_exe.py

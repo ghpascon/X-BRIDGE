@@ -1,3 +1,7 @@
+"""
+poetry run python git_commit_all.py 
+"""
+
 import subprocess
 from datetime import datetime
 from pathlib import Path

@@ -5,11 +5,12 @@ from app.schemas.events import events
 
 
 class OnReceive:
-    async def on_receive(self, data):
+    async def on_receive(self, data, verbose = False):
         data = data.decode(errors="ignore")
         data = data.replace("\r", "").replace("\n", "")
         data = data.lower()
-        logging.info(f"{self.name} -> 📥 Received Data: {data}")
+        if verbose:
+            logging.info(f"{self.name} -> 📥 Received Data: {data}")
 
         if data.startswith("#read:"):
             self.is_reading = data.endswith("on")
