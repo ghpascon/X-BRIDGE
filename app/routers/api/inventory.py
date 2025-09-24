@@ -70,6 +70,20 @@ async def get_tags_count():
     return {"count": len(events.tags)}
 
 
+@router.get(
+    "/get_gtin",
+    summary="Get GTIN counts",
+    description="Returns the count of tags by GTIN. Tags without GTIN are labeled 'NC'.",
+    response_description="List of GTINs with their counts",
+)
+async def get_gtin():
+    eans = {}
+    for tag in events.tags.values():
+        ean = tag.get("gtin") or "NC"
+        eans[ean] = eans.get(ean, 0) + 1
+    return [{"ean": k, "count": v} for k, v in eans.items()]
+
+
 @router.post(
     "/receive_tags",
     summary="Receive tags from external devices",

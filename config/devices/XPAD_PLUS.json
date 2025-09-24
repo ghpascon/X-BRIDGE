@@ -1,7 +1,6 @@
 {
   "READER": "X714",
   "CONNECTION": "AUTO",
-  "BLUETOOTH": false,
   "VID": 1,
   "PID": 1,
   "BAUDRATE": 115200,

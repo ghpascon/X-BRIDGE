@@ -25,7 +25,7 @@ def run_git_command(args, repo_path, check=True, capture_output=False):
         if result.stderr:
             filtered_stderr = "\n".join(
                 line for line in result.stderr.splitlines()
-                if "ignored by one of your .gitignore files" not in line
+                if "ignored by one of your .gitignore files" not in line and "__pycache__" not in line
             )
             result.stderr = filtered_stderr
 
