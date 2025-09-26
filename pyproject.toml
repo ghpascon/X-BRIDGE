@@ -26,6 +26,7 @@ dependencies = [
     "pyepc (==0.5.0)",
     "pygame (==2.6.1)",
     "httpx (==0.28.1)",
+    "gmqtt (>=0.7.0,<0.8.0)",
 ]
 
 

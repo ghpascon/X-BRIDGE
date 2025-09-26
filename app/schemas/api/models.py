@@ -87,6 +87,10 @@ class ActionsRequest(BaseModel):
     DATABASE_URL: Optional[str] = Field(
         "mysql+aiomysql://root:admin@localhost:3306/middleware_smartx"
     )
+    MQTT_URL: Optional[str] = Field(
+        "mqtt://localhost:1883/connector"
+    ) 
+
     XTRACK_URL: Optional[str] = Field("https://192.168.0.100:6100/req")
     STORAGE_DAYS: int = Field(0)
     LOG_PATH: str = Field("Logs")
