@@ -5,11 +5,11 @@ from fastapi import APIRouter, Body, HTTPException
 from fastapi.responses import JSONResponse
 
 from app.core.path import get_prefix_from_path
-from app.schemas.api.models import validate_device
-from app.schemas.api.responses import device_responses, gpo_responses, state_responses
-from app.schemas.devices import devices
-from app.schemas.events import events
-from app.schemas.validators.tag import TagSchema
+from app.schemas.devices import validate_device
+from app.schemas.responses import device_responses
+from app.services.devices import devices
+from app.services.events import events
+from app.schemas.tag import TagSchema
 
 router = APIRouter(prefix=get_prefix_from_path(__file__), tags=[get_prefix_from_path(__file__)])
 
@@ -19,7 +19,7 @@ async def start_inventory(device: str):
     try:
         status, msg = validate_device(device=device)
         if not status:
-            logging.error("[ START ]", msg)
+            logging.error(f"[ START ] {msg}")
             raise HTTPException(status_code=422, detail=msg)
 
         logging.info(f"START -> {device}")
@@ -37,7 +37,7 @@ async def stop_inventory(device: str):
     try:
         status, msg = validate_device(device=device)
         if not status:
-            logging.error("[ STOP ]", msg)
+            logging.error(f"[ STOP ] {msg}")
             raise HTTPException(status_code=422, detail=msg)
 
         logging.info(f"STOP -> {device}")

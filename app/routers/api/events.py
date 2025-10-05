@@ -6,8 +6,8 @@ from fastapi import APIRouter, Body, Request
 
 from app.core.path import get_prefix_from_path
 from app.db.database import database_engine
-from app.schemas.api.models import EventRequest
-from app.schemas.events import events
+from app.schemas.events import EventRequest
+from app.services.events import events
 
 router = APIRouter(prefix=get_prefix_from_path(__file__), tags=[get_prefix_from_path(__file__)])
 

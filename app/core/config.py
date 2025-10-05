@@ -2,7 +2,7 @@ import json
 import logging
 import os
 
-from app.schemas.logger import logger_manager
+from app.services.logger import logger_manager
 
 
 class Settings:

@@ -1,12 +1,10 @@
 from fastapi import APIRouter, HTTPException
-from fastapi.responses import JSONResponse
 
 from app.core.config import settings
 from app.core.path import get_prefix_from_path
-from app.schemas.api.models import ActionsRequest
-from app.schemas.api.responses import rfid_actions_responses
-from app.schemas.devices import devices
-from app.schemas.events import events
+from app.schemas.events import ActionsRequest
+from app.schemas.responses import rfid_actions_responses
+from app.services.events import events
 
 router_prefix = get_prefix_from_path(__file__)
 router = APIRouter(prefix=router_prefix, tags=[router_prefix])

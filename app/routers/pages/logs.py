@@ -2,7 +2,7 @@ from fastapi import APIRouter, Request
 from fastapi.responses import HTMLResponse
 
 from app.core.templates import templates
-from app.schemas.logger import logger_manager
+from app.services.logger import logger_manager
 
 router = APIRouter(prefix="", tags=["Logs"])
 

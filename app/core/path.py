@@ -74,9 +74,9 @@ def include_all_routers(current_path, app):
                         relative_path = file_path.name
                     logging.info(f"✅ Route loaded: {relative_path}")
                 else:
-                    logging.warning(f"⚠️  File {relative_path} does not contain a 'router'")
+                    logging.warning(f"⚠️  File {current_path} does not contain a 'router'")
             except Exception as e:
-                logging.error(f"❌ Error loading {relative_path}: {e}")
+                logging.error(f"❌ Error loading {current_path}: {e}")
 
 
 def load_swagger_description(swagger_file_path: str) -> str:

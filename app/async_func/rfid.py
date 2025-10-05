@@ -4,9 +4,8 @@ from datetime import datetime, timedelta, timezone
 
 from app.core.config import settings
 from app.db.database import database_engine
-from app.schemas.devices import devices
-from app.schemas.events import events
-from app.schemas.logger import logger_manager
+from app.services.devices import devices
+from app.services.events import events
 
 
 async def connect_devices():
@@ -40,8 +39,9 @@ async def daily_clear_db():
     """Periodically clears old logs and database records at midnight (UTC-3)."""
     while True:
         try:
-            await logger_manager.clear_old_logs()
-            await database_engine.clear_db(settings.actions_data.get("STORAGE_DAYS"))
+            storage_days = settings.actions_data.get("STORAGE_DAYS")
+            if storage_days is not None:
+                await database_engine.clear_db(storage_days)
 
             # Calculate the next midnight in Brasília time (UTC-3)
             now = datetime.now(timezone(timedelta(hours=-3)))
