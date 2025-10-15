@@ -3,10 +3,24 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{{ title }}</title>
-    <link rel="stylesheet" href="/static/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="/static/css/themes.css" />
-    <link rel="icon" type="image/png" href="/static/images/logo.png" />
+    <title>{{ title or "Minha Aplicação" }}</title>
+
+    <!-- CSS -->
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', path='css/bootstrap.min.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', path='css/themes.css') }}"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      href="{{ url_for('static', path='images/logo.png') }}"
+    />
+
+    {% block extra_css %}{% endblock %}
   </head>
 
   <body id="main-body" class="d-flex flex-column min-vh-100">
@@ -17,7 +31,7 @@
       >
         <!-- Logo -->
         <img
-          src="/static/images/smtx_w.png"
+          src="{{ url_for('static', path='images/smtx_w.png') }}"
           alt="Logo"
           class="img-fluid"
           style="max-height: 50px; width: auto"
@@ -41,12 +55,14 @@
           <!-- Docs 📚 -->
           <a href="{{ url_for('docs') }}" class="btn btn-primary btn-sm">📚</a>
 
+          <!-- Metrics 📊 -->
+          <a href="{{ url_for('metrics') }}" class="btn btn-info btn-sm">📊</a>
+
           <!-- Get Report 🗃️ -->
           <a href="{{ url_for('get_report') }}" class="btn btn-secondary btn-sm"
             >🗃️</a
           >
 
-          <!-- Dark Mode 🌙 -->
           <div class="form-check form-switch ms-3">
             <input
               class="form-check-input"
@@ -60,9 +76,9 @@
       </div>
     </header>
 
-    <!-- Fast Alerts -->
+    <!-- Alerts -->
     <div class="container">
-      {% for alert in get_alerts() %}
+      {% for alert in alerts %}
       <div
         class="alert {{ alert.style }} alert-dismissible fade show"
         role="alert"
@@ -78,7 +94,7 @@
       {% endfor %}
     </div>
 
-    <!-- Main -->
+    <!-- Main Content -->
     <main class="container flex-fill">{% block content %}{% endblock %}</main>
 
     <!-- Footer -->
@@ -88,34 +104,13 @@
       </div>
     </footer>
 
-    <!-- Iframe oculto -->
+    <!-- Hidden iframe -->
     <iframe name="hidden_iframe" style="display: none"></iframe>
 
-    <script src="/static/js/bootstrap.bundle.min.js"></script>
-    <script>
-      document.addEventListener("DOMContentLoaded", () => {
-        const body = document.getElementById("main-body");
-        const switchEl = document.getElementById("darkModeSwitch");
+    <!-- JS -->
+    <script src="{{ url_for('static', path='js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ url_for('static', path='js/theme.js') }}"></script>
 
-        function applyTheme(dark) {
-          body.setAttribute("data-bs-theme", dark ? "dark" : "light");
-          localStorage.setItem("theme", dark ? "dark" : "light");
-        }
-
-        const savedTheme = localStorage.getItem("theme");
-        if (savedTheme) {
-          applyTheme(savedTheme === "dark");
-          if (switchEl) switchEl.checked = savedTheme === "dark";
-        } else {
-          applyTheme(false);
-        }
-
-        if (switchEl) {
-          switchEl.addEventListener("change", (e) =>
-            applyTheme(e.target.checked)
-          );
-        }
-      });
-    </script>
+    {% block extra_js %}{% endblock %}
   </body>
 </html>
