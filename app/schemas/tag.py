@@ -16,9 +16,9 @@ class TagSchema(BaseModel):
         if v is None:
             return v
         if len(v) != 24:
-            raise ValueError(f"{field.name} must have exactly 24 characters")
+            raise ValueError(f"{field} must have exactly 24 characters")
         if not re.fullmatch(r"[0-9a-fA-F]{24}", v):
-            raise ValueError(f"{field.name} must contain only hexadecimal characters (0-9, a-f)")
+            raise ValueError(f"{field} must contain only hexadecimal characters (0-9, a-f)")
         return v.lower()
 
 
@@ -47,18 +47,18 @@ class WriteTagValidator(BaseModel):
             v = "0" * 24
 
         if len(v) != 24:
-            raise ValueError(f"{field.name} must have exactly 24 characters")
+            raise ValueError(f"{field} must have exactly 24 characters")
         if not re.fullmatch(r"[0-9a-fA-F]{24}", v):
-            raise ValueError(f"{field.name} must contain only hexadecimal characters (0-9, a-f)")
-        return v.upper()
+            raise ValueError(f"{field} must contain only hexadecimal characters (0-9, a-f)")
+        return v.lower()
 
     @field_validator("password")
     def validate_password_length_and_hex(cls, v, field):
         if len(v) != 8:
-            raise ValueError(f"{field.name} must have exactly 8 characters")
+            raise ValueError(f"{field} must have exactly 8 characters")
         if not re.fullmatch(r"[0-9a-fA-F]{8}", v):
-            raise ValueError(f"{field.name} must contain only hexadecimal characters (0-9, a-f)")
-        return v.upper()  # Opcional: retorna sempre em maiúsculas
+            raise ValueError(f"{field} must contain only hexadecimal characters (0-9, a-f)")
+        return v.lower()  
 
 
 

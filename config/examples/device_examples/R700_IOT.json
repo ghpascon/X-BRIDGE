@@ -1,6 +1,8 @@
 {
   "READER": "R700_IOT",
   "CONNECTION": "impinj-15-d4-2d",
+  "USERNAME": "root",
+  "PASSWORD": "impinj",
   "START_READING": true,
   "READING_CONFIG": {
     "antennaConfigs": [

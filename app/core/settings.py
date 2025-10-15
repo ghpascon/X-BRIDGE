@@ -31,13 +31,13 @@ class Settings:
             except Exception as e:
                 logging.error(f"Error loading {actions_path}: {e}")
 
-        logger_manager.load()
+        logger_manager.load(log_path=self.actions_data.get("LOG_PATH", "Logs"))
 
     def save(self):
         """Save current configuration to file."""
         try:
 
-            logging.info("Salvando em:", self._config_path)
+            logging.info(f"Salvando em: {self._config_path}")
             with open(self._config_path, "w", encoding="utf8") as f:
                 json.dump(self.data, f, indent=4, ensure_ascii=False)
 

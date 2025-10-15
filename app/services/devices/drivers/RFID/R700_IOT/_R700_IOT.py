@@ -26,7 +26,7 @@ class R700_IOT(OnEvent, ReaderHelpers, WriteCommands):
         self.endpoint_write = f"{self.urlBase}/profiles/inventory/tag-access"
 
         self.interface_config = {"rfidInterface": "rest"}
-        self.auth = httpx.BasicAuth("root", "impinj")
+        self.auth = httpx.BasicAuth(self.config.get("USERNAME", "root"), self.config.get("PASSWORD", "impinj"))
 
         self.tags_to_write = {}
 

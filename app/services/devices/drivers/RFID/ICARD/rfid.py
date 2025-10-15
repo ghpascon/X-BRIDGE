@@ -14,8 +14,9 @@ class RfidCommands:
             elif self.step == 2:
                 await self.set_power()
             else:
-                self.is_connected = True
-                asyncio.create_task(events.on_connect(self.name))
+                if not self.is_connected:
+                    self.is_connected = True
+                    asyncio.create_task(events.on_connect(self.name))
                 await self.inventory_cmd()
 
     async def inventory_cmd(self):

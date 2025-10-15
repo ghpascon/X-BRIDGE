@@ -1,0 +1,10 @@
+{
+  "READER": "ICARD",
+  "CONNECTION": "AUTO",
+  "VID": 4292,
+  "PID": 60000,
+  "BAUDRATE": 9600,
+  "POWER": 26,
+  "SESSION": 1,
+  "START_READING": true
+}
