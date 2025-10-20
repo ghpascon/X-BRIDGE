@@ -5,43 +5,57 @@
   {% if is_rfid_reader(device) %}
   <!-- BUTTONS -->
   <div style="padding: 0%" class="d-flex">
-    <button onclick="fetch('{{ url_for('start_inventory', device=device) }}', { method: 'POST' })"
-      class="btn btn-success">
+    <button
+      onclick="fetch('{{ url_for('start_inventory', device=device) }}', { method: 'POST' })"
+      class="btn btn-success"
+    >
       Start
     </button>
 
-    <button onclick="fetch('{{ url_for('stop_inventory', device=device) }}', { method: 'POST' })" class="btn btn-danger"
-      style="margin-left: 15px">
+    <button
+      onclick="fetch('{{ url_for('stop_inventory', device=device) }}', { method: 'POST' })"
+      class="btn btn-danger"
+      style="margin-left: 15px"
+    >
       Stop
     </button>
 
-    <button onclick="fetch('{{ url_for('clear_tags', device=device) }}', { method: 'POST' })" class="btn btn-warning"
-      style="margin-left: 15px">
+    <button
+      onclick="fetch('{{ url_for('clear_tags', device=device) }}', { method: 'POST' })"
+      class="btn btn-warning"
+      style="margin-left: 15px"
+    >
       Clear
     </button>
 
     <!-- GPO -->
     <button
       onclick="fetch('{{ url_for('writegpo') }}', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ device: '{{ device }}', pin: 1, state: true, control: 'static', time: 1000 }) })"
-      class="btn btn-success" style="margin-left: 15px">
+      class="btn btn-success"
+      style="margin-left: 15px"
+    >
       GPO TRUE
     </button>
     <button
       onclick="fetch('{{ url_for('writegpo') }}', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ device: '{{ device }}', pin: 1, state: false, control: 'static', time: 1000 }) })"
-      class="btn btn-danger" style="margin-left: 15px">
+      class="btn btn-danger"
+      style="margin-left: 15px"
+    >
       GPO FALSE
     </button>
   </div>
   {% endif %}
 
   <!-- STATE -->
-  <div class="d-flex align-items-center justify-content-between mb-3 gap-1 flex-wrap">
+  <div
+    class="d-flex align-items-center justify-content-between mb-3 gap-1 flex-wrap"
+  >
     <h2 id="state_label_{{ device|replace(' ', '_') }}"></h2>
   </div>
 </div>
 
 <script>
-  async function updateReadingState_{ { device | replace(' ', '_') } } () {
+  async function updateReadingState_{{ device | replace(' ', '_') }} () {
     try {
       const response = await fetch("{{ url_for('get_device_state', device=device) }}");
       if (!response.ok) throw new Error("Request failed");
@@ -97,5 +111,5 @@
 
   // Update every 500ms
   setInterval(updateReadingState_{{ device| replace(' ', '_') }}, 500);
-  updateReadingState_{ { device | replace(' ', '_') } } ();
+  updateReadingState_{{ device | replace(' ', '_') }} ();
 </script>

@@ -16,9 +16,9 @@ class OnReceive:
             self.is_reading = data.endswith("on")
             if self.is_reading:
                 await self.clear_tags()
-                await self.on_start(self.name)
+                await self.on_start()
             else:
-                await self.on_stop(self.name)
+                await self.on_stop()
 
         elif data.startswith("#t+@"):
             tag = data[4:]

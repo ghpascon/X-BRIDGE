@@ -1,6 +1,6 @@
 {
   "HTTP_POST": null,
-  "DATABASE_URL": null,
+  "DATABASE_URL": "mysql+aiomysql://root:admin@localhost:3306/cofema",
   "XTRACK_URL": null,
   "MQTT_URL": null,
   "STORAGE_DAYS": -1,
