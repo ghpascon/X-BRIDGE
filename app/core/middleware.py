@@ -4,7 +4,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
 from prometheus_fastapi_instrumentator import Instrumentator
 from starlette.middleware.gzip import GZipMiddleware
-
+from fastapi.responses import JSONResponse
+import logging
 
 # =====================
 #  AUTO-REGISTRATION
@@ -32,3 +33,25 @@ def setup_middlewares(app):
     app.add_middleware(GZipMiddleware, minimum_size=1000)
     Instrumentator().instrument(app).expose(app, include_in_schema=False)
 
+class SafeRequestMiddleware(BaseHTTPMiddleware):
+    """
+    Middleware that wraps every request in a try/except block.
+    Returns a JSON error response if any unhandled exception occurs.
+    """
+
+    async def dispatch(self, request, call_next):
+        try:
+            response = await call_next(request)
+            return response
+        except Exception as e:
+            # Log the error
+            logging.error(f"[Middleware Error] {type(e).__name__}: {e}")
+
+            # Return JSON error response
+            return JSONResponse(
+                status_code=500,
+                content={
+                    "message": str(e),
+                    "path": request.url.path,
+                },
+            )
