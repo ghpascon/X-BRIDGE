@@ -8,9 +8,34 @@ import sys
 from app.core.path import get_path
 
 
+async def restartable_task(func, *args, **kwargs):
+    """Executa uma coroutine que se reinicia automaticamente em caso de erro."""
+    name = f"{func.__module__}.{func.__name__}"
+
+    while True:
+        try:
+            logging.info(f"🚀 Starting task {name}")
+            await func(*args, **kwargs)
+            logging.warning(f"🛑 Task {name} finished normally — not restarting")
+            break
+
+        except asyncio.CancelledError:
+            logging.warning(f"⚠️ Task {name} cancelled — exiting cleanly")
+            break
+
+        except KeyboardInterrupt:
+            logging.warning(f"🧹 Task {name} received KeyboardInterrupt — exiting program")
+            raise  # Propaga o Ctrl+C para encerrar o programa
+
+        except Exception as e:
+            logging.exception(f"💥 Task {name} crashed: {e}. Restarting in 1s...")
+            await asyncio.sleep(1)
+
+
 async def create_tasks(module_dir):
+    """Cria tasks restartáveis para todas as corotinas do diretório informado."""
     package_path = os.path.abspath(get_path(module_dir))
-    sys.path.insert(0, os.path.dirname(package_path))  # Ensure Python can locate the package
+    sys.path.insert(0, os.path.dirname(package_path))
     package_name = os.path.basename(package_path)
 
     tasks = []
@@ -22,18 +47,17 @@ async def create_tasks(module_dir):
             continue
 
         if os.path.isdir(full_path) and not file.startswith("."):
-            # Recursively add tasks from subdirectories
             sub_tasks = await create_tasks(full_path)
             tasks.extend(sub_tasks)
 
         elif file.endswith(".py") and file != "__init__.py":
-            module_name = f"{package_name}.{file[:-3]}"  # Convert to dot notation
+            module_name = f"{package_name}.{file[:-3]}"
             module = importlib.import_module(module_name)
 
-            # Add all coroutine functions defined in the module
             for name, func in inspect.getmembers(module, inspect.iscoroutinefunction):
                 if func.__module__ == module.__name__:
-                    tasks.append(asyncio.create_task(func()))
-                    logging.info(f"✅ Added {file} - {name}() -> tasks")
+                    task = asyncio.create_task(restartable_task(func))
+                    tasks.append(task)
+                    logging.info(f"✅ Registered restartable task {file} - {name}()")
 
     return tasks
