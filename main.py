@@ -32,6 +32,10 @@ from app.core.path import get_path, include_all_routers
 from app.core.middleware import setup_middlewares
 from app.core.exeption_handlers import setup_exeptions
 
+import uvicorn
+import threading
+import webbrowser
+
 # Application constants
 DEFAULT_PORT = 5000
 DEFAULT_HOST = "0.0.0.0"
@@ -147,8 +151,6 @@ app = create_application()
 
 # Server startup code
 if __name__ == "__main__":
-    import uvicorn
-
     # Get port and host from settings or use defaults
     port = settings.data.get("PORT", DEFAULT_PORT)
     host = settings.data.get("HOST", DEFAULT_HOST)
@@ -157,9 +159,6 @@ if __name__ == "__main__":
 
     # Open browser automatically if configured
     if settings.data.get("OPEN_BROWSER", True):
-        import threading
-        import webbrowser
-
         def open_browser() -> None:
             """Open the default web browser at the application URL."""
             url = f"http://localhost:{port}"
@@ -174,5 +173,11 @@ if __name__ == "__main__":
         uvicorn.run(
             app, host=host, port=port, access_log=False, log_level="critical", log_config=None
         )
+    except SystemExit as e:
+        logging.error(f"Server exited with SystemExit: {e}")
+        error_html = get_path("app/templates/start_error.html")
+        url = f"file://{error_html}"  
+        webbrowser.open_new(url)
+
     except Exception as e:
         logging.error(f"Failed to start server: {e}")
