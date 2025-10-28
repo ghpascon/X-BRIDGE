@@ -5,8 +5,9 @@ from app.services.events import events
 
 
 class OnReceive:
-    async def on_receive(self, data, verbose = False):
-        data = data.decode(errors="ignore")
+    async def on_receive(self, data, verbose: bool = False):
+        if not isinstance(data, str):
+            data = data.decode(errors="ignore")
         data = data.replace("\r", "").replace("\n", "")
         data = data.lower()
         if verbose:

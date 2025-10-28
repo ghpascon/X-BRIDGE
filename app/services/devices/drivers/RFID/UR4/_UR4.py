@@ -74,16 +74,16 @@ class UR4(ReaderHelpers, OnEvent, SetupReader, WriteCommands):
 
                 self.is_connected = False
                 asyncio.create_task(events.on_disconnect(self.name))
-                logging.info("Conexão perdida, tentando reconectar...")
+                logging.info("Conexão perdida")
             except (asyncio.TimeoutError, ConnectionRefusedError, OSError, PermissionError) as e:
                 self.is_connected = False
-                logging.warning(f"⏳ Falha ao conectar ({e.__class__.__name__}): {e}. Tentando novamente em 3s...")
+                logging.warning(f"⏳ Falha ao conectar ({e.__class__.__name__}): {e}.")
             except Exception as e:
                 self.is_connected = False
                 asyncio.create_task(events.on_disconnect(self.name))
-                logging.error(f"❌ Erro: {e}. Tentando reconectar em 3 segundos...")
-            except:
-                logging.error(f"❌ Erro desconhecido")
+                logging.error(f"❌ Erro: {e}.")
+            finally:
+                logging.info("Tentando reconectar em 3 segundos...")
 
             await asyncio.sleep(3)
 

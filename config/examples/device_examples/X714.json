@@ -3,6 +3,8 @@
   "CONNECTION": "AUTO",
   "VID": 1,
   "PID": 1,
+  "IS_BLUETOOTH": true,
+  "BLE_NAME": "XPAD_PLUS",
   "BAUDRATE": 115200,
   "BUZZER": true,
   "ANT": {

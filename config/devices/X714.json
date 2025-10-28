@@ -1,16 +1,16 @@
 {
   "READER": "X714",
-  "IS_BLUETOOTH": false,
-  "BLE_NAME": "XPAD_PLUS",
   "CONNECTION": "AUTO",
   "VID": 1,
   "PID": 1,
+  "IS_BLUETOOTH": true,
+  "BLE_NAME": "XPAD_PLUS",
   "BAUDRATE": 115200,
   "BUZZER": true,
   "ANT": {
     "1": {
       "active": true,
-      "power": 24,
+      "power": 22,
       "rssi": -100
     },
     "2": {

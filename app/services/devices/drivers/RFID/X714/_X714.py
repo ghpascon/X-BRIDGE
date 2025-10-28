@@ -30,17 +30,16 @@ class X714(SerialProtocol, OnReceive, RfidCommands, BLEProtocol, WriteCommands):
         self.is_reading = False
 
         self.is_auto = self.port == "AUTO"
-
+        self.init_ble_vars()
 
     def write(self, to_send, verbose=True):
         if self.is_bluetooth:
-            asyncio.run(self.write_ble(to_send.encode(), verbose))
+            asyncio.create_task(self.write_ble(to_send.encode(), verbose))
         else:
             self.write_serial(to_send, verbose)
 
     async def connect(self):
         if self.is_bluetooth:
-            raise NotImplementedError()
             await self.connect_ble()
         else:
             await self.connect_serial()
