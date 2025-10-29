@@ -1,10 +1,12 @@
 {
   "READER": "X714",
+  "_CONNECTION_TYPE": ["SERIAL", "BLE", "TCP"],
+  "CONNECTION_TYPE": "SERIAL",
   "CONNECTION": "AUTO",
   "VID": 1,
   "PID": 1,
-  "IS_BLUETOOTH": true,
   "BLE_NAME": "XPAD_PLUS",
+  "TCP_PORT": 23,
   "BAUDRATE": 115200,
   "BUZZER": true,
   "ANT": {

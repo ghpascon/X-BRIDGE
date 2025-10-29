@@ -1,5 +1,5 @@
 {
-  "HTTP_POST": "http://localhost:5001",
+  "HTTP_POST": null,
   "DATABASE_URL": null,
   "XTRACK_URL": null,
   "MQTT_URL": null,

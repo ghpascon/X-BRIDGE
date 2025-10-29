@@ -72,12 +72,12 @@ class SerialProtocol(asyncio.Protocol):
                     await asyncio.sleep(3)
                     continue  # try to detect again in next loop
                 else:
-                    self.port = found_port
+                    self.connection = found_port
 
             try:
-                logging.info(f"🔌 Trying to connect to {self.port} at {self.baudrate} bps...")
+                logging.info(f"🔌 Trying to connect to {self.connection} at {self.baudrate} bps...")
                 await serial_asyncio.create_serial_connection(
-                    loop, lambda: self, self.port, baudrate=self.baudrate
+                    loop, lambda: self, self.connection, baudrate=self.baudrate
                 )
                 logging.info("🟢 Successfully connected.")
                 await self.on_con_lost.wait()
@@ -87,7 +87,7 @@ class SerialProtocol(asyncio.Protocol):
 
             # If in AUTO mode, reset port to "AUTO" to force detection next loop
             if self.is_auto:
-                self.port = "AUTO"
+                self.connection = "AUTO"
 
             logging.info("⏳ Waiting 3 seconds before retrying...")
             await asyncio.sleep(3)

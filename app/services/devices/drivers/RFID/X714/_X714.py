@@ -4,19 +4,27 @@ from .rfid import RfidCommands
 from .serial_protocol import SerialProtocol
 from .ble_protocol import BLEProtocol
 from .write_commands import WriteCommands
+from .tcp_protocol import TCPProtocol
+import logging
 
-class X714(SerialProtocol, OnReceive, RfidCommands, BLEProtocol, WriteCommands):
+class X714(SerialProtocol, OnReceive, RfidCommands, BLEProtocol, WriteCommands, TCPProtocol):
     def __init__(self, config, name):
         self.is_rfid_reader = True
 
         self.name = name
         self.config = config
 
-        self.is_bluetooth = self.config.get("IS_BLUETOOTH", False)
+        # CONNECTION TYPE
+        self.connection_type = self.config.get("CONNECTION_TYPE")
+        if self.connection_type not in config.get("_CONNECTION_TYPE", []):
+            self.connection_type = "SERIAL"
+
+        self.tcp_port = self.config.get("TCP_PORT", 23)
+
         self.ble_name = self.config.get("BLE_NAME", "XPAD_PLUS")
         self.init_ble_vars()
 
-        self.port = self.config.get("CONNECTION", "AUTO")
+        self.connection = self.config.get("CONNECTION", "AUTO")
         self.baudrate = self.config.get("BAUDRATE", 115200)
         self.vid = self.config.get("VID", 1)
         self.pid = self.config.get("PID", 1)
@@ -29,17 +37,21 @@ class X714(SerialProtocol, OnReceive, RfidCommands, BLEProtocol, WriteCommands):
         self.is_connected = False
         self.is_reading = False
 
-        self.is_auto = self.port == "AUTO"
+        self.is_auto = self.connection == "AUTO"
         self.init_ble_vars()
 
     def write(self, to_send, verbose=True):
-        if self.is_bluetooth:
+        if self.connection_type == "SERIAL":
+            self.write_serial(to_send, verbose)
+        elif self.connection_type == "BLE":
             asyncio.create_task(self.write_ble(to_send.encode(), verbose))
         else:
-            self.write_serial(to_send, verbose)
+            asyncio.create_task(self.write_tcp(to_send, verbose))
 
     async def connect(self):
-        if self.is_bluetooth:
+        if self.connection_type == "SERIAL":
+            await self.connect_serial()
+        elif self.connection_type == "BLE":
             await self.connect_ble()
         else:
-            await self.connect_serial()
+            await self.connect_tcp(self.connection, self.tcp_port)
