@@ -63,8 +63,7 @@ class OnEvent:
         except ValidationError as e:
             logging.error(f"❌ Invalid tag: {e.json()}")
 
-        finally:
-            return None
+        return None
 
     async def on_start(self, device: str) -> None:
         """

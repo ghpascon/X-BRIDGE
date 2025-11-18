@@ -89,12 +89,15 @@ class TCPProtocol(TCPHelpers):
             except ValueError as e:
                 logging.error(f"❌ [INVALID IP] {self.name}: {e}")
                 retry_delay = 5
+                continue
             except OSError as e:
                 logging.error(f"💥 [NETWORK ERROR] {self.name}: {e}")
-                retry_delay = min(retry_delay * 2, 30)  # backoff até 30s
+                retry_delay = 5  # backoff até 30s
+                continue
             except Exception as e:
                 logging.error(f"❌ [UNEXPECTED ERROR] {self.name}: {e}")
                 retry_delay = 5
+                continue
 
             # Garante desconexão limpa
             if self.writer:
