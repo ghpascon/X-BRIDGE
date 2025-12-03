@@ -39,7 +39,8 @@ class Events(OnEvent, Actions):
         try:
             async with database_engine.get_db() as db:
                 for tag in self.tags.values():
-                    current_tag = DbTag(**tag)
+                    # Use safe method to handle extra fields like 'count'
+                    current_tag = DbTag.create_from_dict(tag)
 
                     # Skip invalid tags
                     if current_tag.epc is None:

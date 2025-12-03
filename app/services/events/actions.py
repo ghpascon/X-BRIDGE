@@ -71,7 +71,8 @@ class Actions:
     async def tag_db(self, tag):
         try:
             async with database_engine.get_db() as db:
-                current_tag = DbTag(**tag)
+                # Use safe method to handle extra fields like 'count'
+                current_tag = DbTag.create_from_dict(tag)
                 if current_tag.epc is None:
                     return
                 db.add(current_tag)

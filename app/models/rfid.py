@@ -2,9 +2,9 @@ from sqlalchemy import Column, DateTime, Integer, String
 from sqlalchemy.sql import func
 
 from app.db.session import Base
+from .helpers import BaseModelMixin
 
-
-class DbTag(Base):
+class DbTag(Base, BaseModelMixin):
     """
     Database model for RFID tag readings.
 
@@ -25,7 +25,7 @@ class DbTag(Base):
     gtin = Column(String(24), nullable=True, index=True)
 
 
-class DbEvent(Base):
+class DbEvent(Base, BaseModelMixin):
     """
     Database model for system events and logs.
 
@@ -41,3 +41,4 @@ class DbEvent(Base):
     device = Column(String(50), nullable=False, index=True)
     event_type = Column(String(50), nullable=False, index=True)
     event_data = Column(String(200), nullable=False)
+
