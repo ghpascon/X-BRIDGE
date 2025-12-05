@@ -12,9 +12,8 @@ class SerialProtocol(asyncio.Protocol):
     def connection_made(self, transport):
         self.transport = transport
         self.is_connected = True
-        asyncio.create_task(events.on_connect(self.name))
         logging.info("✅ Serial connection successfully established.")
-        asyncio.create_task(self.config_reader())
+        self.on_connected()
 
     def data_received(self, data):
         self.rx_buffer += data

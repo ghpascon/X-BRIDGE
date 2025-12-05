@@ -1,0 +1,41 @@
+{
+  "READER": "X714",
+  "_CONNECTION_TYPE": ["SERIAL", "BLE", "TCP"],
+  "CONNECTION_TYPE": "TCP",
+  "CONNECTION": "192.168.1.102",
+  "VID": 1,
+  "PID": 1,
+  "BLE_NAME": "SMTX",
+  "TCP_PORT": 23,
+  "BAUDRATE": 115200,
+  "BUZZER": false,
+  "ANT": {
+    "1": {
+      "active": true,
+      "power": 33,
+      "rssi": -150
+    },
+    "2": {
+      "active": true,
+      "power": 33,
+      "rssi": -150
+    },
+    "3": {
+      "active": false,
+      "power": 33,
+      "rssi": -150
+    },
+    "4": {
+      "active": false,
+      "power": 33,
+      "rssi": -150
+    }
+  },
+  "SESSION": 1,
+  "START_READING": true,
+  "GPI_START": false,
+  "IGNORE_READ": false,
+  "ALWAYS_SEND": true,
+  "SIMPLE_SEND": false,
+  "KEYBOARD": false
+}

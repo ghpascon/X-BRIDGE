@@ -1,4 +1,5 @@
 import asyncio
+from app.services.events import events
 from .on_receive import OnReceive
 from .rfid import RfidCommands
 from .serial_protocol import SerialProtocol
@@ -55,3 +56,8 @@ class X714(SerialProtocol, OnReceive, RfidCommands, BLEProtocol, WriteCommands, 
             await self.connect_ble()
         else:
             await self.connect_tcp(self.connection, self.tcp_port)
+
+    def on_connected(self):
+        """Callback chamado quando a conexão é estabelecida."""
+        asyncio.create_task(self.config_reader())
+        asyncio.create_task(events.on_connect(self.name))

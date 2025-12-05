@@ -61,13 +61,14 @@ class TCPProtocol(TCPHelpers):
                 self.reader, self.writer = await asyncio.wait_for(connect_task, timeout=3)
 
                 self.is_connected = True
-                asyncio.create_task(events.on_connect(self.name))
+                self.on_connected()
                 logging.info(f"✅ [CONNECTED] {self.name} - {ip}:{port}")
 
                 # Cria tasks de leitura e monitoramento
                 tasks = [
                     asyncio.create_task(self.receive_data_tcp()),
                     asyncio.create_task(self.monitor_connection()),
+                    asyncio.create_task(self.periodic_ping(10))
                 ]
 
                 # Espera até que uma delas finalize
@@ -126,3 +127,8 @@ class TCPProtocol(TCPHelpers):
                 if self.is_connected:
                     self.is_connected = False
                     asyncio.create_task(events.on_disconnect(self.name))
+
+    async def periodic_ping(self, interval: int):
+        while self.is_connected:
+            await asyncio.sleep(interval)
+            await self.write_tcp("ping", verbose=False)

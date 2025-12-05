@@ -1,6 +1,6 @@
 {
   "HTTP_POST": null,
-  "DATABASE_URL": "mysql+aiomysql://root:admin@localhost:3306/middleware_smartx",
+  "DATABASE_URL": null,
   "XTRACK_URL": null,
   "MQTT_URL": null,
   "STORAGE_DAYS": -1,
