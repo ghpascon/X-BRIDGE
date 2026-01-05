@@ -53,7 +53,7 @@ class TCP(Helpers):
             except Exception as e:
                 self.is_connected = False
                 asyncio.create_task(events.on_disconnect(self.name))
-                logging.error(
+                logging.warning(
                     f"❌ [CONNECTION ERROR] {self.device_name}: {e} - Retrying in 3 seconds..."
                 )
 
@@ -68,6 +68,6 @@ class TCP(Helpers):
                 if verbose:
                     logging.info(f"[SENT] {data.strip()}")
             except Exception as e:
-                logging.error(f"[SEND ERROR] {e}")
+                logging.warning(f"[SEND ERROR] {e}")
                 self.is_connected = False
                 asyncio.create_task(events.on_disconnect(self.name))

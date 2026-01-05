@@ -5,7 +5,7 @@ import time
 import serial.tools.list_ports
 import serial_asyncio
 
-from app.core.settings import settings
+from app.core import settings
 from app.schemas.events import events
 
 from .on_receive import OnReceive
@@ -76,7 +76,7 @@ class SERIAL(asyncio.Protocol, OnReceive):
                 asyncio.create_task(self.on_receive(message))
 
     def connection_lost(self, exc):
-        logging.error("⚠️ Serial connection lost.")
+        logging.warning("⚠️ Serial connection lost.")
         self.transport = None
         self.is_connected = False
         self.step = 0
@@ -105,7 +105,7 @@ class SERIAL(asyncio.Protocol, OnReceive):
 
             self.transport.write(to_send)
         else:
-            logging.error("❌ Send attempt failed: connection not established.")
+            logging.warning("❌ Send attempt failed: connection not established.")
 
     async def connect(self):
         """Serial connection/reconnection loop"""
@@ -143,7 +143,7 @@ class SERIAL(asyncio.Protocol, OnReceive):
                 await self.on_con_lost.wait()
                 logging.info("🔄 Connection lost. Attempting to reconnect...")
             except Exception as e:
-                logging.error(f"❌ Connection error: {e}")
+                logging.warning(f"❌ Connection error: {e}")
 
             # If in AUTO mode, reset port to "AUTO" to force detection next loop
             if self.is_auto:

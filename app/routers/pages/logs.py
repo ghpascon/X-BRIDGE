@@ -2,7 +2,7 @@ from fastapi import APIRouter, Request
 from fastapi.responses import HTMLResponse
 
 from app.core.templates import templates
-from app.services.logger import logger_manager
+from app.core import logger
 
 router = APIRouter(prefix="", tags=["Logs"])
 
@@ -18,4 +18,4 @@ async def logs(request: Request):
 
 @router.get("/get_logs")
 async def get_logs():
-    return list(logger_manager.logs)
+    return list(logger.logs)

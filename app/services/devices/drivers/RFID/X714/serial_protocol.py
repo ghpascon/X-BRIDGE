@@ -25,7 +25,7 @@ class SerialProtocol(asyncio.Protocol):
             asyncio.create_task(self.on_receive(packet))
 
     def connection_lost(self, exc):
-        logging.error("⚠️ Serial connection lost.")
+        logging.warning("⚠️ Serial connection lost.")
         self.transport = None
         self.is_connected = False
         asyncio.create_task(events.on_disconnect(self.name))
@@ -42,7 +42,7 @@ class SerialProtocol(asyncio.Protocol):
                 to_send = to_send.encode()  # convert string to bytes
             self.transport.write(to_send)
         else:
-            logging.error("❌ Send attempt failed: connection not established.")
+            logging.warning("❌ Send attempt failed: connection not established.")
 
     async def connect_serial(self):
         """Serial connection/reconnection loop"""
@@ -82,7 +82,7 @@ class SerialProtocol(asyncio.Protocol):
                 await self.on_con_lost.wait()
                 logging.info("🔄 Connection lost. Attempting to reconnect...")
             except Exception as e:
-                logging.error(f"❌ Connection error: {e}")
+                logging.warning(f"❌ Connection error: {e}")
 
             # If in AUTO mode, reset port to "AUTO" to force detection next loop
             if self.is_auto:

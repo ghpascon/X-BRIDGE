@@ -20,7 +20,7 @@ from app import models  # Ensure models are imported
 
 from .session import Base
 
-from app.core.settings import settings
+from app.core import settings
 
 # Constants
 DEFAULT_POOL_SIZE = 10

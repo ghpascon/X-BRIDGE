@@ -39,7 +39,7 @@ class TCPHelpers:
         except Exception as e:
             if self.is_connected:
                 self.is_connected = False
-                logging.error(f"[RECEIVE ERROR] {e}")
+                logging.warning(f"[RECEIVE ERROR] {e}")
 
 
 class TCPProtocol(TCPHelpers):
@@ -88,15 +88,15 @@ class TCPProtocol(TCPHelpers):
                 logging.warning(f"⏱️ [TIMEOUT] {self.name} - No response from {ip}:{port}")
                 continue
             except ValueError as e:
-                logging.error(f"❌ [INVALID IP] {self.name}: {e}")
+                logging.warning(f"❌ [INVALID IP] {self.name}: {e}")
                 retry_delay = 5
                 continue
             except OSError as e:
-                logging.error(f"💥 [NETWORK ERROR] {self.name}: {e}")
+                logging.warning(f"💥 [NETWORK ERROR] {self.name}: {e}")
                 retry_delay = 5  # backoff até 30s
                 continue
             except Exception as e:
-                logging.error(f"❌ [UNEXPECTED ERROR] {self.name}: {e}")
+                logging.warning(f"❌ [UNEXPECTED ERROR] {self.name}: {e}")
                 retry_delay = 5
                 continue
 
@@ -123,7 +123,7 @@ class TCPProtocol(TCPHelpers):
                 if verbose:
                     logging.info(f"[SENT] {data.strip()}")
             except Exception as e:
-                logging.error(f"[SEND ERROR] {e}")
+                logging.warning(f"[SEND ERROR] {e}")
                 if self.is_connected:
                     self.is_connected = False
                     asyncio.create_task(events.on_disconnect(self.name))

@@ -43,7 +43,7 @@ class ReaderHelpers:
                 return response.status_code == 204
 
         except Exception as e:
-            logging.error(f"Error posting to {endpoint}: {e}")
+            logging.warning(f"Error posting to {endpoint}: {e}")
             return False
 
     async def get_tag_list(self, session):
@@ -73,12 +73,12 @@ class ReaderHelpers:
                             asyncio.create_task(self.on_tag(tagEvent))
 
                     except (json.JSONDecodeError, UnicodeDecodeError) as parse_error:
-                        logging.error(f"Warning: Failed to parse event: {parse_error}")
+                        logging.warning(f"Warning: Failed to parse event: {parse_error}")
                     except Exception as e:
-                        logging.error(f"Unexpected error: {e}")
+                        logging.warning(f"Unexpected error: {e}")
 
         except httpx.RequestError as e:
-            logging.error(f"Connection error: {e}")
+            logging.warning(f"Connection error: {e}")
 
     async def get_tid_from_epc(self, epc):
         current_tags = list(self.tags)

@@ -27,7 +27,7 @@ from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 
 from app.async_func import create_tasks
-from app.core.settings import settings
+from app.core import settings
 from app.core.path import get_path, include_all_routers
 from app.core.middleware import setup_middlewares
 from app.core.exeption_handlers import setup_exeptions

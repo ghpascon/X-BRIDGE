@@ -34,7 +34,7 @@ class ReaderHelpers:
 
         except Exception as e:
             self.is_connected = False
-            logging.error(f"[ERRO RECEBIMENTO] {e}")
+            logging.warning(f"[ERRO RECEBIMENTO] {e}")
 
     async def get_temperature(self):
         while True:

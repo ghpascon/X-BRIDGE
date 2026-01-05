@@ -6,7 +6,7 @@ class WriteCommands:
         try:
             validated_tag = WriteTagValidator(**tag)
         except Exception as e:
-            logging.error(e)
+            logging.warning(e)
             return  
         identifier = validated_tag.target_identifier
         value = validated_tag.target_value

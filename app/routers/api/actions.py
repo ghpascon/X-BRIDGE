@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
 
-from app.core.settings import settings
+from app.core import settings
 from app.core.path import get_prefix_from_path
 from app.schemas.events import ActionsRequest
 from app.schemas.responses import rfid_actions_responses

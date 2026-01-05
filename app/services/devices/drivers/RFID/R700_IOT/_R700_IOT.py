@@ -61,13 +61,13 @@ class R700_IOT(OnEvent, ReaderHelpers, WriteCommands):
                 self.is_reading = False
                 success = await self.configure_interface(session)
                 if not success:
-                    logging.error("Failed to configure interface")
+                    logging.warning("Failed to configure interface")
                     await asyncio.sleep(1)
                     continue
 
                 success = await self.stop_inventory(session)
                 if not success:
-                    logging.error("Failed to stop profiles")
+                    logging.warning("Failed to stop profiles")
                     await asyncio.sleep(1)
                     continue
 
@@ -76,7 +76,7 @@ class R700_IOT(OnEvent, ReaderHelpers, WriteCommands):
                 ):
                     success = await self.start_inventory(session)
                     if not success:
-                        logging.error("Failed to start inventory")
+                        logging.warning("Failed to start inventory")
                         await asyncio.sleep(1)
                         continue
                 if self.config.get("START_READING"):
@@ -108,7 +108,7 @@ class R700_IOT(OnEvent, ReaderHelpers, WriteCommands):
                     session, self.endpoint_gpo, payload=gpo_command, method="put"
                 )
         except Exception as e:
-            logging.error(f"Failed to set GPO: {e}")
+            logging.warning(f"Failed to set GPO: {e}")
 
     async def write_epc(self, tag_commands):
         """
@@ -123,7 +123,7 @@ class R700_IOT(OnEvent, ReaderHelpers, WriteCommands):
                 validated_tag = WriteTagValidator(**tag)
                 all_commands.append(await self.get_write_cmd(validated_tag))
             except Exception as e:
-                logging.error(e)
+                logging.warning(e)
                 continue
 
         await self.send_write_command(all_commands)

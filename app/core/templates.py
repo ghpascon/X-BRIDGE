@@ -6,7 +6,7 @@ from typing import Any, Callable, Dict
 from fastapi.templating import Jinja2Templates
 
 from app.services.devices import devices
-from .fast_alerts import fast_alerts
+from app.core import fast_alerts
 from .path import get_path
 
 

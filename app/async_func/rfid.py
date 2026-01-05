@@ -2,7 +2,7 @@ import asyncio
 import logging
 from datetime import datetime, timedelta, timezone
 
-from app.core.settings import settings
+from app.core import settings
 from app.db.database import database_engine
 from app.services.devices import devices
 from app.services.events import events

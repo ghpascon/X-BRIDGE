@@ -8,7 +8,7 @@ from urllib.parse import urlparse
 import httpx
 from gmqtt import Client as MQTTClient
 
-from app.core.settings import settings
+from app.core import settings
 from app.core.indicator import beep
 from app.db.database import database_engine
 from app.models.rfid import DbEvent, DbTag

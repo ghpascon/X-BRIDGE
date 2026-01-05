@@ -66,4 +66,4 @@ class WriteCommands:
             async with httpx.AsyncClient(auth=self.auth, verify=False, timeout=10.0) as session:
                 await self.post_to_reader(session, self.endpoint_write, payload=payload)
         except Exception as e:
-            logging.error(f"Failed to Write: {e}")
+            logging.warning(f"Failed to Write: {e}")

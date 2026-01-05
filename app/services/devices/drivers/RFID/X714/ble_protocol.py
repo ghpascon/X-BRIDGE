@@ -37,7 +37,7 @@ class BLEProtocol:
                     logging.info(f"[BLE TX] {data}")
                 return True
             except Exception as e:
-                logging.error(f"[BLE Write Error] {e}")
+                logging.warning(f"[BLE Write Error] {e}")
                 return False
 
     async def scan_for_device(self) -> Optional[str]:
@@ -52,7 +52,7 @@ class BLEProtocol:
                         return d.address
                 logging.warning("❌ Device not found, retrying in 3s...")
             except Exception as e:
-                logging.error(f"[Scan Error] {e}")
+                logging.warning(f"[Scan Error] {e}")
             await asyncio.sleep(3)
         return None
 
@@ -131,10 +131,10 @@ class BLEProtocol:
                     logging.info("🔌 Disconnected from device.")
 
             except BleakError as e:
-                logging.error(f"[BLE Error] {e}")
+                logging.warning(f"[BLE Error] {e}")
                 await asyncio.sleep(5)
             except Exception as e:
-                logging.error(f"[Unexpected BLE Error] {e}")
+                logging.warning(f"[Unexpected BLE Error] {e}")
                 await asyncio.sleep(5)
             finally:
                 self.connected_ble_event.clear()

@@ -169,4 +169,4 @@ class LoggerManager:
         return list(self.logs)[:n]
 
 
-logger_manager = LoggerManager()
+logger = LoggerManager()

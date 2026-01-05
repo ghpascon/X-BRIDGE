@@ -2,7 +2,7 @@ from fastapi import APIRouter, Request
 from fastapi.openapi.docs import get_swagger_ui_html
 from fastapi.responses import HTMLResponse
 
-from app.core.settings import settings
+from app.core import settings
 from app.core.templates import templates
 
 router = APIRouter(prefix="", tags=["Pages"])

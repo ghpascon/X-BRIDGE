@@ -81,7 +81,7 @@ class UR4(ReaderHelpers, OnEvent, SetupReader, WriteCommands):
             except Exception as e:
                 self.is_connected = False
                 asyncio.create_task(events.on_disconnect(self.name))
-                logging.error(f"❌ Erro: {e}.")
+                logging.warning(f"❌ Erro: {e}.")
             finally:
                 logging.info("Tentando reconectar em 3 segundos...")
 
@@ -97,7 +97,7 @@ class UR4(ReaderHelpers, OnEvent, SetupReader, WriteCommands):
                 if verbose:
                     logging.info(f"[ENVIADO] {' '.join(f'{b:02x}' for b in data)}")
             except Exception as e:
-                logging.error(f"[ERRO ENVIO] {e}")
+                logging.warning(f"[ERRO ENVIO] {e}")
                 self.is_connected = False
                 asyncio.create_task(events.on_disconnect(self.name))
 

@@ -165,7 +165,7 @@ class WriteCommands:
                 await self.clear_tags()
 
         except Exception as e:
-            logging.error(e)
+            logging.warning(e)
 
     async def get_bytes_from_str(self, word: str) -> list[int]:
         """

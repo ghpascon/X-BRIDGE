@@ -15,7 +15,7 @@ project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
 # Import your app modules
-from app.core.settings import settings
+from app.core import settings
 from app.models import *  # Import all models
 from app.db.session import Base
 
