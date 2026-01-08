@@ -13,7 +13,10 @@ import pygame
 from .path import get_path
 
 # Initialize pygame mixer
-pygame.mixer.init()
+try:
+    pygame.mixer.init()
+except Exception as e:
+    logging.error(f"Erro inicializando mixer do pygame: {e}")
 
 
 def load_sound(filename: str):

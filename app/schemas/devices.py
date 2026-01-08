@@ -18,11 +18,9 @@ def validate_device(device: str, need_connected: bool = True) -> Tuple[bool, str
     return True, {"msg": "success"}
 
 
-
 class BooleanDeviceRequest(BaseModel):
     device: str = Field("DEVICE01")
     state: bool = True
-
 
 
 class SetGpoRequest(BaseModel):
@@ -31,5 +29,3 @@ class SetGpoRequest(BaseModel):
     state: Optional[bool] = Field(True)
     control: Optional[str] = Field("static")
     time: Optional[int] = Field(1000)
-
-

@@ -3,8 +3,8 @@ import logging
 
 import httpx
 
-from app.services.events import events
 from app.schemas.tag import WriteTagValidator
+from app.services.events import events
 
 from .on_event import OnEvent
 from .reader_helpers import ReaderHelpers
@@ -26,7 +26,9 @@ class R700_IOT(OnEvent, ReaderHelpers, WriteCommands):
         self.endpoint_write = f"{self.urlBase}/profiles/inventory/tag-access"
 
         self.interface_config = {"rfidInterface": "rest"}
-        self.auth = httpx.BasicAuth(self.config.get("USERNAME", "root"), self.config.get("PASSWORD", "impinj"))
+        self.auth = httpx.BasicAuth(
+            self.config.get("USERNAME", "root"), self.config.get("PASSWORD", "impinj")
+        )
 
         self.tags_to_write = {}
 
@@ -38,14 +40,14 @@ class R700_IOT(OnEvent, ReaderHelpers, WriteCommands):
         """Desconecta o reader de forma segura."""
         logging.info(f"🔌 Disconnecting R700_IOT reader: {self.name}")
         self._stop_connection = True
-        
+
         if self.is_reading:
             try:
                 async with httpx.AsyncClient(auth=self.auth, verify=False, timeout=5.0) as session:
                     await self.stop_inventory(session)
             except Exception as e:
                 logging.warning(f"⚠️ Error stopping inventory during disconnect: {e}")
-        
+
         self.is_connected = False
         self.is_reading = False
         asyncio.create_task(events.on_disconnect(self.name))

@@ -14,11 +14,11 @@ async def connect_devices():
         if not devices._initialized:
             logging.error("❌ Sistema de devices não foi inicializado corretamente")
             return
-            
+
         logging.info("🚀 Iniciando sistema de conexão de devices...")
         await devices.create_connect_loop()
         logging.info("✅ Sistema de conexão iniciado com sucesso")
-        
+
     except Exception as e:
         logging.error(f"❌ Erro ao iniciar conexão dos devices: {e}")
         # Tenta reinicializar em caso de erro

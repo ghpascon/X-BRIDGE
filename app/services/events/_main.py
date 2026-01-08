@@ -57,4 +57,5 @@ class Events(OnEvent, Actions):
     def get_epcs(self):
         return [tag.get("epc") for tag in self.tags.values() if tag.get("epc") is not None]
 
+
 events = Events()

@@ -76,32 +76,28 @@ async def create_device(device_name: str, data: dict):
         # Verifica se o sistema está em estado válido
         if devices._updating:
             raise HTTPException(
-                status_code=503, 
-                detail="System is currently updating devices, please try again in a few moments"
+                status_code=503,
+                detail="System is currently updating devices, please try again in a few moments",
             )
-            
+
         # Valida a estrutura básica dos dados
         if not isinstance(data, dict) or not data.get("READER"):
             raise HTTPException(
-                status_code=400, 
-                detail="Invalid configuration: missing required READER field"
+                status_code=400, detail="Invalid configuration: missing required READER field"
             )
-            
+
         # Valida o nome do device
         if not device_name or not device_name.strip():
-            raise HTTPException(
-                status_code=400,
-                detail="Device name cannot be empty"
-            )
-            
+            raise HTTPException(status_code=400, detail="Device name cannot be empty")
+
         logging.info(f"🆕 Creating new device '{device_name}' of type '{data.get('READER')}'")
         result = await devices.create_device(data, device_name.strip())
-        
+
         if "error" in result:
             raise HTTPException(status_code=500, detail=result["error"])
-            
+
         return result
-        
+
     except HTTPException:
         raise
     except Exception as e:
@@ -119,30 +115,29 @@ async def update_device(device_name: str, data: dict):
         # Verifica se o sistema está em estado válido
         if devices._updating:
             raise HTTPException(
-                status_code=503, 
-                detail="System is currently updating devices, please try again in a few moments"
+                status_code=503,
+                detail="System is currently updating devices, please try again in a few moments",
             )
-            
+
         # Valida o device (não precisa estar conectado para atualizar)
         status, msg = validate_device(device=device_name, need_connected=False)
         if not status:
             raise HTTPException(status_code=422, detail=msg)
-            
+
         # Valida a estrutura básica dos dados
         if not isinstance(data, dict) or not data.get("READER"):
             raise HTTPException(
-                status_code=400, 
-                detail="Invalid configuration: missing required READER field"
+                status_code=400, detail="Invalid configuration: missing required READER field"
             )
-            
+
         logging.info(f"🔄 Updating device '{device_name}' with new configuration")
         result = await devices.update_device(data, device_name)
-        
+
         if "error" in result:
             raise HTTPException(status_code=500, detail=result["error"])
-            
+
         return result
-        
+
     except HTTPException:
         raise
     except Exception as e:
@@ -160,23 +155,23 @@ async def delete_device(device_name: str):
         # Verifica se o sistema está em estado válido
         if devices._updating:
             raise HTTPException(
-                status_code=503, 
-                detail="System is currently updating devices, please try again in a few moments"
+                status_code=503,
+                detail="System is currently updating devices, please try again in a few moments",
             )
-            
+
         # Valida se o device existe
         status, msg = validate_device(device=device_name, need_connected=False)
         if not status:
             raise HTTPException(status_code=422, detail=msg)
-            
+
         logging.info(f"🗑️ Deleting device '{device_name}'")
         result = await devices.delete_device(name=device_name)
-        
+
         if "error" in result:
             raise HTTPException(status_code=404, detail=result["error"])
-            
+
         return result
-        
+
     except HTTPException:
         raise
     except Exception as e:
@@ -271,15 +266,7 @@ async def get_system_status():
     """Return system-wide status information for monitoring and debugging."""
     try:
         status = devices.get_system_status()
-        return {
-            "status": "ok",
-            "timestamp": datetime.now().isoformat(),
-            **status
-        }
+        return {"status": "ok", "timestamp": datetime.now().isoformat(), **status}
     except Exception as e:
         logging.error(f"❌ Error getting system status: {e}")
-        return {
-            "status": "error",
-            "error": str(e),
-            "timestamp": datetime.now().isoformat()
-        }
+        return {"status": "error", "error": str(e), "timestamp": datetime.now().isoformat()}

@@ -2,14 +2,14 @@ import logging
 
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import JSONResponse
+from pyepc import SGTIN
 
 from app.core.path import get_prefix_from_path
 from app.schemas.devices import BooleanDeviceRequest
 from app.schemas.events import EventRequest
-from app.schemas.tag import TagListSimulator, TagRequestSimulator, TagGtinSimulator
 from app.schemas.responses import rfid_base_responses
+from app.schemas.tag import TagGtinSimulator, TagListSimulator, TagRequestSimulator
 from app.services.events import events
-from pyepc import SGTIN
 
 router_prefix = get_prefix_from_path(__file__)
 router = APIRouter(prefix=router_prefix, tags=[router_prefix])
@@ -82,7 +82,7 @@ async def gtin_list(tag_generator: TagGtinSimulator):
         body = digits[:-1]
 
         # Weights 3 and 1 from right to left
-        weights = [3 if (i % 2 == 0) else 1 for i in range(len(body)-1, -1, -1)]
+        weights = [3 if (i % 2 == 0) else 1 for i in range(len(body) - 1, -1, -1)]
 
         total = sum(d * w for d, w in zip(body, weights))
         calc_digit = (10 - (total % 10)) % 10
@@ -93,7 +93,7 @@ async def gtin_list(tag_generator: TagGtinSimulator):
     if not validate_gtin14(gtin):
         raise HTTPException(
             status_code=400,
-            detail=f"GTIN {gtin} is invalid. Must contain 14 digits and pass check digit validation."
+            detail=f"GTIN {gtin} is invalid. Must contain 14 digits and pass check digit validation.",
         )
 
     # -------------------------------------------------------
@@ -103,9 +103,9 @@ async def gtin_list(tag_generator: TagGtinSimulator):
         for i in range(qtd):
             # Create SGTIN from GTIN and sequential serial number
             sgtin = SGTIN.from_sgtin(
-                gtin=gtin, 
+                gtin=gtin,
                 serial_number=str(start_serial + i),
-                company_prefix_len=7  # Standard 7-digit company prefix
+                company_prefix_len=7,  # Standard 7-digit company prefix
             )
             # Encode to hexadecimal EPC
             epc_hex = sgtin.encode().lower()
@@ -124,7 +124,6 @@ async def gtin_list(tag_generator: TagGtinSimulator):
     except Exception as e:
         logging.error(f"Error while processing GTIN tag generation: {e}")
         raise HTTPException(status_code=500, detail=str(e))
-
 
 
 @router.post(
@@ -146,7 +145,6 @@ async def simulator_connection(connection: BooleanDeviceRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-
 @router.post(
     "/inventory",
     responses=rfid_base_responses,
@@ -166,7 +164,6 @@ async def simulator_inventory(inventory: BooleanDeviceRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-
 @router.post(
     "/event",
     responses=rfid_base_responses,
@@ -181,4 +178,3 @@ async def simulator_event(event: EventRequest):
     except Exception as e:
         logging.error(f"Error while processing event simulation: {e}")
         raise HTTPException(status_code=500, detail=str(e))
-

@@ -2,13 +2,14 @@
 poetry run python git_commit_all.py 
 """
 
+import os
 import subprocess
+import webbrowser
 from datetime import datetime
 from pathlib import Path
-import os
-import webbrowser
 
 username = "ghpascon"
+
 
 def run_git_command(args, repo_path, check=True, capture_output=False):
     """Run git command and handle errors gracefully, suppressing ignored-path warnings."""
@@ -24,8 +25,10 @@ def run_git_command(args, repo_path, check=True, capture_output=False):
         # Filter out Git warnings about ignored paths
         if result.stderr:
             filtered_stderr = "\n".join(
-                line for line in result.stderr.splitlines()
-                if "ignored by one of your .gitignore files" not in line and "__pycache__" not in line
+                line
+                for line in result.stderr.splitlines()
+                if "ignored by one of your .gitignore files" not in line
+                and "__pycache__" not in line
             )
             result.stderr = filtered_stderr
 
@@ -39,13 +42,16 @@ def run_git_command(args, repo_path, check=True, capture_output=False):
         # Filter ignored-path warnings in the exception too
         if e.stderr:
             filtered_stderr = "\n".join(
-                line for line in e.stderr.splitlines()
-                if "ignored by one of your .gitignore files" not in line and "__pycache__" not in line
+                line
+                for line in e.stderr.splitlines()
+                if "ignored by one of your .gitignore files" not in line
+                and "__pycache__" not in line
             )
             e.stderr = filtered_stderr
             if e.stderr:
                 print(e.stderr)
         return e
+
 
 def ensure_git_repo(repo_path: Path):
     if not (repo_path / ".git").exists():
@@ -53,12 +59,16 @@ def ensure_git_repo(repo_path: Path):
         run_git_command(["init"], repo_path)
         print("Initialized empty Git repository.")
 
+
 def get_remote_url(repo_path: Path):
     """Return the URL of origin remote if it exists, else None."""
-    result = run_git_command(["remote", "get-url", "origin"], repo_path, check=False, capture_output=True)
+    result = run_git_command(
+        ["remote", "get-url", "origin"], repo_path, check=False, capture_output=True
+    )
     if result.returncode == 0:
         return result.stdout.strip()
     return None
+
 
 def ensure_remote(repo_path: Path, repo_name: str = None):
     """Set remote only if it doesn't exist."""
@@ -81,13 +91,15 @@ def ensure_remote(repo_path: Path, repo_name: str = None):
     print(f"Remote 'origin' set to {remote_url}")
     return remote_url
 
+
 def safe_add(repo_path):
     """Add all files safely, skipping .git and .vscode folders silently."""
     for root, dirs, files in os.walk(repo_path):
-        dirs[:] = [d for d in dirs if not d.startswith('.git') and not d.startswith('.vscode')]
+        dirs[:] = [d for d in dirs if not d.startswith(".git") and not d.startswith(".vscode")]
         for file in files:
             file_path = Path(root) / file
             run_git_command(["add", str(file_path)], repo_path, check=False)
+
 
 def git_commit_all():
     repo_path = Path.cwd()
@@ -101,7 +113,9 @@ def git_commit_all():
     if not commit_title:
         commit_title = f"Auto-commit: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
     commit_description = input("Enter commit description (optional): ").strip()
-    commit_message = f"{commit_title}\n\n{commit_description}" if commit_description else commit_title
+    commit_message = (
+        f"{commit_title}\n\n{commit_description}" if commit_description else commit_title
+    )
 
     # Commit changes if any
     status = run_git_command(["status", "--porcelain"], repo_path, capture_output=True)
@@ -121,12 +135,19 @@ def git_commit_all():
     run_git_command(["fetch", "origin"], repo_path, check=False)
 
     # Merge remote changes automatically without prompting
-    run_git_command([
-        "merge", f"origin/{branch}",
-        "-X", "theirs",
-        "--allow-unrelated-histories",
-        "-m", "Merged remote changes, remote takes priority"
-    ], repo_path, check=False)
+    run_git_command(
+        [
+            "merge",
+            f"origin/{branch}",
+            "-X",
+            "theirs",
+            "--allow-unrelated-histories",
+            "-m",
+            "Merged remote changes, remote takes priority",
+        ],
+        repo_path,
+        check=False,
+    )
 
     # First try a normal push
     push_result = run_git_command(["push", "-u", "origin", branch], repo_path, check=False)
@@ -136,6 +157,7 @@ def git_commit_all():
         print(f"Force-pushed changes to remote branch '{branch}'.")
     else:
         print(f"Pushed changes to remote branch '{branch}' successfully.")
+
 
 if __name__ == "__main__":
     git_commit_all()

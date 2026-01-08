@@ -2,7 +2,9 @@ from sqlalchemy import Column, DateTime, Integer, String
 from sqlalchemy.sql import func
 
 from app.db.session import Base
+
 from .helpers import BaseModelMixin
+
 
 class DbTag(Base, BaseModelMixin):
     """
@@ -41,4 +43,3 @@ class DbEvent(Base, BaseModelMixin):
     device = Column(String(50), nullable=False, index=True)
     event_type = Column(String(50), nullable=False, index=True)
     event_data = Column(String(200), nullable=False)
-

@@ -17,10 +17,9 @@ from sqlalchemy.orm import DeclarativeMeta, sessionmaker
 from sqlalchemy.pool import NullPool
 
 from app import models  # Ensure models are imported
+from app.core import settings
 
 from .session import Base
-
-from app.core import settings
 
 # Constants
 DEFAULT_POOL_SIZE = 10
@@ -59,9 +58,7 @@ class DatabaseEngine:
         try:
             url = settings.actions_data.get("DATABASE_URL")
             if not url:
-                logging.error(
-                    f"[DatabaseEngine._load_database_url] 'DATABASE_URL' is None"
-                )
+                logging.error(f"[DatabaseEngine._load_database_url] 'DATABASE_URL' is None")
                 return None
 
             return url
@@ -222,6 +219,7 @@ class DatabaseEngine:
         finally:
             # Close session to release connection
             await db.close()
+
     async def clear_db(self, days: int) -> Dict[str, Any]:
         """
         Clear old records from database tables.

@@ -1,12 +1,15 @@
 import asyncio
+import logging
+
 from app.services.events import events
+
+from .ble_protocol import BLEProtocol
 from .on_receive import OnReceive
 from .rfid import RfidCommands
 from .serial_protocol import SerialProtocol
-from .ble_protocol import BLEProtocol
-from .write_commands import WriteCommands
 from .tcp_protocol import TCPProtocol
-import logging
+from .write_commands import WriteCommands
+
 
 class X714(SerialProtocol, OnReceive, RfidCommands, BLEProtocol, WriteCommands, TCPProtocol):
     def __init__(self, config, name):

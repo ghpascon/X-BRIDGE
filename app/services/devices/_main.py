@@ -26,7 +26,7 @@ class Devices(AddDevice, DevicesCommands, ManageDevices):
         self._shutdown_event = asyncio.Event()
         self._updating = False
         self._initialized = False
-        
+
         try:
             self.get_devices_from_config()
             self._initialized = True
@@ -65,11 +65,11 @@ class Devices(AddDevice, DevicesCommands, ManageDevices):
             devices_path (str): Path to the directory containing device config files.
         """
         logging.info("🔄 Loading devices from configuration...")
-        
+
         # Armazena devices antigos para comparação
         old_devices = dict(self.devices)
         self.devices = {}
-        
+
         devices_loaded = 0
         devices_failed = 0
 
@@ -89,32 +89,36 @@ class Devices(AddDevice, DevicesCommands, ManageDevices):
             if filename.endswith(".json"):
                 filepath = os.path.join(devices_path, filename)
                 logging.info(f"📄 Processing file: {filename}")
-                
+
                 try:
                     with open(filepath, "r", encoding="utf-8") as f:
                         data = json.load(f)
-                        
+
                     # Validate basic structure
                     if not isinstance(data, dict):
-                        logging.warning(f"⚠️ Invalid config format in '{filename}': not a JSON object")
+                        logging.warning(
+                            f"⚠️ Invalid config format in '{filename}': not a JSON object"
+                        )
                         devices_failed += 1
                         continue
-                        
+
                     # If the device config is invalid, remove the file
                     if data.get("READER") is None:
-                        logging.warning(f"⚠️ Invalid config in '{filename}': missing READER field, removing file")
+                        logging.warning(
+                            f"⚠️ Invalid config in '{filename}': missing READER field, removing file"
+                        )
                         os.remove(filepath)
                         devices_failed += 1
                         continue
-                        
+
                     name = filename.replace(".json", "")
-                    
+
                     # Tenta adicionar o device
                     if self.add_device(data, name):
                         devices_loaded += 1
                     else:
                         devices_failed += 1
-                        
+
                 except json.JSONDecodeError as e:
                     logging.error(f"❌ JSON decode error in '{filename}': {e}")
                     devices_failed += 1
@@ -124,9 +128,9 @@ class Devices(AddDevice, DevicesCommands, ManageDevices):
                 except Exception as e:
                     logging.error(f"❌ Error processing file '{filename}': {e}")
                     devices_failed += 1
-                    
+
         logging.info(f"📊 Device loading summary: {devices_loaded} loaded, {devices_failed} failed")
-        
+
         if devices_loaded == 0 and devices_failed > 0:
             logging.warning("⚠️ No devices loaded successfully, restoring previous configuration")
             self.devices = old_devices
@@ -169,40 +173,45 @@ class Devices(AddDevice, DevicesCommands, ManageDevices):
         except Exception as e:
             return {"error": "Device not found"}
 
-
     def get_system_status(self):
         """Retorna o status completo do sistema de devices."""
-        connected_count = sum(1 for device in self.devices.values() 
-                            if hasattr(device, 'is_connected') and device.is_connected)
-        reading_count = sum(1 for device in self.devices.values() 
-                          if hasattr(device, 'is_reading') and device.is_reading)
-        
+        connected_count = sum(
+            1
+            for device in self.devices.values()
+            if hasattr(device, "is_connected") and device.is_connected
+        )
+        reading_count = sum(
+            1
+            for device in self.devices.values()
+            if hasattr(device, "is_reading") and device.is_reading
+        )
+
         return {
             "total_devices": len(self.devices),
             "connected_devices": connected_count,
             "reading_devices": reading_count,
             "updating": self._updating,
             "initialized": self._initialized,
-            "connect_task_running": self.connect_task and not self.connect_task.done()
+            "connect_task_running": self.connect_task and not self.connect_task.done(),
         }
-    
+
     async def shutdown(self):
         """Shutdown seguro de todo o sistema de devices."""
         logging.info("🛑 Iniciando shutdown do sistema de devices...")
-        
+
         try:
             self._updating = True
-            
+
             # Para o loop principal
             if self.connect_task and not self.connect_task.done():
                 self._shutdown_event.set()
                 await self.connect_task
-            
+
             # Desconecta todos os devices
             await self._disconnect_all_devices()
-            
+
             logging.info("✅ Shutdown do sistema de devices concluído")
-            
+
         except Exception as e:
             logging.error(f"❌ Erro durante shutdown: {e}")
         finally:

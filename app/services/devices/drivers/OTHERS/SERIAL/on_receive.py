@@ -1,12 +1,12 @@
 import asyncio
 import logging
 
-from app.services.events import events
 from app.schemas.tag import TagSchema
+from app.services.events import events
 
 
 class OnReceive:
-    async def on_receive(self, data, verbose = False):
+    async def on_receive(self, data, verbose=False):
         if verbose:
             logging.info(f"{self.name} -> 📥 Received Data: {data}")
 

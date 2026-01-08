@@ -1,8 +1,9 @@
-'''
+"""
 poetry run python build_exe.py
-'''
+"""
 
 import os
+
 import PyInstaller.__main__
 from PyInstaller.utils.hooks import collect_all, collect_submodules
 
@@ -89,10 +90,9 @@ PyInstaller.__main__.run(
         f"--name={APP_NAME}",
         "--onefile",
         "--noconsole",
-        f"--distpath={output_dir}",          # Executable output
-        f"--workpath={output_dir}/build",    # Build folder
+        f"--distpath={output_dir}",  # Executable output
+        f"--workpath={output_dir}/build",  # Build folder
     ]
     + [f"--hidden-import={h}" for h in hiddenimports + all_manual_hidden]
     + [f"--add-data={d}" for d in extra_data]
 )
-

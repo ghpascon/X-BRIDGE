@@ -12,29 +12,30 @@ Para configurar MySQL:
     "DATABASE_URL": "sqlite+aiosqlite:///instance/db.sqlite",
     "DATABASE_URL": "mysql+aiomysql://root:admin@localhost:3306/middleware_smartx"
 """
+
 import sys
-sys.coinit_flags = 0 
+
+sys.coinit_flags = 0
 import asyncio
+
 if hasattr(asyncio, "WindowsSelectorEventLoopPolicy"):
     asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 import logging
 import os
-
+import threading
+import webbrowser
 from contextlib import asynccontextmanager
 from typing import List
 
+import uvicorn
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 
 from app.async_func import create_tasks
 from app.core import settings
-from app.core.path import get_path, include_all_routers
-from app.core.middleware import setup_middlewares
 from app.core.exeption_handlers import setup_exeptions
-
-import uvicorn
-import threading
-import webbrowser
+from app.core.middleware import setup_middlewares
+from app.core.path import get_path, include_all_routers
 
 # Application constants
 DEFAULT_PORT = 5000
@@ -159,6 +160,7 @@ if __name__ == "__main__":
 
     # Open browser automatically if configured
     if settings.data.get("OPEN_BROWSER", True):
+
         def open_browser() -> None:
             """Open the default web browser at the application URL."""
             url = f"http://localhost:{port}"
@@ -176,7 +178,7 @@ if __name__ == "__main__":
     except SystemExit as e:
         logging.error(f"Server exited with SystemExit: {e}")
         error_html = get_path("app/templates/start_error.html")
-        url = f"file://{error_html}"  
+        url = f"file://{error_html}"
         webbrowser.open_new(url)
 
     except Exception as e:

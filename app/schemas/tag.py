@@ -58,8 +58,7 @@ class WriteTagValidator(BaseModel):
             raise ValueError(f"{field} must have exactly 8 characters")
         if not re.fullmatch(r"[0-9a-fA-F]{8}", v):
             raise ValueError(f"{field} must contain only hexadecimal characters (0-9, a-f)")
-        return v.lower()  
-
+        return v.lower()
 
 
 class TagRequest(BaseModel):
@@ -112,6 +111,7 @@ class TagRequestSimulator(BaseModel):
                 f"{info.field_name} must contain only hexadecimal characters (0-9, a-f)"
             )
         return v
+
 
 class TagListSimulator(BaseModel):
     device: str = Field("DEVICE01")

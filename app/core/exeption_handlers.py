@@ -1,9 +1,13 @@
-from starlette.responses import RedirectResponse, JSONResponse, HTMLResponse
 import logging
 from typing import Any
-from fastapi.exceptions import RequestValidationError
+
 from fastapi import Request
+from fastapi.exceptions import RequestValidationError
+from starlette.responses import HTMLResponse, JSONResponse, RedirectResponse
+
 from app.core.templates import templates
+
+
 def setup_exeptions(app):
     @app.exception_handler(404)
     async def not_found_handler(request: Request, exc: Any) -> RedirectResponse:
@@ -45,4 +49,4 @@ def setup_exeptions(app):
                 "body": body_text,
                 "message": "Invalid request received",
             },
-        )    
+        )

@@ -7,9 +7,9 @@ from fastapi.responses import JSONResponse
 from app.core.path import get_prefix_from_path
 from app.schemas.devices import validate_device
 from app.schemas.responses import device_responses
+from app.schemas.tag import TagSchema
 from app.services.devices import devices
 from app.services.events import events
-from app.schemas.tag import TagSchema
 
 router = APIRouter(prefix=get_prefix_from_path(__file__), tags=[get_prefix_from_path(__file__)])
 
@@ -78,6 +78,7 @@ async def get_tags_count():
 )
 async def get_epcs():
     return events.get_epcs()
+
 
 @router.get(
     "/get_gtin_count",

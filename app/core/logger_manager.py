@@ -1,9 +1,9 @@
-import logging
-import sys
 import asyncio
-import threading
-import queue
+import logging
 import os
+import queue
+import sys
+import threading
 from collections import deque
 from datetime import datetime, timedelta
 from typing import Callable, Optional
@@ -83,7 +83,7 @@ class AsyncDailyRotatingHandler(logging.Handler):
 
         backups_dates.sort(key=lambda x: x[0])  # do mais antigo para o mais recente
         if len(backups_dates) > self.max_backup_days:
-            for _, old_file in backups_dates[:-self.max_backup_days]:
+            for _, old_file in backups_dates[: -self.max_backup_days]:
                 try:
                     os.remove(old_file)
                     logging.info(f"Removed old log file: {old_file}")
@@ -97,7 +97,9 @@ class AsyncDailyRotatingHandler(logging.Handler):
 
 
 class LoggerManager:
-    def __init__(self, max_logs: int = 100, memory_callback: Optional[Callable[[str], None]] = None):
+    def __init__(
+        self, max_logs: int = 100, memory_callback: Optional[Callable[[str], None]] = None
+    ):
         self.logs = deque(maxlen=max_logs)
         self.memory_callback = memory_callback
         self.project_name = os.path.basename(os.getcwd())

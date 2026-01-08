@@ -36,30 +36,30 @@ class OnEvent:
     async def _handle_existing_tag(self, tag_validado: TagSchema, verbose: bool = True):
         """
         Handle updates for an existing tag.
-        
+
         Args:
             tag_validado (TagSchema): Validated tag data.
             verbose (bool): If True, log updates.
         """
         existing_tag = self.tags[tag_validado.epc]
-        
+
         # Update timestamp for any detection
         existing_tag["timestamp"] = datetime.now()
-        
+
         # Update RSSI only if new value is stronger (closer to 0)
         if tag_validado.rssi is not None:
             current_rssi = existing_tag.get("rssi")
             if current_rssi is None or abs(tag_validado.rssi) < abs(current_rssi):
                 existing_tag["rssi"] = tag_validado.rssi
                 existing_tag["ant"] = tag_validado.ant  # Update antenna too
-                
+
         # Increment count for existing tag
         existing_tag["count"] = existing_tag.get("count", 1) + 1
-        
+
     async def _handle_new_tag(self, tag_validado: TagSchema, verbose: bool = True):
         """
         Handle first detection of a new tag.
-        
+
         Args:
             tag_validado (TagSchema): Validated tag data.
             verbose (bool): If True, log new tag detection.
@@ -79,7 +79,7 @@ class OnEvent:
             "ant": tag_validado.ant,
             "rssi": tag_validado.rssi,
             "gtin": gtin,
-            "count": 1  
+            "count": 1,
         }
 
         # Save new tag

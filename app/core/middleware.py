@@ -1,19 +1,21 @@
 import inspect
-import sys
-from fastapi.middleware.cors import CORSMiddleware
-from starlette.middleware.base import BaseHTTPMiddleware
-from prometheus_fastapi_instrumentator import Instrumentator
-from starlette.middleware.gzip import GZipMiddleware
-from fastapi.responses import JSONResponse
 import logging
+import sys
+
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from prometheus_fastapi_instrumentator import Instrumentator
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.middleware.gzip import GZipMiddleware
 
 # =====================
 #  AUTO-REGISTRATION
 # =====================
 
+
 def setup_middlewares(app):
     """Automatically register all BaseHTTPMiddleware subclasses defined in this module"""
-    
+
     # CORS middleware
     app.add_middleware(
         CORSMiddleware,
@@ -32,6 +34,7 @@ def setup_middlewares(app):
 
     app.add_middleware(GZipMiddleware, minimum_size=1000)
     Instrumentator().instrument(app).expose(app, include_in_schema=False)
+
 
 class SafeRequestMiddleware(BaseHTTPMiddleware):
     """

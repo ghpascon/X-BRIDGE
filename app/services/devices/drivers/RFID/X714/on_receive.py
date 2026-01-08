@@ -46,7 +46,6 @@ class OnReceive:
         elif data.startswith("#set_cmd:"):
             logging.info(f"CONFIG -> {data[data.index(':')+1:]}")
 
-
     async def on_start(self):
         await events.on_start(self.name)
 
@@ -57,5 +56,13 @@ class OnReceive:
         target = await events.on_tag(tag)
         if target is None:
             return
-        asyncio.create_task(self.write_epc({"target_identifier":"tid", "target_value":tag.get("tid"), "new_epc":target, "password":"00000000"}))
-        
+        asyncio.create_task(
+            self.write_epc(
+                {
+                    "target_identifier": "tid",
+                    "target_value": tag.get("tid"),
+                    "new_epc": target,
+                    "password": "00000000",
+                }
+            )
+        )

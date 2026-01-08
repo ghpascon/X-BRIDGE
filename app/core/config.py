@@ -35,7 +35,9 @@ class Settings:
         storage_days = self.actions_data.get("STORAGE_DAYS", 7)
         if not isinstance(storage_days, int) or storage_days < 1:
             storage_days = 7
-        logger.load(log_path=self.actions_data.get("LOG_PATH", "Logs"), max_backup_days=storage_days)
+        logger.load(
+            log_path=self.actions_data.get("LOG_PATH", "Logs"), max_backup_days=storage_days
+        )
 
     def save(self):
         """Save current configuration to file."""

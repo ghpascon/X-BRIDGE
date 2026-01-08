@@ -1,7 +1,9 @@
 import asyncio
 import logging
-from app.services.events import events
 import socket
+
+from app.services.events import events
+
 
 class TCPHelpers:
     async def monitor_connection(self):
@@ -68,7 +70,7 @@ class TCPProtocol(TCPHelpers):
                 tasks = [
                     asyncio.create_task(self.receive_data_tcp()),
                     asyncio.create_task(self.monitor_connection()),
-                    asyncio.create_task(self.periodic_ping(10))
+                    asyncio.create_task(self.periodic_ping(10)),
                 ]
 
                 # Espera até que uma delas finalize
@@ -114,7 +116,7 @@ class TCPProtocol(TCPHelpers):
             logging.info(f"🔁 Retrying {self.name} in {retry_delay}s...")
             await asyncio.sleep(retry_delay)
 
-    async def write_tcp(self, data: str, verbose: bool=True):
+    async def write_tcp(self, data: str, verbose: bool = True):
         if self.is_connected and self.writer:
             try:
                 data = data + "\n"

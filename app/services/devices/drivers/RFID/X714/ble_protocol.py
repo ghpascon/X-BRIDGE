@@ -1,10 +1,12 @@
 import asyncio
-import threading
 import logging
+import threading
 from typing import Optional
+
 from bleak import BleakClient, BleakScanner
-from bleak.exc import BleakError
 from bleak.backends.winrt.util import allow_sta
+from bleak.exc import BleakError
+
 from app.services.events import events
 
 allow_sta()  # Required on Windows
@@ -63,7 +65,7 @@ class BLEProtocol:
             try:
                 # Se já estava conectado antes, emite o evento de desconexão
                 if self.is_connected:
-                    self.is_connected = False    
+                    self.is_connected = False
                     asyncio.create_task(events.on_disconnect(self.name))
 
                 # Escolhe o endereço conforme o modo
@@ -110,7 +112,7 @@ class BLEProtocol:
                                     self.is_connected = True
                                     asyncio.create_task(events.on_connect(self.name))
                                     logging.info("✅ BLE connection successfully established.")
-                                    asyncio.create_task(self.config_reader())                                    
+                                    asyncio.create_task(self.config_reader())
                                     logging.info(f"🟢 Notifications enabled for {char.uuid}")
                                     self.notify_enabled = True
                                 except Exception as e:
@@ -140,10 +142,10 @@ class BLEProtocol:
                 self.connected_ble_event.clear()
                 self.client_ble = None
 
-
     # ---------------- Thread Wrapper ----------------
     def connect_ble(self):
         """Run BLE loop in a separate thread (ideal for FastAPI)."""
+
         def run_loop():
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)

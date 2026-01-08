@@ -23,5 +23,14 @@ class OnEvent:
         target = await events.on_tag(current_tag)
         if target is None:
             return
-        
-        asyncio.create_task(self.write_epc({"target_identifier":"tid", "target_value":current_tag.get("tid"), "new_epc":target, "password":"00000000"}))
+
+        asyncio.create_task(
+            self.write_epc(
+                {
+                    "target_identifier": "tid",
+                    "target_value": current_tag.get("tid"),
+                    "new_epc": target,
+                    "password": "00000000",
+                }
+            )
+        )

@@ -84,12 +84,14 @@ class Actions:
     # EVENTS HANDLING
     # -------------------------------
     async def on_events(self, device, event_type, event_data, timestamp):
-        self.events.appendleft({
-            "timestamp": timestamp,
-            "device": device,
-            "event_type": event_type,
-            "event_data": event_data,
-        })
+        self.events.appendleft(
+            {
+                "timestamp": timestamp,
+                "device": device,
+                "event_type": event_type,
+                "event_data": event_data,
+            }
+        )
 
         # Save to database if configured
         if self.actions.get("DATABASE_URL"):
@@ -99,7 +101,7 @@ class Actions:
             "timestamp": timestamp.isoformat() if isinstance(timestamp, datetime) else timestamp,
             "device": device,
             "event_type": event_type,
-            "event_data": event_data
+            "event_data": event_data,
         }
 
         # HTTP POST
@@ -143,14 +145,17 @@ class Actions:
         self.mqtt_client = MQTTClient("client_id")
 
         # optional: define on_connect and on_disconnect callbacks
-        self.mqtt_client.on_connect = lambda client, flags, rc, properties: self.mqtt_connected.set()
-        self.mqtt_client.on_disconnect = lambda client, packet, exc=None: self.mqtt_connected.clear()
+        self.mqtt_client.on_connect = (
+            lambda client, flags, rc, properties: self.mqtt_connected.set()
+        )
+        self.mqtt_client.on_disconnect = (
+            lambda client, packet, exc=None: self.mqtt_connected.clear()
+        )
 
         await self.mqtt_client.connect(broker, port)
         await self.mqtt_connected.wait()  # ensure connection before publishing
 
-
-    def convert_datetimes(self,obj):
+    def convert_datetimes(self, obj):
         """Converte qualquer datetime em string ISO dentro de dicionários aninhados."""
         if isinstance(obj, dict):
             return {k: self.convert_datetimes(v) for k, v in obj.items()}
@@ -160,6 +165,7 @@ class Actions:
             return obj.isoformat()
         else:
             return obj
+
     async def send_payload(self, payload, endpoint, mqtt=False):
         try:
             payload = self.convert_datetimes(payload)

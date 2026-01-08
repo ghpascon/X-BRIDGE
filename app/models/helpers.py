@@ -1,11 +1,12 @@
-from typing import Dict, Any
+from typing import Any, Dict
+
 
 class BaseModelMixin:
     """
     Mixin class that provides common methods for all database models.
     Handles safe data filtering and creation from dictionaries.
     """
-    
+
     @classmethod
     def get_db_columns(cls):
         """Get all column names that exist in the database table."""
@@ -15,10 +16,10 @@ class BaseModelMixin:
     def filter_db_data(cls, data: Dict[str, Any]) -> Dict[str, Any]:
         """
         Filter data to only include fields that exist in the database model.
-        
+
         Args:
             data: Dictionary with data (may include extra fields)
-            
+
         Returns:
             Dictionary with only the fields that exist in the database
         """
@@ -29,10 +30,10 @@ class BaseModelMixin:
     def create_from_dict(cls, data: Dict[str, Any]):
         """
         Create a model instance from dictionary data, safely filtering out non-DB fields.
-        
+
         Args:
             data: Dictionary with data (may include fields that don't exist in DB)
-            
+
         Returns:
             Model instance with only valid database fields
         """
