@@ -79,7 +79,7 @@ class AddDevice:
     def is_rfid_reader(self, device):
         try:
             return self.devices.get(device).is_rfid_reader
-        except:
+        except Exception:
             return False
 
     def _generate_unique_name(self, base_name):

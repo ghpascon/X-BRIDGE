@@ -13,6 +13,8 @@ Para configurar MySQL:
     "DATABASE_URL": "mysql+aiomysql://root:admin@localhost:3306/middleware_smartx"
 """
 
+# ruff: noqa: E402
+
 import sys
 
 sys.coinit_flags = 0

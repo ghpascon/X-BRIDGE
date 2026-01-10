@@ -126,7 +126,7 @@ def git_commit_all():
         print("Nothing to commit. Working tree clean.")
 
     # Ensure remote exists (only asks first time)
-    remote_url = ensure_remote(repo_path)
+    ensure_remote(repo_path)
 
     branch = "main"
     run_git_command(["branch", "-M", branch], repo_path, check=False)

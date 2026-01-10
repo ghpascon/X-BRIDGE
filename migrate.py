@@ -17,7 +17,7 @@ def run_command(command):
         if result.stderr:
             print(result.stderr)
         if result.returncode == 0:
-            print(f"✅ Command completed successfully")
+            print("✅ Command completed successfully")
         else:
             print(f"❌ Command failed with exit code: {result.returncode}")
             return False
@@ -47,7 +47,7 @@ def main():
         print("❌ Failed to create migration. Exiting.")
         sys.exit(1)
 
-    print(f"\n🚀 Applying migrations to database...")
+    print("\n🚀 Applying migrations to database...")
     print("-" * 30)
 
     # Apply migrations
@@ -56,7 +56,7 @@ def main():
         print("❌ Failed to apply migrations. Exiting.")
         sys.exit(1)
 
-    print(f"\n🎉 Migration process completed successfully!")
+    print("\n🎉 Migration process completed successfully!")
     print("✅ Database is now up to date.")
 
 

@@ -1,7 +1,5 @@
 import csv
-import json
 import logging
-import os
 import zipfile
 from contextlib import asynccontextmanager
 from datetime import datetime, timedelta, timezone
@@ -16,7 +14,6 @@ from sqlalchemy.future import select
 from sqlalchemy.orm import DeclarativeMeta, sessionmaker
 from sqlalchemy.pool import NullPool
 
-from app import models  # Ensure models are imported
 from app.core import settings
 
 from .session import Base
@@ -58,7 +55,7 @@ class DatabaseEngine:
         try:
             url = settings.actions_data.get("DATABASE_URL")
             if not url:
-                logging.error(f"[DatabaseEngine._load_database_url] 'DATABASE_URL' is None")
+                logging.error("[DatabaseEngine._load_database_url] 'DATABASE_URL' is None")
                 return None
 
             return url

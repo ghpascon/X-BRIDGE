@@ -7,7 +7,7 @@ authors = [
 ]
 license = {text = "MIT"}
 readme = "README.md"
-requires-python = "=3.11"
+requires-python = "==3.11"
 dependencies = [
     "fastapi (==0.110.0)",
     "uvicorn (==0.29.0)",
@@ -42,34 +42,47 @@ package-mode = false
 
 [tool.poetry.group.dev.dependencies]
 tomli = "^2.2.1"
-black = "^24.8.0"
-flake8 = "^7.1.1"
-isort = "^5.13.2"
+ruff = "^0.8.0"
 pyinstaller = "^6.10.0"
 
 
-[tool.black]
+[tool.ruff]
+# Configuração geral
 line-length = 100
-target-version = ["py311"]
-include = '\\.pyi?$'
+target-version = "py311"
+extend-include = ["*.pyi"]
 
-
-[tool.flake8]
-max-line-length = 100
-extend-ignore = [
-  "E203",  # compatível com Black (slice spacing)
-  "W503",  # compatível com Black (line break before binary operator)
-  "E501"
+lint.ignore = [
+    "E203",    # compatível com formatter (slice spacing)
+    "E501",    # line too long (handled by formatter)
+    "S101",    # use of assert (comum em testes)
+    "S104",    # hardcoded bind all interfaces (comum em desenvolvimento)
+    "S105",    # hardcoded password string (pode ser muito restritivo)
+    "S106",    # hardcoded password argument (pode ser muito restritivo)
+    "S107",    # hardcoded password default (pode ser muito restritivo)
+    "TRY003",  # avoid specifying long messages outside exception class
+    "PLR0913", # too many arguments
+    "PLR0912", # too many branches
+    "PLR0915", # too many statements
+    "PLR2004", # magic value used in comparison
 ]
-per-file-ignores = [
-  "__init__.py:F401",
-]
 
-[tool.isort]
-profile = "black"
-line_length = 100
-multi_line_output = 3
-include_trailing_comma = true
-force_grid_wrap = 0
-use_parentheses = true
-ensure_newline_before_comments = true
+# Configurações por arquivo (equivalente ao per-file-ignores do flake8)
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401"]  # unused imports
+"**/migrations/**" = ["ALL"]  # ignorar regras em migrações
+"tests/**" = ["S101", "PLR2004"]  # permitir asserts e magic numbers em testes
+
+[tool.ruff.format]
+# Configuração do formatter (equivalente ao Black)
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+
+[tool.ruff.lint.isort]
+# Configuração do import sorting (equivalente ao isort)
+combine-as-imports = true
+force-single-line = false
+force-wrap-aliases = true
+split-on-trailing-comma = true

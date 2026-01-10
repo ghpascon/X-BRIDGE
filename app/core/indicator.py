@@ -1,16 +1,13 @@
 import os
-
-os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
-
+from .path import get_path
+import logging
 import warnings
 
+os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
 warnings.filterwarnings("ignore", category=UserWarning, module="pygame.pkgdata")
 
-import logging
+import pygame # noqa: E402
 
-import pygame
-
-from .path import get_path
 
 # Initialize pygame mixer
 try:

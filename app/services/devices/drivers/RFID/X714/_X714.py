@@ -1,5 +1,4 @@
 import asyncio
-import logging
 
 from app.services.events import events
 

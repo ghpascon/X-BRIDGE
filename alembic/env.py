@@ -9,14 +9,13 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from alembic import context
 
-# Add the project root to Python path
-project_root = Path(__file__).parent.parent
-sys.path.insert(0, str(project_root))
-
 # Import your app modules
 from app.core import settings
 from app.db.session import Base
-from app.models import *  # Import all models
+from app.models import *  #noqa: F403 # Import all models
+# Add the project root to Python path
+project_root = Path(__file__).parent.parent
+sys.path.insert(0, str(project_root))
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

@@ -170,7 +170,7 @@ class Devices(AddDevice, DevicesCommands, ManageDevices):
             with open(path, "r") as f:
                 content = json.load(f)
                 return content
-        except Exception as e:
+        except Exception:
             return {"error": "Device not found"}
 
     def get_system_status(self):

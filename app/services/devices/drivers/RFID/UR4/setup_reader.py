@@ -6,7 +6,7 @@ import time
 class SetupReader:
     async def setup_reader(self):
         await asyncio.sleep(0.5)
-        logging.info(f"[SETUP] Iniciando setup")
+        logging.info("[SETUP] Iniciando setup")
         self.setup_step = 0
         self.setup = False
         self.wait_answer = False
@@ -126,7 +126,7 @@ class SetupReader:
             elif not self.wait_answer:
                 self.setup = True
 
-                logging.info(f"[SETUP] ✅ Setup Concluido")
+                logging.info("[SETUP] ✅ Setup Concluido")
                 if self.config.get("START_READING"):
                     await self.start_inventory()
 

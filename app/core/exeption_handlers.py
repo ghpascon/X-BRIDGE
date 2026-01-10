@@ -3,9 +3,8 @@ from typing import Any
 
 from fastapi import Request
 from fastapi.exceptions import RequestValidationError
-from starlette.responses import HTMLResponse, JSONResponse, RedirectResponse
+from starlette.responses import JSONResponse, RedirectResponse
 
-from app.core.templates import templates
 
 
 def setup_exeptions(app):

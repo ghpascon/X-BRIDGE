@@ -5,7 +5,7 @@ import queue
 import sys
 import threading
 from collections import deque
-from datetime import datetime, timedelta
+from datetime import datetime
 from typing import Callable, Optional
 
 
