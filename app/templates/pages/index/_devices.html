@@ -1,0 +1,110 @@
+<!-- Devices Widget Simplificado -->
+<div
+  class="bg-white rounded-lg shadow-lg border p-4 flex flex-col"
+  style="width: 20vw; max-height: 40vh"
+  x-data="devicesSummary()"
+>
+  <!-- Header -->
+  <div class="text-sm mb-4 flex-shrink-0">
+    <h4 class="font-semibold text-gray-800 mb-3 text-center">Device Status</h4>
+
+    <!-- Status Vertical -->
+    <div class="space-y-2">
+      <div class="flex justify-between">
+        <span class="text-gray-500">Total</span>
+        <span class="font-medium text-gray-800" x-text="stats.total"></span>
+      </div>
+      <div class="flex justify-between">
+        <span class="text-gray-500">Connected</span>
+        <span
+          class="font-medium text-green-600"
+          x-text="stats.connected"
+        ></span>
+      </div>
+      <div class="flex justify-between">
+        <span class="text-gray-500">Reading</span>
+        <span class="font-medium text-blue-600" x-text="stats.reading"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Divider -->
+  <div class="border-t border-gray-300 my-4 flex-shrink-0"></div>
+
+  <!-- Device List -->
+  <div class="space-y-2 flex-1 overflow-y-auto" style="min-height: 0">
+    <template x-for="device in devices" :key="device.name">
+      <div
+        class="flex items-center justify-between p-2 bg-gray-50 rounded text-sm hover:bg-gray-100 transition-colors"
+      >
+        <span
+          class="font-medium text-gray-800 truncate flex-1 mr-3"
+          x-text="device.name"
+        ></span>
+        <div
+          class="w-4 h-4 rounded-full flex-shrink-0"
+          :class="!device.is_connected ? 'bg-red-500' : 
+                  (device.is_connected && device.is_reading) ? 'bg-green-500 pulse-fast' : 
+                  'bg-yellow-500'"
+        ></div>
+      </div>
+    </template>
+
+    <!-- Empty State -->
+    <div x-show="devices.length === 0" class="text-center py-8 text-gray-400">
+      <div class="text-4xl mb-2">📱</div>
+      <div class="text-sm">No devices found</div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .pulse-fast {
+    animation: pulse-fast 0.8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  @keyframes pulse-fast {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.3;
+    }
+  }
+</style>
+
+<script>
+  function devicesSummary() {
+    return {
+      devices: [],
+      stats: { total: 0, connected: 0, reading: 0 },
+
+      async init() {
+        await this.loadDevices();
+        setInterval(() => this.loadDevices(), 1000);
+      },
+
+      async loadDevices() {
+        try {
+          const response = await fetch("{{ url_for('get_devices_info') }}");
+          if (response.ok) {
+            const data = await response.json();
+            this.devices = Array.isArray(data) ? data : [];
+            this.updateStats();
+          }
+        } catch (err) {
+          console.error("Error loading devices:", err);
+        }
+      },
+
+      updateStats() {
+        this.stats.total = this.devices.length;
+        this.stats.connected = this.devices.filter(
+          (d) => d.is_connected
+        ).length;
+        this.stats.reading = this.devices.filter((d) => d.is_reading).length;
+      },
+    };
+  }
+</script>

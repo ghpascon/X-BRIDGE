@@ -143,7 +143,6 @@ def main():
 		print(f'✅ Tag: {tag_name}')
 		print(f'✅ Commit: {commit_message}')
 
-
 	except KeyboardInterrupt:
 		print('\n❌ Operação cancelada pelo usuário (Ctrl+C)')
 		sys.exit(1)

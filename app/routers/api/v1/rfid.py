@@ -26,7 +26,7 @@ async def get_tag_count():
 	return {'count': len(rfid_manager.events.tags)}
 
 
-@router.get(
+@router.post(
 	'/clear_tags',
 	summary='Clear all tags',
 	description='Removes all detected RFID tags from the system.',
@@ -55,3 +55,12 @@ async def get_epcs():
 )
 async def get_gtin_count():
 	return rfid_manager.events.tags.get_gtin_counts()
+
+
+@router.get(
+	'/get_tag_info/{epc}',
+	summary='Get tag information',
+	description='Returns detailed information about detected RFID tags.',
+)
+async def get_tag_info(epc: str):
+	return rfid_manager.events.tags.get_by_identifier(identifier_value=epc, identifier_type='epc')

@@ -11,12 +11,12 @@ router = APIRouter(prefix='', tags=['Pages'])
 async def index(request: Request):
 	alerts = []
 	# alerts example
-	alerts = [
-		{'text': 'Sistema SMARTX RFID iniciado com sucesso!', 'level': 'success'},
-		{'text': 'Conectado aos dispositivos RFID', 'level': 'info'},
-		{'text': 'Atenção: Verifique a configuração dos devices', 'level': 'warning'},
-		{'text': 'Erro de conexão detectado', 'level': 'error'},
-	]
+	# alerts = [
+	# 	{'text': 'Sistema SMARTX RFID iniciado com sucesso!', 'level': 'success'},
+	# 	{'text': 'Conectado aos dispositivos RFID', 'level': 'info'},
+	# 	{'text': 'Atenção: Verifique a configuração dos devices', 'level': 'warning'},
+	# 	{'text': 'Erro de conexão detectado', 'level': 'error'},
+	# ]
 	return templates.TemplateResponse(
 		'pages/index/main.html',
 		{'request': request, 'title': settings.TITLE, 'alerts': alerts},

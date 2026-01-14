@@ -11,6 +11,9 @@
       defer
       src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"
     ></script>
+
+    <!-- Hidden iframe para posts sem recarregar página -->
+    <iframe name="hidden_iframe" style="display: none"></iframe>
   </head>
   <body
     class="bg-gradient-to-br from-slate-50 to-blue-50 text-gray-800 min-h-screen flex flex-col"
@@ -22,10 +25,8 @@
     {% include "includes/alerts.html" %}
 
     <!-- Main Content Area -->
-    <main class="flex-1 flex items-center justify-center px-4 py-8">
-      <div class="w-full max-w-6xl mx-auto">
-        {% block content %}{% endblock %}
-      </div>
+    <main class="max-w-7xl mx-auto w-full sm:px-6">
+      {% block content %}{% endblock %}
     </main>
 
     <!-- Fixed Footer -->
