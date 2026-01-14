@@ -142,13 +142,7 @@ def main():
 		print(f'✅ Versão: {new_version}')
 		print(f'✅ Tag: {tag_name}')
 		print(f'✅ Commit: {commit_message}')
-		print('\n🔗 Links úteis:')
-		print('   • GitHub Actions: https://github.com/ghpascon/publish_lib_ghp/actions')
-		print('   • PyPI (após publicação): https://pypi.org/project/publish-lib-ghp/')
-		print('\n⏳ O GitHub Actions irá automaticamente:')
-		print('   1. Executar os testes')
-		print('   2. Fazer build do package')
-		print('   3. Publicar no PyPI')
+
 
 	except KeyboardInterrupt:
 		print('\n❌ Operação cancelada pelo usuário (Ctrl+C)')

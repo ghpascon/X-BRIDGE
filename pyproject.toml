@@ -1,6 +1,6 @@
 [project]
 name = "smartx-connector"
-version = "2025.8.31"
+version = "1.0.0"
 description = "Conector RFID SMARTX"
 authors = [
     {name = "Gabriel Henrique Pascon",email = "gh.pascon@gmail.com"}
