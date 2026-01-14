@@ -1,8 +1,0 @@
-{
-  "HTTP_POST": null,
-  "DATABASE_URL": null,
-  "XTRACK_URL": null,
-  "MQTT_URL": null,
-  "STORAGE_DAYS": -1,
-  "LOG_PATH": "C:/Users/DELL/Desktop/Logs"
-}

@@ -1,0 +1,131 @@
+from fastapi import APIRouter
+from fastapi.responses import JSONResponse
+from smartx_rfid.utils.path import get_prefix_from_path
+
+from app.services import rfid_manager
+
+router_prefix = get_prefix_from_path(__file__)
+router = APIRouter(prefix=router_prefix, tags=[router_prefix])
+
+
+@router.get(
+	'/get_devices',
+	summary='Get registered devices',
+	description='Returns a list of all registered RFID devices.',
+)
+async def get_devices():
+	return rfid_manager.devices.get_devices()
+
+
+@router.get(
+	'/get_device_config/{device_name}',
+	summary='Get device configuration',
+	description='Returns the current configuration of the specified device.',
+)
+async def get_device_config(device_name: str):
+	config = rfid_manager.devices.get_device_config(name=device_name)
+	if config is None:
+		return JSONResponse(
+			status_code=404,
+			content={'message': f"Device '{device_name}' not found."},
+		)
+	return JSONResponse(status_code=200, content=config)
+
+
+@router.get(
+	'/get_device_types_list',
+	summary='Get list of supported device types',
+	description='Returns a list of supported device types that can be configured.',
+)
+async def get_device_types_list():
+	return rfid_manager.devices.get_device_types_example()
+
+
+@router.get(
+	'/get_device_config_example/{device_name}',
+	summary='Get example device configuration',
+	description='Returns an example configuration for the specified device type.',
+)
+async def get_device_config_example(device_name: str):
+	config = rfid_manager.devices.get_device_config_example(name=device_name)
+	if config is None:
+		return JSONResponse(
+			status_code=404,
+			content={'message': f"Example configuration for device '{device_name}' not found."},
+		)
+	return JSONResponse(status_code=200, content=config)
+
+
+@router.get(
+	'/get_device_count',
+	summary='Get device count',
+	description='Returns the total number of registered RFID devices.',
+)
+async def get_device_count():
+	return {'device_count': rfid_manager.devices.get_device_count()}
+
+
+@router.get(
+	'/get_device_info/{device_name}',
+	summary='Get device information',
+	description='Returns connection and reading status for the specified device.',
+)
+async def get_device_info(device_name: str):
+	info = rfid_manager.devices.get_device_info(name=device_name)
+	if len(info) == 0:
+		return JSONResponse(
+			status_code=404,
+			content={'message': f"Device '{device_name}' not found."},
+		)
+	return JSONResponse(status_code=200, content=info[0])
+
+
+@router.get(
+	'/get_devices_info',
+	summary='Get all devices information',
+	description='Returns connection and reading status for all registered devices.',
+)
+async def get_devices_info():
+	info = rfid_manager.devices.get_device_info()
+	return JSONResponse(status_code=200, content=info)
+
+
+@router.get(
+	'/any_device_reading',
+	summary='Check if any device is reading',
+	description='Returns true if any registered device is currently reading tags.',
+)
+async def any_device_reading():
+	is_reading = rfid_manager.devices.any_device_reading()
+	return {'any_device_reading': is_reading}
+
+
+@router.post(
+	'/start_inventory/{device_name}',
+	summary='Start device inventory',
+	description='Starts the inventory process for the specified device.',
+)
+async def start_device_inventory(device_name: str):
+	print(f'Starting inventory for device: {device_name}')
+	success = rfid_manager.devices.start_inventory(name=device_name)
+	if not success:
+		return JSONResponse(
+			status_code=404,
+			content={'message': f"Device '{device_name}' not found or could not start inventory."},
+		)
+	return {'message': f"Inventory started for device '{device_name}'."}
+
+
+@router.post(
+	'/stop_inventory/{device_name}',
+	summary='Stop device inventory',
+	description='Stops the inventory process for the specified device.',
+)
+async def stop_device_inventory(device_name: str):
+	success = rfid_manager.devices.stop_inventory(name=device_name)
+	if not success:
+		return JSONResponse(
+			status_code=404,
+			content={'message': f"Device '{device_name}' not found or could not stop inventory."},
+		)
+	return {'message': f"Inventory stopped for device '{device_name}'."}

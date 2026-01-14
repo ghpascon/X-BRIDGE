@@ -1,8 +1,0 @@
-{
-  "READER": "SERIAL",
-  "CONNECTION": "AUTO",
-  "VID": 259,
-  "PID": 24673,
-  "BAUDRATE": 9600,
-  "EVENT_TYPE": "generic_event"
-}

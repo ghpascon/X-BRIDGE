@@ -1,6 +1,0 @@
-{
-  "READER": "TCP",
-  "CONNECTION": "192.168.99.202",
-  "PORT": 23,
-  "EVENT_TYPE": "generic_event"
-}

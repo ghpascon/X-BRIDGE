@@ -1,8 +1,0 @@
-{
-  "HTTP_POST": "http://localhost:5001/rfid",
-  "DATABASE_URL": "mysql+aiomysql://root:admin@localhost:3306/middleware_smartx",
-  "MQTT_URL": "mqtt://localhost:1883/connector",
-  "XTRACK_URL": "https://192.168.0.100:6100/req",
-  "STORAGE_DAYS": 1,
-  "LOG_PATH": "Logs"
-}

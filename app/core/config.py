@@ -2,53 +2,50 @@ import json
 import logging
 import os
 
-from app.core import logger
-
 
 class Settings:
-    def __init__(self, config_path="config/config.json"):
-        """Application settings loader and manager."""
-        self.load(config_path)
+	def __init__(self, config_path='config/config.json'):
+		"""Application settings loader and manager."""
+		self._config_path = config_path
+		self.load()
 
-    def load(self, config_path="config/config.json"):
-        """Load configuration from JSON files."""
-        self._config_path = config_path
-        self.data = {}
+	def load(self):
+		"""Load configuration from JSON file."""
+		data = {}
 
-        # Load main config
-        if os.path.exists(self._config_path):
-            try:
-                with open(self._config_path, "r", encoding="utf8") as f:
-                    self.data = json.load(f)
-            except Exception as e:
-                logging.error(f"Error loading {self._config_path}: {e}")
+		if os.path.exists(self._config_path):
+			try:
+				with open(self._config_path, 'r', encoding='utf8') as f:
+					data = json.load(f)
+			except Exception as e:
+				logging.error(f'Error loading {self._config_path}: {e}')
 
-        actions_path = "config/actions.json"
-        if os.path.exists(actions_path):
-            try:
-                with open(actions_path, "r") as f:
-                    self.actions_data = json.load(f)
-            except Exception as e:
-                self.actions_data = {}
-                logging.error(f"Error loading {actions_path}: {e}")
+		# Load variables with defaults
+		self.TITLE = data.get('TITLE', 'SMARTX')
+		self.LOG_PATH = data.get('LOG_PATH', 'Logs')
+		self.STORAGE_DAYS = data.get('STORAGE_DAYS', 0)
+		self.OPEN_BROWSER = data.get('OPEN_BROWSER', False)
+		self.BEEP = data.get('BEEP', False)
+		self.CLEAR_OLD_TAGS_INTERVAL = data.get('CLEAR_OLD_TAGS_INTERVAL', None)
+		self.WEBHOOK_URL = data.get('WEBHOOK_URL', None)
+		self.DATABASE_URL = data.get('DATABASE_URL', None)
+		self.XTRACK_URL = data.get('XTRACK_URL', None)
+		self.MQTT_URL = data.get('MQTT_URL', None)
+		self.PORT = data.get('PORT', 5000)
 
-        storage_days = self.actions_data.get("STORAGE_DAYS", 7)
-        if not isinstance(storage_days, int) or storage_days < 1:
-            storage_days = 7
-        logger.load(
-            log_path=self.actions_data.get("LOG_PATH", "Logs"), max_backup_days=storage_days
-        )
+	def save(self):
+		"""Save all instance attributes except _config_path to JSON file."""
+		try:
+			logging.info(f'Saving config to: {self._config_path}')
 
-    def save(self):
-        """Save current configuration to file."""
-        try:
+			# Dynamically get all attributes except _config_path
+			data = {key: value for key, value in self.__dict__.items() if key != '_config_path'}
 
-            logging.info(f"Salvando em: {self._config_path}")
-            with open(self._config_path, "w", encoding="utf8") as f:
-                json.dump(self.data, f, indent=4, ensure_ascii=False)
+			# Make sure folder exists
+			os.makedirs(os.path.dirname(self._config_path), exist_ok=True)
 
-        except Exception as e:
-            logging.error(f"Erro ao salvar config: {e}")
+			with open(self._config_path, 'w', encoding='utf8') as f:
+				json.dump(data, f, indent=4, ensure_ascii=False)
 
-
-settings = Settings()
+		except Exception as e:
+			logging.error(f'Error saving config: {e}')

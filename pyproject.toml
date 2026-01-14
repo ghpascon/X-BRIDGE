@@ -1,6 +1,6 @@
 [project]
 name = "smartx-connector"
-version = "2025.08.30"
+version = "2025.8.31"
 description = "Conector RFID SMARTX"
 authors = [
     {name = "Gabriel Henrique Pascon",email = "gh.pascon@gmail.com"}
@@ -21,15 +21,13 @@ dependencies = [
     "aiomysql (==0.2.0)",
     "aiosqlite (==0.19.0)",
     "asyncpg (==0.29.0)",
-    "pyserial-asyncio (==0.6)",
-    "pyserial (==3.5)",
     "pyepc (==0.5.0)",
     "pygame (==2.6.1)",
     "httpx (==0.28.1)",
     "gmqtt (>=0.7.0,<0.8.0)",
-    "bleak[winrt] (>=1.1.1,<2.0.0)",
     "prometheus-fastapi-instrumentator (>=7.1.0,<8.0.0)",
-    "alembic (>=1.17.2,<2.0.0)"
+    "alembic (>=1.17.2,<2.0.0)",
+    "smartx-rfid (==1.1.5)"
 ]
 
 
@@ -46,6 +44,9 @@ ruff = "^0.8.0"
 pyinstaller = "^6.10.0"
 
 
+
+[tool.poetry.dependencies]
+smartx-rfid = {allow-prereleases = true}
 [tool.ruff]
 # Configuração geral
 line-length = 100
@@ -75,10 +76,11 @@ lint.ignore = [
 
 [tool.ruff.format]
 # Configuração do formatter (equivalente ao Black)
-quote-style = "double"
-indent-style = "space"
+quote-style = "single"
+indent-style = "tab"
 skip-magic-trailing-comma = false
 line-ending = "auto"
+docstring-code-format = true
 
 [tool.ruff.lint.isort]
 # Configuração do import sorting (equivalente ao isort)

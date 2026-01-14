@@ -14,47 +14,47 @@ from starlette.middleware.gzip import GZipMiddleware
 
 
 def setup_middlewares(app):
-    """Automatically register all BaseHTTPMiddleware subclasses defined in this module"""
+	"""Automatically register all BaseHTTPMiddleware subclasses defined in this module"""
 
-    # CORS middleware
-    app.add_middleware(
-        CORSMiddleware,
-        allow_origins=["*"],
-        allow_credentials=True,
-        allow_methods=["GET", "POST", "PUT", "DELETE"],
-        allow_headers=["*"],
-    )
+	# CORS middleware
+	app.add_middleware(
+		CORSMiddleware,
+		allow_origins=['*'],
+		allow_credentials=True,
+		allow_methods=['GET', 'POST', 'PUT', 'DELETE'],
+		allow_headers=['*'],
+	)
 
-    # Auto-register custom middlewares
-    current_module = sys.modules[__name__]
-    for name, obj in inspect.getmembers(current_module, inspect.isclass):
-        if issubclass(obj, BaseHTTPMiddleware) and obj is not BaseHTTPMiddleware:
-            app.add_middleware(obj)
-            print(f"[Middleware] Registered: {name}")
+	# Auto-register custom middlewares
+	current_module = sys.modules[__name__]
+	for name, obj in inspect.getmembers(current_module, inspect.isclass):
+		if issubclass(obj, BaseHTTPMiddleware) and obj is not BaseHTTPMiddleware:
+			app.add_middleware(obj)
+			print(f'[Middleware] Registered: {name}')
 
-    app.add_middleware(GZipMiddleware, minimum_size=1000)
-    Instrumentator().instrument(app).expose(app, include_in_schema=False)
+	app.add_middleware(GZipMiddleware, minimum_size=1000)
+	Instrumentator().instrument(app).expose(app, include_in_schema=False)
 
 
 class SafeRequestMiddleware(BaseHTTPMiddleware):
-    """
-    Middleware that wraps every request in a try/except block.
-    Returns a JSON error response if any unhandled exception occurs.
-    """
+	"""
+	Middleware that wraps every request in a try/except block.
+	Returns a JSON error response if any unhandled exception occurs.
+	"""
 
-    async def dispatch(self, request, call_next):
-        try:
-            response = await call_next(request)
-            return response
-        except Exception as e:
-            # Log the error
-            logging.error(f"[Middleware Error] {type(e).__name__}: {e}")
+	async def dispatch(self, request, call_next):
+		try:
+			response = await call_next(request)
+			return response
+		except Exception as e:
+			# Log the error
+			logging.error(f'[Middleware Error] {type(e).__name__}: {e}')
 
-            # Return JSON error response
-            return JSONResponse(
-                status_code=500,
-                content={
-                    "message": str(e),
-                    "path": request.url.path,
-                },
-            )
+			# Return JSON error response
+			return JSONResponse(
+				status_code=500,
+				content={
+					'message': str(e),
+					'path': request.url.path,
+				},
+			)
