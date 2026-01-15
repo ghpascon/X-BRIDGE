@@ -234,6 +234,10 @@ class Devices:
 			logging.warning(f"⚠️ Device '{name}' not found.")
 			return False
 
+		if not device.device_type == "rfid":
+			logging.warning(f"⚠️ Device '{name}' is not an RFID device.")
+			return False
+
 		if not device.is_connected:
 			logging.warning(f"⚠️ Device '{name}' is not connected.")
 			return False
@@ -255,6 +259,10 @@ class Devices:
 		device = next((d for d in self.devices if d.name == name), None)
 		if not device:
 			logging.warning(f"⚠️ Device '{name}' not found.")
+			return False
+		
+		if not device.device_type == "rfid":
+			logging.warning(f"⚠️ Device '{name}' is not an RFID device.")
 			return False
 
 		if not device.is_connected:
