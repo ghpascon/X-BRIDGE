@@ -5,14 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{{ title }}</title>
     <!-- Tailwind CSS CDN for development -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Alpine.js CDN -->
-    <script
-      defer
-      src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"
-    ></script>
+    <link rel="icon" type="image/png" href="/static/images/logo.png" />
+    <script src="/static/js/tailwind.js"></script>
 
-    <!-- Hidden iframe para posts sem recarregar página -->
+    <!-- Alpine.js from local static files -->
+    <script defer src="/static/js/alpine.js"></script>
+
+    <!-- Hidden iframe for posts without page reload -->
     <iframe name="hidden_iframe" style="display: none"></iframe>
   </head>
   <body

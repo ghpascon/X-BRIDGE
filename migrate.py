@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """
 Simple migration script for SmartX Connector.
+poetry run python migrate.py
 """
 
 import subprocess
