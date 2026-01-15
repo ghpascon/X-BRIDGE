@@ -13,7 +13,7 @@ TEMPLATES_PATH = 'app/templates'
 settings = Settings(CONFIG_PATH)
 
 # logging
-LoggerManager(
+logger = LoggerManager(
 	log_path=settings.LOG_PATH,
 	storage_days=settings.STORAGE_DAYS,
 	base_filename=os.path.basename(os.getcwd()),

@@ -1,9 +1,14 @@
 import logging
 from smartx_rfid.utils import TagList
+from .integration import Integration
+import asyncio
 
 
 class Events:
 	def __init__(self):
+		# Integration
+		logging.info('Setting up Integration')
+		self.integration = Integration()
 		self.tags = TagList()
 
 	def on_event(self, name: str, event_type: str, event_data):
@@ -19,6 +24,11 @@ class Events:
 			self.on_tag(name=name, tag_data=event_data)
 		else:
 			logging.info(f'[ EVENT ] {name} - {event_type}: {event_data}')
+			asyncio.create_task(
+				self.integration.on_event_integration(
+					name=name, event_type=event_type, event_data=event_data
+				)
+			)
 
 	def on_tag(self, name: str, tag_data: dict):
 		"""
@@ -33,6 +43,8 @@ class Events:
 		# NEW TAG
 		if new_tag:
 			logging.info(f'[ TAG ] {name} - Tag Data: {tag}')
+			# Integrate new tag
+			asyncio.create_task(self.integration.on_tag_integration(device=name, tag_data=tag_data))
 
 		# EXISTING TAG
 		elif tag is not None:

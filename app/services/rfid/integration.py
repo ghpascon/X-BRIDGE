@@ -1,0 +1,128 @@
+from app.db import setup_database
+from smartx_rfid.db import DatabaseManager
+from smartx_rfid.webhook import WebhookManager
+import logging
+from app.models import Tag, Event
+from app.core import settings
+import asyncio
+
+
+class Integration:
+	def __init__(self):
+		self.db_manager: DatabaseManager | None = None
+		self.webhook_manager: WebhookManager | None = None
+		self.setup_integration()
+
+	# [ SETUP ]
+	def setup_integration(self):
+		self.load_database()
+		self.load_webhook()
+
+	def load_database(self):
+		try:
+			if settings.DATABASE_URL is not None:
+				logging.info('Setting up Database Integration')
+				self.db_manager: DatabaseManager = setup_database(
+					database_url=settings.DATABASE_URL
+				)
+				return True
+			else:
+				logging.warning('DATABASE_URL not set. Skipping Database Integration setup.')
+				return False
+		except Exception as e:
+			logging.error(f'Error setting up Database Integration: {e}')
+			return False
+
+	def load_webhook(self):
+		try:
+			if settings.WEBHOOK_URL is not None:
+				logging.info('Setting up Webhook Integration')
+				self.webhook_manager = WebhookManager(
+					url=settings.WEBHOOK_URL, timeout=1, max_retries=1
+				)
+				return True
+			else:
+				logging.warning('WEBHOOK_URL not set. Skipping Webhook Integration setup.')
+				return False
+		except Exception as e:
+			logging.error(f'Error setting up Webhook Integration: {e}')
+			return False
+
+	# [ EVENT ]
+	async def on_event_integration(self, name: str, event_type: str, event_data: dict):
+		"""
+		Handle integration of events into the database.
+
+		Args:
+		    name: Name of the device
+		    event_type: Type of event
+		    event_data: Data of the event
+		"""
+		tasks = []
+
+		# DATABASE INTEGRATION
+		if self.db_manager is not None:
+			logging.info('[ EVENT INTEGRATION ] DATABASE')
+			tasks.append(
+				self._event_database_integration(
+					name=name, event_type=event_type, event_data=event_data
+				)
+			)
+
+		# WEBHOOK INTEGRATION
+		if self.webhook_manager is not None:
+			logging.info('[ EVENT INTEGRATION ] WEBHOOK')
+			tasks.append(
+				self.webhook_manager.post(device=name, event_type=event_type, event_data=event_data)
+			)
+
+		# Execute all tasks concurrently
+		if tasks:
+			logging.info(f'[ EVENT INTEGRATION ] Executing {len(tasks)} tasks concurrently')
+			await asyncio.gather(*tasks)
+
+	async def _event_database_integration(self, name: str, event_type: str, event_data: dict):
+		"""Save event to database."""
+		with self.db_manager.get_session() as session:
+			session.add(
+				Event(
+					device=name,
+					event_type=event_type,
+					event_data=str(event_data),  # Convert dict to string for Text field
+				)
+			)
+			session.commit()
+
+	# [ TAG ]
+	async def on_tag_integration(self, device: str, tag_data: dict):
+		"""
+		Handle integration of tag reads into the database.
+
+		Args:
+		    device: Device name
+		    tag_data: Data of the read tag
+		"""
+		tasks = []
+
+		# DATABASE INTEGRATION
+		if self.db_manager is not None:
+			logging.info('[ TAG INTEGRATION ] DATABASE')
+			tasks.append(self._tag_database_integration(data={'device': device, **tag_data}))
+
+		# WEBHOOK INTEGRATION
+		if self.webhook_manager is not None:
+			logging.info('[ TAG INTEGRATION ] WEBHOOK')
+			tasks.append(
+				self.webhook_manager.post(device=device, event_type='tag', event_data=tag_data)
+			)
+
+		# Execute all tasks concurrently
+		if tasks:
+			logging.info(f'[ TAG INTEGRATION ] Executing {len(tasks)} tasks concurrently')
+			await asyncio.gather(*tasks)
+
+	async def _tag_database_integration(self, data: dict):
+		"""Save tag to database."""
+		with self.db_manager.get_session() as session:
+			session.add(Tag.from_dict(data))
+			session.commit()
