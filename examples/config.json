@@ -1,7 +1,7 @@
 {
   "TITLE": "SMARTX CONNECTOR",
   "LOG_PATH": "C:/Users/DELL/Desktop/Logs",
-  "STORAGE_DAYS": 0,
+  "STORAGE_DAYS": 1,
   "OPEN_BROWSER": false,
   "BEEP": false,
   "CLEAR_OLD_TAGS_INTERVAL": null,
