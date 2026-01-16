@@ -64,7 +64,8 @@ class Integration:
 		if self.db_manager is not None:
 			logging.info('[ EVENT INTEGRATION ] DATABASE')
 			tasks.append(
-				self._event_database_integration(
+				asyncio.to_thread(
+					self._event_database_integration,
 					name=name, event_type=event_type, event_data=event_data
 				)
 			)
@@ -81,7 +82,7 @@ class Integration:
 			logging.info(f'[ EVENT INTEGRATION ] Executing {len(tasks)} tasks concurrently')
 			await asyncio.gather(*tasks)
 
-	async def _event_database_integration(self, name: str, event_type: str, event_data: dict):
+	def _event_database_integration(self, name: str, event_type: str, event_data: dict):
 		"""Save event to database."""
 		with self.db_manager.get_session() as session:
 			session.add(
@@ -107,7 +108,12 @@ class Integration:
 		# DATABASE INTEGRATION
 		if self.db_manager is not None:
 			logging.info('[ TAG INTEGRATION ] DATABASE')
-			tasks.append(self._tag_database_integration(data={'device': device, **tag_data}))
+			tasks.append(
+				asyncio.to_thread(
+					self._tag_database_integration,
+					data={'device': device, **tag_data}
+				)
+			)
 
 		# WEBHOOK INTEGRATION
 		if self.webhook_manager is not None:
@@ -121,7 +127,7 @@ class Integration:
 			logging.info(f'[ TAG INTEGRATION ] Executing {len(tasks)} tasks concurrently')
 			await asyncio.gather(*tasks)
 
-	async def _tag_database_integration(self, data: dict):
+	def _tag_database_integration(self, data: dict):
 		"""Save tag to database."""
 		with self.db_manager.get_session() as session:
 			session.add(Tag.from_dict(data))
