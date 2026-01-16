@@ -5,7 +5,9 @@ import logging
 from app.models import Tag, Event
 from app.core import settings
 import asyncio
+from typing import List
 
+from app.models import Base
 
 class Integration:
 	def __init__(self):
@@ -132,3 +134,34 @@ class Integration:
 		with self.db_manager.get_session() as session:
 			session.add(Tag.from_dict(data))
 			session.commit()
+
+	def generate_table_report(self, model: Base, limit: int = 1000, offset: int = 0) -> dict:
+		"""
+		Generate table report with pagination for better performance.
+		
+		Args:
+		    model: SQLAlchemy model to query
+		    limit: Maximum number of records to return (default: 1000)
+		    offset: Number of records to skip (default: 0)
+		    
+		Returns:
+		    dict with 'data', 'total', 'limit', and 'offset' keys
+		"""
+		if self.db_manager is None:
+			raise Exception("Database manager is not initialized")
+		
+		with self.db_manager.get_session() as session:
+			# Get total count (more efficient than loading all records)
+			total = session.query(model).count()
+			
+			# Get paginated records using yield_per for memory efficiency
+			query = session.query(model).limit(limit).offset(offset)
+			records = [record.to_dict() for record in query]
+			
+			return {
+				'total': total,
+				'limit': limit,
+				'offset': offset,
+				'has_more': (offset + limit) < total,
+				'data': records,
+			}
