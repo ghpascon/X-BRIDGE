@@ -4,11 +4,11 @@
   "STORAGE_DAYS": 0,
   "OPEN_BROWSER": false,
   "BEEP": false,
-  "CLEAR_OLD_TAGS_INTERVAL": null,
+  "CLEAR_OLD_TAGS_INTERVAL": 10,
   "_DATABASE_URL_MYSQL": "mysql+pymysql://root:admin@localhost:3306/lib_smtx",
   "_DATABASE_URL_SQLITE": "sqlite:///lib_smtx.db",
   "_DATABASE_URL_POSTGRESQL": "postgresql+psycopg2://app_user:app_password@localhost:5432/lib_smartx",
-  "DATABASE_URL": "mysql+pymysql://root:admin@localhost:3306/lib_smtx",
+  "DATABASE_URL": null,
   "WEBHOOK_URL": null,
   "PORT": 5000
 }

@@ -1560,14 +1560,14 @@ type = ["importlib_metadata (>=7.0.2) ; python_version < \"3.10\"", "jaraco.deve
 
 [[package]]
 name = "smartx-rfid"
-version = "1.5.3"
+version = "1.5.4"
 description = "SmartX RFID library"
 optional = false
 python-versions = "<4.0,>=3.11"
 groups = ["main"]
 files = [
-    {file = "smartx_rfid-1.5.3-py3-none-any.whl", hash = "sha256:290e26425437aa069bb7f3166327b5d0945dc150352a4b6a834714d762a821ea"},
-    {file = "smartx_rfid-1.5.3.tar.gz", hash = "sha256:718b38119abdb89d58b8aed41a5f7945e81b7b66c91370ae493c8687e45507b8"},
+    {file = "smartx_rfid-1.5.4-py3-none-any.whl", hash = "sha256:02ccbafe487edd5d5e6aa7d0da1ce86b38c192424bc4f5ac70fd78c4bd5092b5"},
+    {file = "smartx_rfid-1.5.4.tar.gz", hash = "sha256:7970dbead09176c4cdbedaca597f212c5a84c880f893cd591f3358c1cb1e252d"},
 ]
 
 [package.dependencies]
@@ -2096,4 +2096,4 @@ all = ["winrt-Windows.Foundation.Collections[all] (>=3.2.1.0,<3.3.0.0)", "winrt-
 [metadata]
 lock-version = "2.1"
 python-versions = "==3.11"
-content-hash = "74baf64a3087c326a0a56281749cc4c3663c06db7e8c621f2ed7dc5f873f4fb1"
+content-hash = "7379be239347b72459fb9ccd4b9ecb2c0c2c853c789cbdcd3e257e789ede64b9"
