@@ -14,6 +14,7 @@ async def clear_old_tags():
 	while True:
 		if settings.CLEAR_OLD_TAGS_INTERVAL is None:
 			await asyncio.sleep(60)
+			continue
 		await asyncio.sleep(settings.CLEAR_OLD_TAGS_INTERVAL)  
 		if len(rfid_manager.events.tags) == 0:
 			continue

@@ -2,6 +2,7 @@ from .config import Settings
 from smartx_rfid.utils.logger_manager import LoggerManager
 import os
 from .build_templates import TemplateManager
+from .indicator import Indicator
 
 # DEFAULT VARS
 SWAGGER_PATH = 'SWAGGER.md'

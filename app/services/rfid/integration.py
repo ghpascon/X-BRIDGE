@@ -1,11 +1,11 @@
 from app.db import setup_database
 from smartx_rfid.db import DatabaseManager
-from smartx_rfid.webhook import WebhookManager
+from smartx_rfid.webhook import WebhookManager, WebhookXtrack
 import logging
 from app.models import Tag, Event
 from app.core import settings
 import asyncio
-from typing import List
+from app.core import Indicator
 
 from app.models import Base
 
@@ -13,14 +13,18 @@ class Integration:
 	def __init__(self):
 		self.db_manager: DatabaseManager | None = None
 		self.webhook_manager: WebhookManager | None = None
+		self.webhook_xtrack: WebhookXtrack | None = None
+		self.indicator = Indicator()
 		self.setup_integration()
 
 	# [ SETUP ]
 	def setup_integration(self):
 		self.load_database()
 		self.load_webhook()
+		self.load_webhook_xtrack()
 
 	def load_database(self):
+		self.db_manager = None
 		try:
 			if settings.DATABASE_URL is not None:
 				logging.info('Setting up Database Integration')
@@ -36,6 +40,7 @@ class Integration:
 			return False
 
 	def load_webhook(self):
+		self.webhook_manager = None
 		try:
 			if settings.WEBHOOK_URL is not None:
 				logging.info('Setting up Webhook Integration')
@@ -48,6 +53,22 @@ class Integration:
 				return False
 		except Exception as e:
 			logging.error(f'Error setting up Webhook Integration: {e}')
+			return False
+
+	def load_webhook_xtrack(self):
+		self.webhook_xtrack = None
+		try:
+			if settings.XTRACK_URL is not None:
+				logging.info('Setting up Webhook Xtrack Integration')
+				self.webhook_xtrack = WebhookXtrack(
+					url=settings.XTRACK_URL, timeout=1
+				)
+				return True
+			else:
+				logging.warning('XTRACK_URL not set. Skipping Webhook Xtrack Integration setup.')
+				return False
+		except Exception as e:
+			logging.error(f'Error setting up Webhook Xtrack Integration: {e}')
 			return False
 
 	# [ EVENT ]
@@ -123,6 +144,18 @@ class Integration:
 			tasks.append(
 				self.webhook_manager.post(device=device, event_type='tag', event_data=tag_data)
 			)
+
+		# XTRACK INTEGRATION
+		if self.webhook_xtrack is not None:
+			logging.info('[ TAG INTEGRATION ] XTRACK')
+			tasks.append(
+				self.webhook_xtrack.post({'device': device, **tag_data})
+			)
+
+		# Beep
+		if settings.BEEP:
+			logging.info('[ TAG INTEGRATION ] BEEP')
+			tasks.append(self.indicator.beep())
 
 		# Execute all tasks concurrently
 		if tasks:
