@@ -56,14 +56,6 @@ class TemplateManager:
 			raise Exception(error_msg) from e
 
 	@staticmethod
-	def generate_footer() -> str:
-		"""
-		Generate a footer string with the current year.
-		"""
-		year = datetime.now().year
-		return f'© {year} - SMARTX'
-
-	@staticmethod
 	def get_default_globals() -> Dict[str, Any]:
 		"""
 		Get default template global functions and variables.
@@ -71,7 +63,7 @@ class TemplateManager:
 		Returns:
 		    Dict[str, Any]: Dictionary of global template functions
 		"""
-		return {'generate_footer': TemplateManager.generate_footer}
+		return {}
 
 	def add_global(self, name: str, func: Callable) -> None:
 		"""
