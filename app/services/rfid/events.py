@@ -44,7 +44,7 @@ class Events:
 		if new_tag:
 			logging.info(f'[ TAG ] {name} - Tag Data: {tag}')
 			# Integrate new tag
-			asyncio.create_task(self.integration.on_tag_integration(device=name, tag_data=tag_data))
+			asyncio.create_task(self.integration.on_tag_integration(tag=tag))
 
 		# EXISTING TAG
 		elif tag is not None:

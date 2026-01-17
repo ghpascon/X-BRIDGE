@@ -84,9 +84,11 @@ async def generate_table_report(table_name: str, limit: int = 1000, offset: int 
 			break
 
 	if not valid_table:
-		return JSONResponse(status_code=400, content={"error": "Invalid table name"})
-	
+		return JSONResponse(status_code=400, content={'error': 'Invalid table name'})
+
 	try:
-		return rfid_manager.events.integration.generate_table_report(model=table_model, limit=limit, offset=offset)
+		return rfid_manager.events.integration.generate_table_report(
+			model=table_model, limit=limit, offset=offset
+		)
 	except Exception as e:
-		return JSONResponse(status_code=500, content={"error": str(e)})
+		return JSONResponse(status_code=500, content={'error': str(e)})

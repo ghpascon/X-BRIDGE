@@ -234,7 +234,7 @@ class Devices:
 			logging.warning(f"⚠️ Device '{name}' not found.")
 			return False
 
-		if not device.device_type == "rfid":
+		if not device.device_type == 'rfid':
 			logging.warning(f"⚠️ Device '{name}' is not an RFID device.")
 			return False
 
@@ -260,8 +260,8 @@ class Devices:
 		if not device:
 			logging.warning(f"⚠️ Device '{name}' not found.")
 			return False
-		
-		if not device.device_type == "rfid":
+
+		if not device.device_type == 'rfid':
 			logging.warning(f"⚠️ Device '{name}' is not an RFID device.")
 			return False
 

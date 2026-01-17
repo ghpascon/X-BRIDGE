@@ -9,6 +9,7 @@ from app.core import Indicator
 
 from app.models import Base
 
+
 class Integration:
 	def __init__(self):
 		self.db_manager: DatabaseManager | None = None
@@ -60,9 +61,7 @@ class Integration:
 		try:
 			if settings.XTRACK_URL is not None:
 				logging.info('Setting up Webhook Xtrack Integration')
-				self.webhook_xtrack = WebhookXtrack(
-					url=settings.XTRACK_URL, timeout=1
-				)
+				self.webhook_xtrack = WebhookXtrack(url=settings.XTRACK_URL, timeout=1)
 				return True
 			else:
 				logging.warning('XTRACK_URL not set. Skipping Webhook Xtrack Integration setup.')
@@ -89,7 +88,9 @@ class Integration:
 			tasks.append(
 				asyncio.to_thread(
 					self._event_database_integration,
-					name=name, event_type=event_type, event_data=event_data
+					name=name,
+					event_type=event_type,
+					event_data=event_data,
 				)
 			)
 
@@ -118,7 +119,7 @@ class Integration:
 			session.commit()
 
 	# [ TAG ]
-	async def on_tag_integration(self, device: str, tag_data: dict):
+	async def on_tag_integration(self, tag: dict):
 		"""
 		Handle integration of tag reads into the database.
 
@@ -131,26 +132,21 @@ class Integration:
 		# DATABASE INTEGRATION
 		if self.db_manager is not None:
 			logging.info('[ TAG INTEGRATION ] DATABASE')
-			tasks.append(
-				asyncio.to_thread(
-					self._tag_database_integration,
-					data={'device': device, **tag_data}
-				)
-			)
+			tasks.append(asyncio.to_thread(self._tag_database_integration, data=tag))
 
 		# WEBHOOK INTEGRATION
 		if self.webhook_manager is not None:
 			logging.info('[ TAG INTEGRATION ] WEBHOOK')
 			tasks.append(
-				self.webhook_manager.post(device=device, event_type='tag', event_data=tag_data)
+				self.webhook_manager.post(
+					device=tag.get('device'), event_type='tag', event_data=tag
+				)
 			)
 
 		# XTRACK INTEGRATION
 		if self.webhook_xtrack is not None:
 			logging.info('[ TAG INTEGRATION ] XTRACK')
-			tasks.append(
-				self.webhook_xtrack.post({'device': device, **tag_data})
-			)
+			tasks.append(self.webhook_xtrack.post(tag))
 
 		# Beep
 		if settings.BEEP:
@@ -171,26 +167,26 @@ class Integration:
 	def generate_table_report(self, model: Base, limit: int = 1000, offset: int = 0) -> dict:
 		"""
 		Generate table report with pagination for better performance.
-		
+
 		Args:
 		    model: SQLAlchemy model to query
 		    limit: Maximum number of records to return (default: 1000)
 		    offset: Number of records to skip (default: 0)
-		    
+
 		Returns:
 		    dict with 'data', 'total', 'limit', and 'offset' keys
 		"""
 		if self.db_manager is None:
-			raise Exception("Database manager is not initialized")
-		
+			raise Exception('Database manager is not initialized')
+
 		with self.db_manager.get_session() as session:
 			# Get total count (more efficient than loading all records)
 			total = session.query(model).count()
-			
+
 			# Get paginated records using yield_per for memory efficiency
 			query = session.query(model).limit(limit).offset(offset)
 			records = [record.to_dict() for record in query]
-			
+
 			return {
 				'total': total,
 				'limit': limit,

@@ -8,6 +8,7 @@ warnings.filterwarnings('ignore', category=UserWarning, module='pygame.pkgdata')
 
 import pygame  # noqa: E402
 
+
 class Indicator:
 	def __init__(self):
 		# Initialize pygame mixer
@@ -32,7 +33,6 @@ class Indicator:
 			logging.error(f'Arquivo de som não encontrado: {sound_path}')
 			return None
 
-
 	async def beep(self):
 		"""
 		Executa o som de beep.
@@ -41,4 +41,4 @@ class Indicator:
 			try:
 				self.beep_sound.play()
 			except Exception:
-				pass  
+				pass
