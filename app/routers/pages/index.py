@@ -24,7 +24,7 @@ async def index(request: Request):
 	)
 
 
-@router.get('/docs', include_in_schema=False)
+@router.get('/docs', response_class=HTMLResponse)
 async def docs():
 	return get_swagger_ui_html(
 		openapi_url='/openapi.json',
@@ -32,4 +32,12 @@ async def docs():
 		swagger_js_url='/static/docs/swagger-ui-bundle.js',
 		swagger_css_url='/static/docs/swagger-ui.css',
 		swagger_favicon_url='/static/images/logo.png',
+	)
+
+@router.get('/tag_details', response_class=HTMLResponse)
+async def tag_details(request: Request):
+	return templates.TemplateResponse(
+		'pages/tag_details/main.html',
+		{'request': request, 'title': 'Tag Details', 'alerts': []},
+		media_type='text/html; charset=utf-8',
 	)

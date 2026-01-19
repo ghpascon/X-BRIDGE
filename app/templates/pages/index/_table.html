@@ -6,10 +6,18 @@
 >
   <!-- Left - EPCs List -->
   <div class="flex-1">
-    <h4 class="text-lg font-semibold mb-4">
-      EPCs (<span x-text="epcs.length"></span>)
-    </h4>
+    <div class="justify-between flex items-center mb-4">
+      <h4 class="text-lg font-semibold mb-4">
+        EPCs (<span x-text="epcs.length"></span>)
+      </h4>
 
+      <a
+        href="{{ url_for('tag_details') }}"
+        class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded text-sm"
+      >
+        View All Tags
+      </a>
+    </div>
     <div
       class="border rounded overflow-hidden"
       style="height: calc(100% - 60px)"
@@ -123,8 +131,8 @@
           const response = await fetch(
             "{{ url_for('get_tag_info', epc='placeholder') }}".replace(
               "placeholder",
-              encodeURIComponent(epc)
-            )
+              encodeURIComponent(epc),
+            ),
           );
           if (response.ok) {
             this.tagDetails = await response.json();
