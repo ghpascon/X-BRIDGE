@@ -49,3 +49,26 @@ class Events:
 		# EXISTING TAG
 		elif tag is not None:
 			pass
+
+	def handle_r700_event(self, events: list):
+		for event in events:
+			event_type = event.get("eventType")
+			device = event.get("hostname", "unknown")
+			if event_type == "tagInventory":
+				tag_data = event.get("tagInventoryEvent")
+				if tag_data is not None:
+					current_tag = {
+						"epc": tag_data.get("epcHex"),
+						"tid": tag_data.get("tidHex"),
+						"ant": tag_data.get("antennaPort"),
+						"rssi": int(tag_data.get("peakRssiCdbm", 0) / 100),
+					}
+					self.on_tag(name=device, tag_data=current_tag)
+			elif event_type == "inventoryStatus":
+				event_data = event.get("inventoryStatusEvent")
+				if event_data is not None:
+					self.on_event(
+						name=device, 
+						event_type="reading", 
+						event_data=event_data.get("inventoryStatus") == "running"
+					)
