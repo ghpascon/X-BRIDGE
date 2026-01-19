@@ -1,12 +1,12 @@
 {% extends "base.html" %} {% block content %}
 
 <!-- Main Layout Container -->
-<div class="flex justify-between">
-  <div class="pt-5 space-y-3">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-4 pt-5 pb-5 px-4">
+  <div class="lg:col-span-3 space-y-4">
     {% include 'includes/_events.html' %} {% include 'includes/_devices.html' %}
   </div>
 
-  <div class="pt-5">{% include 'pages/tag_details/_table.html' %}</div>
+  <div class="lg:col-span-9">{% include 'pages/tag_details/_table.html' %}</div>
 </div>
 
 {% endblock %}

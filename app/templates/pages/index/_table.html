@@ -1,7 +1,6 @@
 <!-- EPCs Table Widget -->
 <div
-  class="bg-white rounded-lg shadow border p-4 flex gap-4"
-  style="width: 75vw; height: 80vh"
+  class="bg-white rounded-lg shadow border p-4 flex flex-col lg:flex-row gap-4 w-full h-[80vh]"
   x-data="tagsTable()"
 >
   <!-- Left - EPCs List -->
@@ -52,7 +51,9 @@
   </div>
 
   <!-- Right - Details -->
-  <div class="w-96 border-l pl-4 flex flex-col">
+  <div
+    class="w-full lg:w-96 border-t lg:border-t-0 lg:border-l pt-4 lg:pt-0 lg:pl-4 flex flex-col min-h-[300px] lg:min-h-0"
+  >
     <h4 class="text-lg font-semibold mb-4 flex-shrink-0">Details</h4>
 
     <div class="flex-1 overflow-hidden">

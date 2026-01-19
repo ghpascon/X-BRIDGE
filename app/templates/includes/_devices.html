@@ -1,7 +1,6 @@
 <!-- Devices Widget Simplificado -->
 <div
-  class="bg-white rounded-lg shadow-lg border p-4 flex flex-col"
-  style="width: 20vw"
+  class="bg-white rounded-lg shadow-lg border p-4 flex flex-col w-full max-h-[70vh]"
   x-data="devicesSummary()"
 >
   <!-- Header -->
@@ -32,7 +31,7 @@
   <div class="border-t border-gray-300 my-4 flex-shrink-0"></div>
 
   <!-- Device List -->
-  <div class="space-y-2 overflow-y-auto" style="min-height: 0">
+  <div class="space-y-2 overflow-y-auto flex-1" style="min-height: 0">
     <template x-for="device in devices" :key="device.name">
       <div
         class="flex items-center gap-3 p-2 bg-gray-50 rounded text-sm hover:bg-gray-100 transition-colors"

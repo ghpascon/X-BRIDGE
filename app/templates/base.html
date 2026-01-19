@@ -1,8 +1,11 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes"
+    />
     <title>{{ title }}</title>
     <!-- Tailwind CSS CDN for development -->
     <link rel="icon" type="image/png" href="/static/images/logo.png" />
@@ -24,7 +27,7 @@
     {% include "includes/alerts.html" %}
 
     <!-- Main Content Area -->
-    <main class="max-w-7xl mx-auto w-full sm:px-6">
+    <main class="max-w-full mx-auto w-full">
       {% block content %}{% endblock %}
     </main>
 
