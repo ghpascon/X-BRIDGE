@@ -27,6 +27,9 @@ class Events:
 			self.on_tag(name=name, tag_data=event_data)
 		else:
 			logging.info(f'[ EVENT ] {name} - {event_type}: {event_data}')
+			if event_type == "reading":
+				self.on_start(name=name) if event_data else self.on_stop(name=name)
+
 			asyncio.create_task(
 				self.integration.on_event_integration(
 					name=name, event_type=event_type, event_data=event_data
@@ -52,6 +55,13 @@ class Events:
 		# EXISTING TAG
 		elif tag is not None:
 			pass
+
+	def on_start(self, name: str):
+		logging.info(f'[ START ] {name}')
+		self.tags.remove_tags_by_device(device=name)
+
+	def on_stop(self, name: str):
+		logging.info(f'[ STOP ] {name}')
 
 	def handle_r700_event(self, events: list):
 		for event in events:

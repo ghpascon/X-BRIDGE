@@ -212,6 +212,7 @@ class Devices:
 			'name': device.name,
 			'is_connected': is_connected,
 			'is_reading': is_reading,
+			'device_type': device.device_type
 		}
 
 	def any_device_reading(self) -> bool:
@@ -223,7 +224,7 @@ class Devices:
 				return True
 		return False
 
-	def start_inventory(self, name: str) -> bool:
+	async def start_inventory(self, name: str) -> bool:
 		"""
 		Start inventory on the specified device.
 
@@ -243,14 +244,14 @@ class Devices:
 			return False
 
 		try:
-			device.start_inventory()
-			logging.info(f"✅ Inventory started on device '{name}'.")
+			await device.start_inventory()
+			logging.info(f"✅ Starting inventory on device '{name}'.")
 			return True
 		except Exception as e:
 			logging.error(f"❌ Error starting inventory on device '{name}': {e}")
 			return False
 
-	def stop_inventory(self, name: str) -> bool:
+	async def stop_inventory(self, name: str) -> bool:
 		"""
 		Stop inventory on the specified device.
 
@@ -270,8 +271,8 @@ class Devices:
 			return False
 
 		try:
-			device.stop_inventory()
-			logging.info(f"✅ Inventory stopped on device '{name}'.")
+			await device.stop_inventory()
+			logging.info(f"✅ Stopping inventory on device '{name}'.")
 			return True
 		except Exception as e:
 			logging.error(f"❌ Error stopping inventory on device '{name}': {e}")

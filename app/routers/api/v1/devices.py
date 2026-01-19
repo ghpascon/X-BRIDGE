@@ -106,8 +106,7 @@ async def any_device_reading():
 	description='Starts the inventory process for the specified device.',
 )
 async def start_device_inventory(device_name: str):
-	print(f'Starting inventory for device: {device_name}')
-	success = rfid_manager.devices.start_inventory(name=device_name)
+	success = await rfid_manager.devices.start_inventory(name=device_name)
 	if not success:
 		return JSONResponse(
 			status_code=404,
@@ -122,7 +121,7 @@ async def start_device_inventory(device_name: str):
 	description='Stops the inventory process for the specified device.',
 )
 async def stop_device_inventory(device_name: str):
-	success = rfid_manager.devices.stop_inventory(name=device_name)
+	success = await rfid_manager.devices.stop_inventory(name=device_name)
 	if not success:
 		return JSONResponse(
 			status_code=404,
