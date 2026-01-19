@@ -5,6 +5,7 @@
   "OPEN_BROWSER": false,
   "BEEP": false,
   "CLEAR_OLD_TAGS_INTERVAL": null,
+  "TAG_PREFIX": null,
   "_DATABASE_URL_MYSQL": "mysql+pymysql://root:admin@localhost:3306/lib_smtx",
   "_DATABASE_URL_SQLITE": "sqlite:///lib_smtx.db",
   "_DATABASE_URL_POSTGRESQL": "postgresql+psycopg2://app_user:app_password@localhost:5432/lib_smartx",

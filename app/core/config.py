@@ -27,6 +27,7 @@ class Settings:
 		self.OPEN_BROWSER = data.get('OPEN_BROWSER', False)
 		self.BEEP = data.get('BEEP', False)
 		self.CLEAR_OLD_TAGS_INTERVAL = data.get('CLEAR_OLD_TAGS_INTERVAL', None)
+		self.TAG_PREFIX = data.get('TAG_PREFIX', None)
 		self.WEBHOOK_URL = data.get('WEBHOOK_URL', None)
 		self.DATABASE_URL = data.get('DATABASE_URL', None)
 		self.XTRACK_URL = data.get('XTRACK_URL', None)

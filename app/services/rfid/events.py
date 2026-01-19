@@ -2,6 +2,7 @@ import logging
 from smartx_rfid.utils import TagList
 from .integration import Integration
 import asyncio
+from app.core import settings
 
 
 class Events:
@@ -9,7 +10,9 @@ class Events:
 		# Integration
 		logging.info('Setting up Integration')
 		self.integration = Integration()
-		self.tags = TagList()
+		self.tags = TagList(
+			prefix=settings.TAG_PREFIX
+		)
 
 	def on_event(self, name: str, event_type: str, event_data):
 		"""
