@@ -27,6 +27,22 @@
         "transmitPowerCdbm": 3300
       }
     ],
+    "startTriggers": [
+      {
+        "gpiTransitionEvent": {
+          "gpi": 1,
+          "transition": "high-to-low"
+        }
+      }
+    ],
+    "stopTriggers": [
+      {
+        "gpiTransitionEvent": {
+          "gpi": 1,
+          "transition": "low-to-high"
+        }
+      }
+    ],
     "eventConfig": {
       "common": {
         "hostname": "disabled"

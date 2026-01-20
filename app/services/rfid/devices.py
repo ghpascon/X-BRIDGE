@@ -3,7 +3,7 @@ import os
 import json
 from smartx_rfid.devices import SERIAL, TCP, R700_IOT, X714
 import asyncio
-from typing import List, Dict, Optional
+from typing import List, Dict, Optional, Tuple
 
 
 class Devices:
@@ -205,14 +205,15 @@ class Devices:
 		if not device:
 			return None
 
-		is_connected = device.is_connected
-		is_reading = device.is_reading if is_connected else False
-
+		is_connected: bool = device.is_connected
+		is_reading: bool = device.is_reading if is_connected else False
+		is_gpi_trigger_on: bool = getattr(device, 'is_gpi_trigger_on', False) == True
 		return {
 			'name': device.name,
 			'is_connected': is_connected,
 			'is_reading': is_reading,
 			'device_type': device.device_type,
+			'is_gpi_trigger_on': is_gpi_trigger_on
 		}
 
 	def any_device_reading(self) -> bool:
@@ -224,23 +225,44 @@ class Devices:
 				return True
 		return False
 
+	def _validate_device_for_inventory(self, name: str, check_gpi: bool = True) -> Tuple[bool, Optional[object]]:
+		"""
+		Validate if a device can perform inventory operations.
+
+		Args:
+			name: Device name
+			check_gpi: If True, also check if GPI trigger is on
+
+		Returns:
+			Tuple of (is_valid, device_object)
+		"""
+		device = next((d for d in self.devices if d.name == name), None)
+		if not device:
+			logging.warning(f"⚠️ Device '{name}' not found.")
+			return False, None
+
+		if not device.device_type == 'rfid':
+			logging.warning(f"⚠️ Device '{name}' is not an RFID device.")
+			return False, None
+
+		if not device.is_connected:
+			logging.warning(f"⚠️ Device '{name}' is not connected.")
+			return False, None
+
+		if check_gpi and getattr(device, 'is_gpi_trigger_on', False):
+			logging.warning(f"⚠️ Device '{name}' has GPI trigger on.")
+			return False, None
+
+		return True, device
+
 	async def start_inventory(self, name: str) -> bool:
 		"""
 		Start inventory on the specified device.
 
 		Returns True if the command was sent successfully, False otherwise.
 		"""
-		device = next((d for d in self.devices if d.name == name), None)
-		if not device:
-			logging.warning(f"⚠️ Device '{name}' not found.")
-			return False
-
-		if not device.device_type == 'rfid':
-			logging.warning(f"⚠️ Device '{name}' is not an RFID device.")
-			return False
-
-		if not device.is_connected:
-			logging.warning(f"⚠️ Device '{name}' is not connected.")
+		is_valid, device = self._validate_device_for_inventory(name, check_gpi=True)
+		if not is_valid:
 			return False
 
 		try:
@@ -257,17 +279,8 @@ class Devices:
 
 		Returns True if the command was sent successfully, False otherwise.
 		"""
-		device = next((d for d in self.devices if d.name == name), None)
-		if not device:
-			logging.warning(f"⚠️ Device '{name}' not found.")
-			return False
-
-		if not device.device_type == 'rfid':
-			logging.warning(f"⚠️ Device '{name}' is not an RFID device.")
-			return False
-
-		if not device.is_connected:
-			logging.warning(f"⚠️ Device '{name}' is not connected.")
+		is_valid, device = self._validate_device_for_inventory(name)
+		if not is_valid:
 			return False
 
 		try:

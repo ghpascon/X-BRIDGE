@@ -52,14 +52,14 @@
         <template x-if="device.device_type === 'rfid'">
           <button
             @click="toggleInventory(device)"
-            :disabled="!device.is_connected"
+            :disabled="!device.is_connected || device.is_gpi_trigger_on"
             :class="{
-              'bg-green-500 hover:bg-green-600': device.is_connected && !device.is_reading,
-              'bg-red-500 hover:bg-red-600': device.is_connected && device.is_reading,
-              'bg-gray-300 cursor-not-allowed': !device.is_connected
+              'bg-green-500 hover:bg-green-600': device.is_connected && !device.is_reading && !device.is_gpi_trigger_on,
+              'bg-red-500 hover:bg-red-600': device.is_connected && device.is_reading && !device.is_gpi_trigger_on,
+              'bg-gray-300 cursor-not-allowed': !device.is_connected || device.is_gpi_trigger_on
             }"
             class="px-3 py-1 text-white text-xs rounded font-medium min-w-[50px] transition-colors"
-            x-text="!device.is_connected ? 'Off' : (device.is_reading ? 'Stop' : 'Start')"
+            x-text="device.is_gpi_trigger_on ? 'GPI' : (!device.is_connected ? 'Off' : (device.is_reading ? 'Stop' : 'Start'))"
           ></button>
         </template>
       </div>
