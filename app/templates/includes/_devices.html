@@ -30,6 +30,27 @@
   <!-- Divider -->
   <div class="border-t border-gray-300 my-4 flex-shrink-0"></div>
 
+  <!-- Control All Buttons -->
+  <div class="flex gap-2 mb-4 flex-shrink-0">
+    <button
+      @click="startInventoryAll()"
+      :disabled="stats.connected === 0"
+      :class="{
+        'bg-green-500 hover:bg-green-600': stats.connected > 0,
+        'bg-gray-300 cursor-not-allowed': stats.connected === 0
+      }"
+      class="flex-1 px-2 py-1 text-white text-xs rounded font-medium transition-colors"
+    >
+      Start All
+    </button>
+    <button
+      @click="stopInventoryAll()"
+      class="flex-1 px-2 py-1 bg-red-500 hover:bg-red-600 text-white text-xs rounded font-medium transition-colors"
+    >
+      Stop All
+    </button>
+  </div>
+
   <!-- Device List -->
   <div class="space-y-2 overflow-y-auto flex-1" style="min-height: 0">
     <template x-for="device in devices" :key="device.name">
@@ -144,6 +165,36 @@
           }
         } catch (err) {
           console.error("Error toggling inventory:", err);
+        }
+      },
+
+      async startInventoryAll() {
+        try {
+          const response = await fetch("{{ url_for('start_inventory_all') }}", {
+            method: "POST",
+          });
+          if (response.ok) {
+            await this.loadDevices();
+          } else {
+            console.error("Failed to start all:", await response.json());
+          }
+        } catch (err) {
+          console.error("Error starting all:", err);
+        }
+      },
+
+      async stopInventoryAll() {
+        try {
+          const response = await fetch("{{ url_for('stop_inventory_all') }}", {
+            method: "POST",
+          });
+          if (response.ok) {
+            await this.loadDevices();
+          } else {
+            console.error("Failed to stop all:", await response.json());
+          }
+        } catch (err) {
+          console.error("Error stopping all:", err);
         }
       },
     };

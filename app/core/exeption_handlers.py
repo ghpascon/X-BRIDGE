@@ -28,22 +28,37 @@ def setup_exeptions(app):
 		    JSONResponse with validation error details
 		"""
 		# Get the request body for logging
-		body = await request.body()
-		body_text = body.decode('utf-8', errors='ignore')
+		try:
+			body = await request.body()
+			body_text = body.decode('utf-8', errors='ignore')
+		except Exception:
+			body_text = '<unable to read body>'
+
+		# Clean error details for safe JSON serialization
+		errors = []
+		for error in exc.errors():
+			error_dict = {
+				'loc': error.get('loc', []),
+				'msg': str(error.get('msg', '')),
+				'type': error.get('type', ''),
+			}
+			if 'input' in error:
+				error_dict['input'] = str(error['input'])
+			errors.append(error_dict)
 
 		# Log validation error with details
 		logging.error(
 			f'Request validation error: {request.method} {request.url}\n'
 			f'Headers: {dict(request.headers)}\n'
 			f'Body: {body_text}\n'
-			f'Errors: {exc.errors()}'
+			f'Errors: {errors}'
 		)
 
 		# Return structured error response
 		return JSONResponse(
 			status_code=422,
 			content={
-				'detail': exc.errors(),
+				'detail': errors,
 				'body': body_text,
 				'message': 'Invalid request received',
 			},

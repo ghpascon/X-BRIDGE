@@ -128,3 +128,33 @@ async def stop_device_inventory(device_name: str):
 			content={'message': f"Device '{device_name}' not found or could not stop inventory."},
 		)
 	return {'message': f"Inventory stopped for device '{device_name}'."}
+
+
+@router.post(
+	'/start_inventory_all',
+	summary='Start inventory on all devices',
+	description='Starts the inventory process for all connected RFID devices.',
+)
+async def start_inventory_all():
+	results = await rfid_manager.devices.start_inventory_all()
+	success_count = sum(1 for success in results.values() if success)
+	total_count = len(results)
+	return {
+		'message': f'Inventory started on {success_count}/{total_count} devices.',
+		'results': results,
+	}
+
+
+@router.post(
+	'/stop_inventory_all',
+	summary='Stop inventory on all devices',
+	description='Stops the inventory process for all connected RFID devices.',
+)
+async def stop_inventory_all():
+	results = await rfid_manager.devices.stop_inventory_all()
+	success_count = sum(1 for success in results.values() if success)
+	total_count = len(results)
+	return {
+		'message': f'Inventory stopped on {success_count}/{total_count} devices.',
+		'results': results,
+	}

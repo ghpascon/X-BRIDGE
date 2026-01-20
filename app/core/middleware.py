@@ -47,14 +47,15 @@ class SafeRequestMiddleware(BaseHTTPMiddleware):
 			response = await call_next(request)
 			return response
 		except Exception as e:
-			# Log the error
-			logging.error(f'[Middleware Error] {type(e).__name__}: {e}')
+			# Log the error with traceback
+			logging.error(f'[Middleware Error] {type(e).__name__}: {e}', exc_info=True)
 
-			# Return JSON error response
+			# Return JSON error response with safe serialization
 			return JSONResponse(
 				status_code=500,
 				content={
 					'message': str(e),
+					'error_type': type(e).__name__,
 					'path': request.url.path,
 				},
 			)

@@ -4,7 +4,7 @@ import json
 from smartx_rfid.devices import SERIAL, TCP, R700_IOT, X714
 import asyncio
 from typing import List, Dict, Optional, Tuple
-
+from smartx_rfid.schemas.tag import WriteTagValidator
 
 class Devices:
 	def __init__(self, devices_path: str, example_path: str = ''):
@@ -179,6 +179,9 @@ class Devices:
 	def get_device_count(self):
 		return len(self.devices)
 
+	def get_device(self, name: str):
+		return next((device for device in self.devices if device.name == name), None)
+
 	def get_device_info(self, name: Optional[str] = None) -> List[Dict]:
 		"""
 		Return device connection and reading status.
@@ -201,7 +204,7 @@ class Devices:
 		"""
 		Return information for a single device.
 		"""
-		device = next((d for d in self.devices if d.name == name), None)
+		device = self.get_device(name)
 		if not device:
 			return None
 
@@ -236,7 +239,7 @@ class Devices:
 		Returns:
 			Tuple of (is_valid, device_object)
 		"""
-		device = next((d for d in self.devices if d.name == name), None)
+		device = self.get_device(name)
 		if not device:
 			logging.warning(f"⚠️ Device '{name}' not found.")
 			return False, None
@@ -290,3 +293,48 @@ class Devices:
 		except Exception as e:
 			logging.error(f"❌ Error stopping inventory on device '{name}': {e}")
 			return False
+
+	async def start_inventory_all(self) -> Dict[str, bool]:
+		"""
+		Start inventory on all connected RFID devices.
+
+		Returns a dictionary with device names as keys and success status as values.
+		"""
+		results = {}
+		for device in self.devices:
+			if device.device_type == 'rfid' and device.is_connected:
+				if not getattr(device, 'is_gpi_trigger_on', False):
+					success = await self.start_inventory(device.name)
+					results[device.name] = success
+				else:
+					logging.info(f"⚠️ Skipping device '{device.name}' (GPI trigger is on).")
+					results[device.name] = False
+		return results
+
+	async def stop_inventory_all(self) -> Dict[str, bool]:
+		"""
+		Stop inventory on all connected RFID devices.
+
+		Returns a dictionary with device names as keys and success status as values.
+		"""
+		results = {}
+		for device in self.devices:
+			if device.device_type == 'rfid' and device.is_connected:
+				success = await self.stop_inventory(device.name)
+				results[device.name] = success
+		return results
+	
+
+	async def write_epc(self, device_name: str, write_tag: WriteTagValidator) -> Tuple[bool, Optional[str]]:
+		device = self.get_device(device_name)
+		if device is None:
+			return False, f"Device '{device_name}' not found."
+		
+		if not getattr(device, "write_epc", None):
+			return False, f"Device '{device_name}' does not support writing EPC."
+		
+		try:
+			await device.write_epc(**write_tag.model_dump())
+			return True, None
+		except Exception as e:
+			return False, str(e)

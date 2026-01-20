@@ -1,6 +1,8 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Body
 from fastapi.responses import JSONResponse
 from smartx_rfid.utils.path import get_prefix_from_path
+from smartx_rfid.schemas.tag import WriteTagValidator
+from app.schemas import write_tag_example
 
 from app.services import rfid_manager
 from app.models import get_all_models
@@ -92,3 +94,21 @@ async def generate_table_report(table_name: str, limit: int = 1000, offset: int 
 		)
 	except Exception as e:
 		return JSONResponse(status_code=500, content={'error': str(e)})
+
+@router.post(
+    "/write_epc/{device_name}",
+    summary="Write EPC to a tag",
+    description="Writes an EPC to a specified RFID tag.",
+    openapi_extra=write_tag_example
+)
+async def write_epc(
+    device_name: str,
+    write_tag: WriteTagValidator
+):
+    status, msg = await rfid_manager.devices.write_epc(device_name, write_tag)
+    if not status:
+        return JSONResponse(status_code=400, content={"message": msg})
+    return JSONResponse(
+        status_code=200,
+        content={"message": "Write epc command sent successfully"}
+    )

@@ -1291,14 +1291,14 @@ hook-testing = ["execnet (>=1.5.0)", "psutil", "pytest (>=2.7.3)"]
 
 [[package]]
 name = "pyinstaller-hooks-contrib"
-version = "2025.11"
+version = "2026.0"
 description = "Community maintained hooks for PyInstaller"
 optional = false
 python-versions = ">=3.8"
 groups = ["dev"]
 files = [
-    {file = "pyinstaller_hooks_contrib-2025.11-py3-none-any.whl", hash = "sha256:777e163e2942474aa41a8e6d31ac1635292d63422c3646c176d584d04d971c34"},
-    {file = "pyinstaller_hooks_contrib-2025.11.tar.gz", hash = "sha256:dfe18632e06655fa88d218e0d768fd753e1886465c12a6d4bce04f1aaeec917d"},
+    {file = "pyinstaller_hooks_contrib-2026.0-py3-none-any.whl", hash = "sha256:0590db8edeba3e6c30c8474937021f5cd39c0602b4d10f74a064c73911efaca5"},
+    {file = "pyinstaller_hooks_contrib-2026.0.tar.gz", hash = "sha256:0120893de491a000845470ca9c0b39284731ac6bace26f6849dea9627aaed48e"},
 ]
 
 [package.dependencies]
@@ -1560,14 +1560,14 @@ type = ["importlib_metadata (>=7.0.2) ; python_version < \"3.10\"", "jaraco.deve
 
 [[package]]
 name = "smartx-rfid"
-version = "1.9.2"
+version = "2.0.0"
 description = "SmartX RFID library"
 optional = false
 python-versions = "<4.0,>=3.11"
 groups = ["main"]
 files = [
-    {file = "smartx_rfid-1.9.2-py3-none-any.whl", hash = "sha256:e44d04b79590f63406a1c947bc57a33878c1a39df35c0e5aec50c0e22a8a8bf4"},
-    {file = "smartx_rfid-1.9.2.tar.gz", hash = "sha256:b78d4a211b4508850d64b91a7fb7f1b1d90a87c95c6d8fe6ce87683d8e31ab63"},
+    {file = "smartx_rfid-2.0.0-py3-none-any.whl", hash = "sha256:b96fb24c0af82ea4aff01835d82ed0415ede4203b233ff3ca79cfc8c28a9cda4"},
+    {file = "smartx_rfid-2.0.0.tar.gz", hash = "sha256:8cf69fa04a024a9b7a981e05568ae1ea8b381f8ba43d578f3d7833225aed41f2"},
 ]
 
 [package.dependencies]
@@ -2096,4 +2096,4 @@ all = ["winrt-Windows.Foundation.Collections[all] (>=3.2.1.0,<3.3.0.0)", "winrt-
 [metadata]
 lock-version = "2.1"
 python-versions = "==3.11"
-content-hash = "a0ff6fa356c4bc6368ba6ca6ad466889c9a53d372f47d5c8410eeb5c77082e40"
+content-hash = "e9cdc8941ad474935065a86d2c91d87dae38c9c7ebd1ac16362118519d920275"
