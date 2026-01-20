@@ -34,6 +34,7 @@ async def docs():
 		swagger_favicon_url='/static/images/logo.png',
 	)
 
+
 @router.get('/tag_details', response_class=HTMLResponse)
 async def tag_details(request: Request):
 	return templates.TemplateResponse(

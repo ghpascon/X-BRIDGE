@@ -212,7 +212,7 @@ class Devices:
 			'name': device.name,
 			'is_connected': is_connected,
 			'is_reading': is_reading,
-			'device_type': device.device_type
+			'device_type': device.device_type,
 		}
 
 	def any_device_reading(self) -> bool:

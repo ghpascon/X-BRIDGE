@@ -172,7 +172,7 @@ async def gtin_list(tag_generator: TagGtinSimulator):
 			# Create tag data structure
 			tag_data = {
 				'epc': epc_hex,
-				'tid': "e280" + str(start_serial + i).zfill(20),  # TID can be None for SGTIN tags
+				'tid': 'e280' + str(start_serial + i).zfill(20),  # TID can be None for SGTIN tags
 				'ant': (i % 4) + 1,  # Rotate between antennas 1-4
 				'rssi': -50 - (i % 30),  # RSSI varying between -50 and -80
 			}

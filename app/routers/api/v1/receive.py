@@ -1,4 +1,3 @@
-import logging
 from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse
 from smartx_rfid.utils.path import get_prefix_from_path
@@ -53,7 +52,6 @@ async def receive_events(device_name: str, events: list[EventSchema] | EventSche
 	)
 
 
-
 @router.post(
 	'/r700',
 	summary='Receive R700 events',
@@ -61,12 +59,12 @@ async def receive_events(device_name: str, events: list[EventSchema] | EventSche
 )
 async def receive_r700(request: Request):
 	data = await request.json()
-	
+
 	if isinstance(data, list):
 		events = data
 	else:
 		events = [data]
-	
+
 	rfid_manager.events.handle_r700_event(events)
 	return JSONResponse(
 		status_code=200,

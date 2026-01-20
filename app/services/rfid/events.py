@@ -10,9 +10,7 @@ class Events:
 		# Integration
 		logging.info('Setting up Integration')
 		self.integration = Integration()
-		self.tags = TagList(
-			prefix=settings.TAG_PREFIX
-		)
+		self.tags = TagList(prefix=settings.TAG_PREFIX)
 
 	def on_event(self, name: str, event_type: str, event_data):
 		"""
@@ -27,7 +25,7 @@ class Events:
 			self.on_tag(name=name, tag_data=event_data)
 		else:
 			logging.info(f'[ EVENT ] {name} - {event_type}: {event_data}')
-			if event_type == "reading":
+			if event_type == 'reading':
 				self.on_start(name=name) if event_data else self.on_stop(name=name)
 
 			asyncio.create_task(
@@ -65,23 +63,23 @@ class Events:
 
 	def handle_r700_event(self, events: list):
 		for event in events:
-			event_type = event.get("eventType")
-			device = event.get("hostname", "unknown")
-			if event_type == "tagInventory":
-				tag_data = event.get("tagInventoryEvent")
+			event_type = event.get('eventType')
+			device = event.get('hostname', 'unknown')
+			if event_type == 'tagInventory':
+				tag_data = event.get('tagInventoryEvent')
 				if tag_data is not None:
 					current_tag = {
-						"epc": tag_data.get("epcHex"),
-						"tid": tag_data.get("tidHex"),
-						"ant": tag_data.get("antennaPort"),
-						"rssi": int(tag_data.get("peakRssiCdbm", 0) / 100),
+						'epc': tag_data.get('epcHex'),
+						'tid': tag_data.get('tidHex'),
+						'ant': tag_data.get('antennaPort'),
+						'rssi': int(tag_data.get('peakRssiCdbm', 0) / 100),
 					}
 					self.on_tag(name=device, tag_data=current_tag)
-			elif event_type == "inventoryStatus":
-				event_data = event.get("inventoryStatusEvent")
+			elif event_type == 'inventoryStatus':
+				event_data = event.get('inventoryStatusEvent')
 				if event_data is not None:
 					self.on_event(
-						name=device, 
-						event_type="reading", 
-						event_data=event_data.get("inventoryStatus") == "running"
+						name=device,
+						event_type='reading',
+						event_data=event_data.get('inventoryStatus') == 'running',
 					)
