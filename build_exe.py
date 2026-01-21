@@ -13,12 +13,17 @@ ENTRY_SCRIPT = 'main.py'  # Main script
 APP_NAME = 'main'  # Final executable name
 EXTRA_FOLDERS = ['app']  # Extra folders to include in the build
 
+# === Icon path ===
+icon_path = os.path.abspath('config/logo.ico')
+
 # === Define output folder ===
 host_folder = os.path.basename(os.getcwd())  # name of the current working directory
 output_dir = os.path.join(EXE_PATH, host_folder)
+work_dir = os.path.join(output_dir, 'build')
 
 # Create folders if they don't exist
 os.makedirs(output_dir, exist_ok=True)
+os.makedirs(work_dir, exist_ok=True)
 
 # === Extra hidden imports ===
 manual_hidden = [
@@ -82,16 +87,19 @@ datas, binaries, hiddenimports = collect_all_from_packages(packages)
 # === Add extra folders as data ===
 extra_data = [f'{folder}{os.sep};{folder}' for folder in EXTRA_FOLDERS if os.path.exists(folder)]
 
+# === Icon path ===
+icon_path = os.path.abspath('config/logo.ico')
 
 # === Run PyInstaller ===
 PyInstaller.__main__.run(
 	[
 		ENTRY_SCRIPT,
 		f'--name={APP_NAME}',
-		'--onefile',
+		'--onedir',
 		'--noconsole',
+		f'--icon={icon_path}',
 		f'--distpath={output_dir}',  # Executable output
-		f'--workpath={output_dir}/build',  # Build folder
+		f'--workpath={work_dir}',  # Build folder
 	]
 	+ [f'--hidden-import={h}' for h in hiddenimports + all_manual_hidden]
 	+ [f'--add-data={d}' for d in extra_data]

@@ -29,7 +29,7 @@
       </div>
 
       <div class="overflow-y-auto" style="height: calc(100% - 50px)">
-        <template x-for="epc in epcs" :key="epc">
+        <template x-for="(epc, index) in epcs" :key="`epc-${index}-${epc}`">
           <div class="border-b p-3 hover:bg-gray-50">
             <div class="grid grid-cols-3 gap-4 items-center text-sm">
               <div class="font-mono truncate col-span-2" x-text="epc"></div>

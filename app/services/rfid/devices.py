@@ -124,6 +124,7 @@ class Devices:
 		await asyncio.gather(*tasks)
 
 	def get_devices(self):
+		"""Return a list of device names."""
 		return [device.name for device in self.devices]
 
 	def get_device_config(self, name: str):

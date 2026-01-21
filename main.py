@@ -20,12 +20,14 @@ import webbrowser
 import uvicorn
 from app.core import settings, SWAGGER_PATH
 
-
 # APP
 from app.core.build_app import create_application
 
 # SMARTX-RFID
 from smartx_rfid.utils.path import get_frozen_path
+
+# Tray
+from app.services.tray import tray_manager
 
 logging.info(f"{'='*60}")
 logging.info('Application starting...')

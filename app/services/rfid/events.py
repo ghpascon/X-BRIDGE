@@ -10,7 +10,7 @@ class Events:
 		# Integration
 		logging.info('Setting up Integration')
 		self.integration = Integration()
-		self.tags = TagList(prefix=settings.TAG_PREFIX)
+		self.tags = TagList(unique_identifier='tid', prefix=settings.TAG_PREFIX)
 
 	def on_event(self, name: str, event_type: str, event_data):
 		"""
@@ -33,6 +33,7 @@ class Events:
 					name=name, event_type=event_type, event_data=event_data
 				)
 			)
+			
 
 	def on_tag(self, name: str, tag_data: dict):
 		"""
@@ -53,6 +54,7 @@ class Events:
 		# EXISTING TAG
 		elif tag is not None:
 			pass
+		return tag is not None
 
 	def on_start(self, name: str):
 		logging.info(f'[ START ] {name}')

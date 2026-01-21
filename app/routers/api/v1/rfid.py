@@ -50,6 +50,14 @@ async def clear_tags():
 async def get_epcs():
 	return rfid_manager.events.tags.get_epcs()
 
+@router.get(
+	'/get_tids',
+	summary='Get all TIDs',
+	description='Returns a list of all detected TIDs from RFID tags.',
+)
+async def get_tids():
+	tags = rfid_manager.events.tags.get_all()
+	return [tag.get("tid") for tag in tags]
 
 @router.get(
 	'/get_gtin_count',

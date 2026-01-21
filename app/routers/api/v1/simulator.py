@@ -87,11 +87,11 @@ async def simulate_tag_list(tag_list: TagListSimulator):
 			}
 
 			# Envia o evento para o sistema
-			rfid_manager.events.on_tag(
+			if not rfid_manager.events.on_tag(
 				name=device_name,
 				tag_data=tag_data,
-			)
-
+			):
+				continue
 			tags_generated.append(tag_data)
 
 		return JSONResponse(
@@ -178,10 +178,11 @@ async def gtin_list(tag_generator: TagGtinSimulator):
 			}
 
 			# Send tag event to processing pipeline
-			rfid_manager.events.on_tag(
+			if not rfid_manager.events.on_tag(
 				name=device_name,
 				tag_data=tag_data,
-			)
+			):
+				continue
 
 			tags_generated.append(tag_data)
 
