@@ -11,7 +11,7 @@ set "EXE_PATH=%SCRIPT_DIR%main.exe"
 set "STARTUP_FOLDER=%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup"
 
 :: Nome do atalho
-set "SHORTCUT_NAME=XBridge.lnk"
+set "SHORTCUT_NAME=Smartx.lnk"
 
 :: Verifica se main.exe existe
 if not exist "%EXE_PATH%" (

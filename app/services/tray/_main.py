@@ -6,6 +6,7 @@ import time
 import os
 import asyncio
 import sys
+import webbrowser
 
 try:
     import pystray
@@ -14,6 +15,7 @@ try:
 except ImportError:
     TRAY_AVAILABLE = False
 
+from app.core import settings
 from app.services import rfid_manager
 
 
@@ -53,6 +55,12 @@ class TrayManager:
         widgets.append(
             pystray.MenuItem(lambda text: self.title, lambda: None, enabled=False)
         )
+
+        # Open browser
+        widgets.append(
+            pystray.MenuItem("Open Browser", self._open_browser)
+        )
+
         # Total tags
         widgets.append(
             pystray.MenuItem(lambda text: f"Total Tags: {len(rfid_manager.events.tags)}", lambda: None, enabled=False)
@@ -66,9 +74,9 @@ class TrayManager:
         widgets.append(pystray.Menu.SEPARATOR)
 
         # Restart
-        widgets.append(pystray.MenuItem("Restart", self._restart))
+        widgets.append(pystray.MenuItem("Restart", self.restart_application))
         # Exit
-        widgets.append(pystray.MenuItem("Exit", self._exit))
+        widgets.append(pystray.MenuItem("Exit", self.exit_application))
 
         self._icon.menu = pystray.Menu(*widgets)
 
@@ -124,11 +132,16 @@ class TrayManager:
         draw.rectangle([size//4, size//4, 3*size//4, 3*size//4], fill=color2)
         return image
     
-    def _restart(self):
-        subprocess.Popen([sys.executable] + sys.argv)
-        self._exit()
+    def _open_browser(self):
+        """Open browser at localhost"""
+        url = f"http://localhost:{settings.PORT}"
+        webbrowser.open(url)
     
-    def _exit(self):
+    def restart_application(self):
+        subprocess.Popen([sys.executable] + sys.argv)
+        self.exit_application()
+    
+    def exit_application(self):
         if self._icon:
             self._icon.stop()  
         os._exit(0)         

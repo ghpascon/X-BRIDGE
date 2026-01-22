@@ -187,6 +187,55 @@
       </div>
     </div>
   </template>
+
+  <!-- Persistent alert -->
+  <div
+    x-show="persistentAlert && persistentAlert.show"
+    x-transition:enter="transition ease-out duration-500 transform"
+    x-transition:enter-start="opacity-0 translate-x-full scale-95"
+    x-transition:enter-end="opacity-100 translate-x-0 scale-100"
+    x-transition:leave="transition ease-in duration-300 transform"
+    x-transition:leave-start="opacity-100 translate-x-0 scale-100"
+    x-transition:leave-end="opacity-0 translate-x-full scale-95"
+    x-cloak
+  >
+    <div
+      @click="dismissPersistentAlert()"
+      :class="persistentAlert ? `max-w-sm w-full backdrop-blur-sm border rounded-2xl shadow-2xl p-5 cursor-pointer hover:scale-105 transition-transform ${getAlertClasses(persistentAlert.level)}` : ''"
+    >
+      <div class="flex items-start">
+        <div
+          class="flex-shrink-0"
+          x-html="persistentAlert ? getAlertIcon(persistentAlert.level) : ''"
+        ></div>
+        <div class="ml-4 flex-1">
+          <div class="flex items-center mb-1">
+            <h4
+              :class="persistentAlert ? `text-sm font-bold ${getAlertTextClass(persistentAlert.level)}` : ''"
+              x-text="persistentAlert ? getAlertTitle(persistentAlert.level) : ''"
+            ></h4>
+          </div>
+          <p
+            :class="persistentAlert ? `text-sm ${getAlertTextClass(persistentAlert.level, true)}` : ''"
+            x-text="persistentAlert ? persistentAlert.text : ''"
+          ></p>
+        </div>
+        <div class="ml-3 flex-shrink-0">
+          <svg
+            class="h-5 w-5 text-amber-600"
+            fill="currentColor"
+            viewBox="0 0 20 20"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"
+              clip-rule="evenodd"
+            />
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -202,9 +251,23 @@
     }
   };
 
+  // Global function to show persistent clickable alerts
+  window.showPersistentAlert = function (
+    text,
+    level = "warning",
+    onClick = null,
+  ) {
+    if (globalAlertsManager) {
+      globalAlertsManager.addPersistentAlert(text, level, onClick);
+    } else {
+      console.warn("Alerts manager not initialized yet");
+    }
+  };
+
   function alertsManager() {
     return {
       dynamicAlerts: [],
+      persistentAlert: null,
 
       init() {
         // Set global instance
@@ -217,6 +280,7 @@
           level: level,
           show: true,
           duration: duration,
+          persistent: false,
         };
 
         this.dynamicAlerts.push(alert);
@@ -228,6 +292,32 @@
             this.dismissAlert(index);
           }
         }, duration);
+      },
+
+      addPersistentAlert(text, level = "warning", onClick = null) {
+        if (this.persistentAlert && this.persistentAlert.show) {
+          return;
+        }
+
+        this.persistentAlert = {
+          text: text,
+          level: level,
+          show: true,
+          persistent: true,
+          onClick: onClick,
+        };
+      },
+
+      dismissPersistentAlert() {
+        if (this.persistentAlert) {
+          if (this.persistentAlert.onClick) {
+            this.persistentAlert.onClick();
+          }
+          this.persistentAlert.show = false;
+          setTimeout(() => {
+            this.persistentAlert = null;
+          }, 300);
+        }
       },
 
       dismissAlert(index) {

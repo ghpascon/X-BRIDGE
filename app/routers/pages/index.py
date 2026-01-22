@@ -43,10 +43,3 @@ async def tag_details(request: Request):
 		media_type='text/html; charset=utf-8',
 	)
 
-@router.get('/write_page', response_class=HTMLResponse)
-async def write_page(request: Request):
-	return templates.TemplateResponse(
-		'pages/write_page/main.html',
-		{'request': request, 'title': 'Write Tags', 'alerts': []},
-		media_type='text/html; charset=utf-8',
-	)
