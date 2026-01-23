@@ -19,6 +19,6 @@ async def settings_page(request: Request):
 async def devices_page(request: Request):
 	return templates.TemplateResponse(
 		'pages/devices_settings/main.html',
-		{'request': request, 'title': 'Settings', 'alerts': []},
+		{'request': request, 'title': 'Devices', 'alerts': []},
 		media_type='text/html; charset=utf-8',
 	)
