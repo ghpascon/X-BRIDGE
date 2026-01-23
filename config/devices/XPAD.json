@@ -9,7 +9,7 @@
     "TCP_PORT": 23,
     "BLE_NAME": "SMTX",
     "BUZZER": true,
-    "SESSION": 0,
+    "SESSION": 1,
     "START_READING": true,
     "GPI_START": false,
     "ANT_DICT": {

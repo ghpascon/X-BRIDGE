@@ -1,4 +1,6 @@
-<div class="bg-white rounded-lg shadow-sm p-3 hover:shadow-md transition flex items-center justify-between gap-3 text-sm">
+<div
+  class="bg-white rounded-lg shadow-sm p-3 hover:shadow-md transition flex items-center justify-between gap-3 text-sm"
+>
   <div class="flex items-center gap-3 min-w-0">
     <span
       class="inline-block w-3.5 h-3.5 rounded-full flex-shrink-0"
@@ -8,8 +10,14 @@
 
     <div class="min-w-0">
       <div class="flex items-center gap-2">
-        <div class="font-medium text-gray-800 truncate" x-text="device.name"></div>
-        <div class="text-xs px-2 py-0.5 rounded bg-gray-100 text-gray-600" x-text="device.device_type || 'unknown'"></div>
+        <div
+          class="font-medium text-gray-800 truncate"
+          x-text="device.name"
+        ></div>
+        <div
+          class="text-xs px-2 py-0.5 rounded bg-gray-100 text-gray-600"
+          x-text="device.device_type || 'unknown'"
+        ></div>
 
         <div
           class="text-xs px-2 py-0.5 rounded-full ml-1"
@@ -18,14 +26,28 @@
         ></div>
 
         <template x-if="device.is_reading">
-          <div class="text-xs px-2 py-0.5 rounded bg-blue-50 text-blue-700">Reading</div>
+          <div class="text-xs px-2 py-0.5 rounded bg-blue-50 text-blue-700">
+            Reading
+          </div>
         </template>
       </div>
     </div>
   </div>
 
   <div class="flex items-center gap-2">
-    <button @click="editDevice(device.name)" title="Edit device" class="px-3 py-1 rounded bg-yellow-50 hover:bg-yellow-100 text-yellow-700 text-sm transition">Edit</button>
-    <button @click="deleteDevice(device.name)" title="Delete device" class="px-3 py-1 rounded bg-red-50 hover:bg-red-100 text-red-700 text-sm transition">Delete</button>
+    <button
+      @click="editDevice(device.name)"
+      title="Edit device"
+      class="px-3 py-1 rounded bg-yellow-50 hover:bg-yellow-100 text-yellow-700 text-sm transition"
+    >
+      Edit
+    </button>
+    <button
+      @click="deleteDevice(device.name)"
+      title="Delete device"
+      class="px-3 py-1 rounded bg-red-50 hover:bg-red-100 text-red-700 text-sm transition"
+    >
+      Delete
+    </button>
   </div>
 </div>

@@ -1737,14 +1737,14 @@ files = [
 
 [[package]]
 name = "smartx-rfid"
-version = "2.2.2"
+version = "2.3.0"
 description = "SmartX RFID library"
 optional = false
 python-versions = "<4.0,>=3.11"
 groups = ["main"]
 files = [
-    {file = "smartx_rfid-2.2.2-py3-none-any.whl", hash = "sha256:a0da828c34b10faa9d872307573fc5b766fbf42c710d97e6bb5eb3f01c774434"},
-    {file = "smartx_rfid-2.2.2.tar.gz", hash = "sha256:46fcf7218200d2cdc6106d48d81dd96427ce213a000df0f1acc856ff3a52ab15"},
+    {file = "smartx_rfid-2.3.0-py3-none-any.whl", hash = "sha256:e98c2c835f16fa9cd0e02f8cff3a646f55aca37fe0762b9ef25e494f04e65281"},
+    {file = "smartx_rfid-2.3.0.tar.gz", hash = "sha256:e6c2937e746d1a082a5458308a1d89a1394a889d2cb02d5cae2677cb5ccb2a37"},
 ]
 
 [package.dependencies]
@@ -2273,4 +2273,4 @@ all = ["winrt-Windows.Foundation.Collections[all] (>=3.2.1.0,<3.3.0.0)", "winrt-
 [metadata]
 lock-version = "2.1"
 python-versions = "==3.11"
-content-hash = "c675d2d7aef75236dabd481870e1388e36397f188d8e7420735ce1b43e007374"
+content-hash = "b6bbd2b8529558d60c9f3148189b05be345d3601d878e242271a08124673f32e"
