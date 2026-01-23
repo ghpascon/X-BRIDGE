@@ -3,15 +3,16 @@ from smartx_rfid.utils.logger_manager import LoggerManager
 import os
 from .build_templates import TemplateManager
 from .indicator import Indicator
+from smartx_rfid.utils.path import get_frozen_path
 
 # DEFAULT VARS
-FILES_PATH = 'config'
-SWAGGER_PATH = 'SWAGGER.md'
+FILES_PATH = get_frozen_path('config')
+SWAGGER_PATH = get_frozen_path('docs/SWAGGER.md')
 CONFIG_PATH = f'{FILES_PATH}/config.json'
-TEMPLATES_PATH = 'app/templates'
+TEMPLATES_PATH = get_frozen_path('app/templates')
 DEVICES_PATH = f'{FILES_PATH}/devices'
-ICON_PATH = f'{FILES_PATH}/logo.ico'
-EXAMPLE_PATH = 'examples'
+ICON_PATH = get_frozen_path('app/static/icons/logo.ico')
+EXAMPLE_PATH = get_frozen_path('examples')
 
 ##CONFIG APLICATION
 # settings

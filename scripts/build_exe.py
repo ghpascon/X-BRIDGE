@@ -11,10 +11,10 @@ from PyInstaller.utils.hooks import collect_all, collect_submodules
 EXE_PATH = 'C:/Users/DELL/Desktop/PYTHON_BUILDS'  # Base folder to store builds
 ENTRY_SCRIPT = 'main.py'  # Main script
 APP_NAME = 'main'  # Final executable name
-EXTRA_FOLDERS = ['app']  # Extra folders to include in the build
+EXTRA_FOLDERS = ['app', 'config', 'examples', 'docs']  # Extra folders to include in the build
 
 # === Icon path ===
-icon_path = os.path.abspath('config/logo.ico')
+icon_path = os.path.abspath('app/static/icons/logo.ico')
 
 # === Define output folder ===
 host_folder = os.path.basename(os.getcwd())  # name of the current working directory
@@ -87,8 +87,6 @@ datas, binaries, hiddenimports = collect_all_from_packages(packages)
 # === Add extra folders as data ===
 extra_data = [f'{folder}{os.sep};{folder}' for folder in EXTRA_FOLDERS if os.path.exists(folder)]
 
-# === Icon path ===
-icon_path = os.path.abspath('config/logo.ico')
 
 # === Run PyInstaller ===
 PyInstaller.__main__.run(
@@ -99,7 +97,8 @@ PyInstaller.__main__.run(
 		'--noconsole',
 		f'--icon={icon_path}',
 		f'--distpath={output_dir}',  # Executable output
-		f'--workpath={work_dir}',  # Build folder
+		f'--workpath={work_dir}',  # Build folder,
+		"--noconfirm"
 	]
 	+ [f'--hidden-import={h}' for h in hiddenimports + all_manual_hidden]
 	+ [f'--add-data={d}' for d in extra_data]
