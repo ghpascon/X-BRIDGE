@@ -27,7 +27,7 @@ class Settings:
 				return {k: replace_empty_with_none(v) for k, v in obj.items()}
 			elif isinstance(obj, list):
 				return [replace_empty_with_none(v) for v in obj]
-			elif obj == "":
+			elif obj == '':
 				return None
 			else:
 				return obj

@@ -4,28 +4,24 @@ from fastapi import APIRouter
 from fastapi.responses import JSONResponse
 from smartx_rfid.utils.path import get_prefix_from_path
 
-from app.services.tray import tray_manager
 from app.services.settings_service import settings_service
 from app.schemas.application import SettingsSchema
 from app.core import settings
+from app.core.utils import delayed_func
+from app.services.tray import tray_manager
 
 router_prefix = get_prefix_from_path(__file__)
 router = APIRouter(prefix=router_prefix, tags=[router_prefix])
 
 
-async def delayed_func(func, delay: float = 1.0):
-	await asyncio.sleep(delay)
-	func()
-
-
-@router.post('/restart_application')
-async def restart_application():
+@router.post('/restart_application_route')
+async def restart_application_route():
 	asyncio.create_task(delayed_func(tray_manager.restart_application))
 	return JSONResponse(content={'status': 'restarting'})
 
 
-@router.post('/exit_application')
-async def exit_application():
+@router.post('/exit_application_route')
+async def exit_application_route():
 	asyncio.create_task(delayed_func(tray_manager.exit_application))
 	return JSONResponse(content={'status': 'exiting'})
 
@@ -77,3 +73,13 @@ async def has_changes():
 @router.get('/get_application_config_example', summary='Get the example configuration')
 async def get_application_config_example():
 	return JSONResponse(content=settings_service._get_example_config())
+
+
+@router.get('/backup_config', summary='Backup the application configuration')
+async def backup_config():
+	return JSONResponse(content=settings_service.backup_config())
+
+
+@router.post('/import_config', summary='Import the application configuration')
+async def import_config(data: dict):
+	return JSONResponse(content=settings_service.import_config(data))

@@ -44,7 +44,7 @@
 
       async restartApplication() {
         try {
-          await fetch('{{ url_for("restart_application") }}', {
+          await fetch('{{ url_for("restart_application_route") }}', {
             method: "POST",
           });
           showAlert("Application is restarting...", "info", 3000);

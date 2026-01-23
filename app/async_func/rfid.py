@@ -23,7 +23,6 @@ async def connect_on_startup():
 		tasks = getattr(rfid_manager.devices, '_connect_tasks', []) or []
 		# If there are no tasks or all are done, attempt to reconnect after backoff
 		if not tasks or all(t.done() for t in tasks):
-			logging.info('No active connect tasks — attempting reconnect in %ss', backoff_seconds)
 			await asyncio.sleep(backoff_seconds)
 			try:
 				await rfid_manager.devices.connect_devices()

@@ -5,11 +5,12 @@ from .build_templates import TemplateManager
 from .indicator import Indicator
 
 # DEFAULT VARS
+FILES_PATH = 'config'
 SWAGGER_PATH = 'SWAGGER.md'
-CONFIG_PATH = 'config/config.json'
+CONFIG_PATH = f'{FILES_PATH}/config.json'
 TEMPLATES_PATH = 'app/templates'
-DEVICES_PATH = 'config/devices'
-ICON_PATH = 'config/logo.ico'
+DEVICES_PATH = f'{FILES_PATH}/devices'
+ICON_PATH = f'{FILES_PATH}/logo.ico'
 EXAMPLE_PATH = 'examples'
 
 ##CONFIG APLICATION
