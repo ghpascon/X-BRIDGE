@@ -33,7 +33,6 @@ class Events:
 					name=name, event_type=event_type, event_data=event_data
 				)
 			)
-			
 
 	def on_tag(self, name: str, tag_data: dict):
 		"""

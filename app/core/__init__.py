@@ -9,7 +9,7 @@ SWAGGER_PATH = 'SWAGGER.md'
 CONFIG_PATH = 'config/config.json'
 TEMPLATES_PATH = 'app/templates'
 DEVICES_PATH = 'config/devices'
-ICON_PATH = "config/logo.ico"
+ICON_PATH = 'config/logo.ico'
 EXAMPLE_PATH = 'examples'
 
 ##CONFIG APLICATION

@@ -5,16 +5,28 @@ from smartx_rfid.devices import SERIAL, TCP, R700_IOT, X714
 import asyncio
 from typing import List, Dict, Optional, Tuple
 from smartx_rfid.schemas.tag import WriteTagValidator
+from typing import Callable
+import inspect
 
 class Devices:
-	def __init__(self, devices_path: str, example_path: str = ''):
+	def __init__(self, devices_path: str, example_path: str = '', event_func: Callable | None = None):
 		self.devices = []
 		self._devices_path = devices_path
 		self._example_path = example_path
-		self.load_devices()
+		self._connect_tasks = []
+		self._event_func: Callable | None = event_func
 
 	def __len__(self):
 		return len(self.devices)
+
+	def assign_event_function(self):
+		# set event handlers
+		if self._event_func is None:
+			logging.info("No event function provided; skipping assignment of event handlers.")
+			return
+		logging.info('Assigning event handlers to devices')
+		for device in self.devices:
+			device.on_event = self._event_func		
 
 	def load_devices(self):
 		logging.info(f'Loading devices from: {self._devices_path}')
@@ -48,6 +60,9 @@ class Devices:
 					logging.error(f'❌ JSON decode error: {e}')
 				except Exception as e:
 					logging.error(f"❌ Error processing file '{filename}': {e}")
+		
+		#Assign event handlers to devices
+		self.assign_event_function()
 
 	def add_device(self, name, device_type, data):
 		logging.info(f'🔍 Adding device: {name}')
@@ -112,16 +127,136 @@ class Devices:
 
 		logging.info(f"✅ Device '{name}' added successfully.")
 
-	async def connect_devices(self):
+	async def connect_devices(self, force: bool = False):
+		"""Start connection tasks for all devices.
+
+		If connect tasks are already running and `force` is False, this is a no-op.
+		When forcing, previous tasks will be cancelled and devices disconnected first.
+		"""
+		logging.info(f"{'='*60}")
+		logging.info("Connecting devices...")
+
+		# If there are active connect tasks and caller didn't request a force, skip.
+		existing = [t for t in getattr(self, '_connect_tasks', []) if not t.done()]
+		if existing and not force:
+			logging.info("Connect tasks already running; skipping new connect.")
+			return
+
+		# Cancel previous tasks and ensure existing device connections are closed
+		try:
+			await self.cancel_connect_tasks()
+		except Exception as e:
+			logging.debug(f"Error cancelling previous connect tasks: {e}")
+
+		try:
+			await self.disconnect_devices()
+		except Exception as e:
+			logging.debug(f"Error disconnecting existing devices: {e}")
+
+		# reload device definitions from disk (this will recreate device objects)
+		self.load_devices()
+
 		tasks = []
 		for device in self.devices:
 			try:
 				logging.info(f"🚀 Starting connection for device: '{device.name}'")
-				task = asyncio.create_task(device.connect())
+				# run device.connect inside a runner that ensures cleanup on cancel
+				task = asyncio.create_task(self._device_connect_runner(device))
 				tasks.append(task)
 			except Exception as e:
 				logging.error(f"❌ Error starting connection for device: '{device.name}': {e}")
-		await asyncio.gather(*tasks)
+
+		# keep tasks running in background; store handles for later cancellation
+		self._connect_tasks = tasks
+		logging.info(f"Started {len(tasks)} device connect task(s).")
+
+	async def cancel_connect_tasks(self):
+		"""Cancel any ongoing connect tasks and wait for their cancellation to complete."""
+		tasks = list(getattr(self, '_connect_tasks', []) or [])
+		if not tasks:
+			self._connect_tasks = []
+			return
+		# request cancellation
+		for t in tasks:
+			if not t.done():
+				t.cancel()
+				logging.info('Cancelled previous device connection task.')
+		# wait for them to finish/cancel
+		try:
+			await asyncio.gather(*tasks, return_exceptions=True)
+		except Exception:
+			# exceptions are expected here due to cancellations; log at debug
+			logging.debug('Exceptions occurred while awaiting cancelled tasks', exc_info=True)
+		self._connect_tasks = []
+
+	async def _device_connect_runner(self, device):
+		"""Run device.connect() and ensure resources are closed on cancellation/exit."""
+		try:
+			# if device.connect is a coroutine it will be awaited; if it raises CancelledError
+			# it will propagate to here so we can cleanup in finally.
+			res = device.connect()
+			if asyncio.iscoroutine(res):
+				await res
+			else:
+				# device.connect may be synchronous/blocking; run in thread
+				try:
+					await asyncio.to_thread(res)
+				except Exception as e:
+					logging.error(f"Error running blocking connect for device {getattr(device,'name',None)}: {e}")
+		except asyncio.CancelledError:
+			logging.info(f"Connect task cancelled for device {getattr(device,'name',None)}")
+			raise
+		except Exception as e:
+			logging.error(f"Exception in connect runner for device {getattr(device,'name',None)}: {e}")
+		finally:
+			# attempt to close any lingering resources on the device
+			try:
+				await self._close_device_resources(device)
+			except Exception as e:
+				logging.debug(f"Error during device resource cleanup for {getattr(device,'name',None)}: {e}")
+
+	async def _close_device_resources(self, device):
+		"""Try common close/disconnect methods on device; support sync and async methods."""
+		for name in ('disconnect', 'close', 'stop', 'shutdown'):
+			method = getattr(device, name, None)
+			if not callable(method):
+				continue
+			try:
+				res = method()
+				if asyncio.iscoroutine(res):
+					await res
+				# if method is sync, it should run immediately and close resource
+			except Exception as e:
+				logging.debug(f"Error calling {name} on device {getattr(device,'name',None)}: {e}")
+
+	async def disconnect_devices(self):
+		for device in list(self.devices):
+			try:
+				# cancel_all (sync ou async)
+				if hasattr(device, "cancel_all") and callable(getattr(device, "cancel_all")):
+					result = device.cancel_all()
+					if inspect.isawaitable(result):
+						await result
+
+				# shutdown (sync ou async)
+				if hasattr(device, "shutdown") and callable(getattr(device, "shutdown")):
+					result = device.shutdown()
+					if inspect.isawaitable(result):
+						await result
+
+			except Exception as e:
+				logging.exception(
+					f"Erro ao desconectar device {device}: {e}"
+				)
+			finally:
+				# Remove da lista de controle
+				try:
+					self.devices.remove(device)
+				except ValueError:
+					pass
+
+				# Remove referência local
+				del device
 
 	def get_devices(self):
 		"""Return a list of device names."""
@@ -211,13 +346,13 @@ class Devices:
 
 		is_connected: bool = device.is_connected
 		is_reading: bool = device.is_reading if is_connected else False
-		is_gpi_trigger_on: bool = getattr(device, 'is_gpi_trigger_on', False) == True
+		is_gpi_trigger_on: bool = getattr(device, 'is_gpi_trigger_on', False)
 		return {
 			'name': device.name,
 			'is_connected': is_connected,
 			'is_reading': is_reading,
 			'device_type': device.device_type,
-			'is_gpi_trigger_on': is_gpi_trigger_on
+			'is_gpi_trigger_on': is_gpi_trigger_on,
 		}
 
 	def any_device_reading(self) -> bool:
@@ -229,7 +364,9 @@ class Devices:
 				return True
 		return False
 
-	def _validate_device_for_inventory(self, name: str, check_gpi: bool = True) -> Tuple[bool, Optional[object]]:
+	def _validate_device_for_inventory(
+		self, name: str, check_gpi: bool = True
+	) -> Tuple[bool, Optional[object]]:
 		"""
 		Validate if a device can perform inventory operations.
 
@@ -324,16 +461,17 @@ class Devices:
 				success = await self.stop_inventory(device.name)
 				results[device.name] = success
 		return results
-	
 
-	async def write_epc(self, device_name: str, write_tag: WriteTagValidator) -> Tuple[bool, Optional[str]]:
+	async def write_epc(
+		self, device_name: str, write_tag: WriteTagValidator
+	) -> Tuple[bool, Optional[str]]:
 		device = self.get_device(device_name)
 		if device is None:
 			return False, f"Device '{device_name}' not found."
-		
-		if not getattr(device, "write_epc", None):
+
+		if not getattr(device, 'write_epc', None):
 			return False, f"Device '{device_name}' does not support writing EPC."
-		
+
 		try:
 			await device.write_epc(**write_tag.model_dump())
 			return True, None

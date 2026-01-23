@@ -42,4 +42,3 @@ async def tag_details(request: Request):
 		{'request': request, 'title': 'Tag Details', 'alerts': []},
 		media_type='text/html; charset=utf-8',
 	)
-

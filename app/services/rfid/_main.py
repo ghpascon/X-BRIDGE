@@ -14,11 +14,7 @@ class RfidManager:
 
 		# connect to devices
 		logging.info('Setting up Devices')
-		self.devices = Devices(devices_path=devices_path, example_path=example_path)
+		self.devices = Devices(devices_path=devices_path, example_path=example_path, event_func = self.events.on_event)
 
-		# set event handlers
-		logging.info('Assigning event handlers to devices')
-		for device in self.devices.devices:
-			device.on_event = self.events.on_event
-
+		
 		logging.info(f"{'='*20} RfidManager initialized {'='*20}")

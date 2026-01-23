@@ -9,7 +9,34 @@ from app.models import get_all_models
 async def connect_on_startup():
 	"""Connect to RFID devices on application startup."""
 	logging.info('Connecting to RFID devices on startup...')
-	await rfid_manager.devices.connect_devices()
+
+	# Attempt initial connect once, then monitor the connection tasks. If all
+	# tasks finish (e.g., due to errors), attempt reconnect with a small backoff.
+	try:
+		await rfid_manager.devices.connect_devices()
+	except Exception as e:
+		logging.error(f'Error during initial devices.connect_devices(): {e}')
+
+	backoff_seconds = 1
+	while True:
+		# get current connect tasks
+		tasks = getattr(rfid_manager.devices, '_connect_tasks', []) or []
+		# If there are no tasks or all are done, attempt to reconnect after backoff
+		if not tasks or all(t.done() for t in tasks):
+			logging.info('No active connect tasks — attempting reconnect in %ss', backoff_seconds)
+			await asyncio.sleep(backoff_seconds)
+			try:
+				await rfid_manager.devices.connect_devices()
+			except Exception as e:
+				logging.error(f'Error reconnecting devices: {e}')
+				# increase backoff up to a limit to avoid tight restart loops
+				backoff_seconds = min(backoff_seconds * 2, 60)
+				continue
+			# reset backoff on successful start
+			backoff_seconds = 1
+		else:
+			# tasks are running; check again later
+			await asyncio.sleep(1)
 
 
 async def clear_old_tags():

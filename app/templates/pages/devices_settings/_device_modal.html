@@ -1,0 +1,208 @@
+<div x-data="createDeviceModal()">
+  <div
+    x-show="showCreateDevice"
+    x-transition
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40"
+    <div x-data="createDeviceModal()">
+      <div
+        x-show="showCreateDevice"
+        x-transition.opacity
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40"
+        @keydown.escape.window="close()"
+        @click.self="close()"
+        aria-hidden="true"
+      >
+        <div class="bg-white rounded-xl shadow-xl w-full max-w-2xl p-6 sm:p-8 relative mx-4" role="dialog" aria-modal="true">
+          <button
+            @click="close()"
+            class="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
+            aria-label="Close"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M10 8.586L15.95 2.636a1 1 0 111.414 1.414L11.414 10l5.95 5.95a1 1 0 11-1.414 1.414L10 11.414l-5.95 5.95A1 1 0 012.636 15.95L8.586 10 2.636 4.05A1 1 0 014.05 2.636L10 8.586z" clip-rule="evenodd" />
+            </svg>
+          </button>
+
+          <header class="mb-4 text-center">
+            <h2 class="text-lg sm:text-2xl font-semibold text-gray-800">
+              <span x-text="isEdit ? 'Edit Device' : 'Create Device'"></span>
+            </h2>
+            <p class="text-sm text-gray-500 mt-1">Configure the device connection and parameters</p>
+          </header>
+
+          <form @submit.prevent="submitForm">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Device Name</label>
+                <input
+                  x-model="deviceName"
+                  :readonly="isEdit"
+                  required
+                  class="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-200"
+                  placeholder="my-device"
+                />
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Device Type</label>
+                <select
+                  x-model="deviceType"
+                  @change="fetchConfigExample()"
+                  required
+                  class="w-full border border-gray-200 rounded px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-200"
+                >
+                  <option value="" disabled>Select type…</option>
+                  <template x-for="type in deviceTypes" :key="type">
+                    <option :value="type" x-text="type"></option>
+                  </template>
+                </select>
+              </div>
+            </div>
+
+            <div class="mt-4">
+              <label class="block text-sm font-medium text-gray-700 mb-1">Configuration (JSON)</label>
+              <template x-if="true">
+                <textarea
+                  x-model="formConfigJson"
+                  rows="10"
+                  class="w-full font-mono text-sm border border-gray-200 rounded p-3 bg-gray-50 resize-y text-gray-800"
+                  placeholder='{
+      "READER": "SERIAL",
+      "port": "COM3",
+      "baudrate": 115200
+    }'
+                ></textarea>
+              </template>
+              <p class="text-xs text-gray-500 mt-2">Paste or edit the device JSON configuration. Invalid JSON will be rejected.</p>
+            </div>
+
+            <p x-show="error" class="text-red-500 text-sm mt-3" x-text="error"></p>
+
+            <div class="flex justify-end gap-3 mt-6">
+              <button type="button" @click="close()" class="px-4 py-2 rounded bg-white border border-gray-200 text-sm text-gray-700 hover:bg-gray-50">Cancel</button>
+              <button type="submit" :disabled="submitting" class="px-4 py-2 rounded bg-indigo-600 text-white text-sm hover:bg-indigo-700 disabled:opacity-60">
+                <span x-text="isEdit ? 'Update Device' : 'Create Device'"></span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <script>
+      document.addEventListener('alpine:init', () => {
+        Alpine.data('createDeviceModal', () => ({
+          showCreateDevice: false,
+          deviceName: '',
+          deviceType: '',
+          deviceTypes: [],
+          formConfigJson: '',
+          error: '',
+          submitting: false,
+          isEdit: false,
+
+          init() {
+            window.addEventListener('open-create-device', () => this.openCreate());
+            window.addEventListener('edit-device', (e) => this.openEdit(e.detail.name, e.detail.config));
+          },
+
+          close() {
+            this.showCreateDevice = false;
+          },
+
+          async openCreate() {
+            this.reset();
+            this.isEdit = false;
+            this.showCreateDevice = true;
+            await this.fetchDeviceTypes();
+          },
+
+          async openEdit(name, config) {
+            this.reset();
+            this.isEdit = true;
+            this.deviceName = name;
+            this.deviceType = config?.READER || '';
+            try {
+              this.formConfigJson = JSON.stringify(config || {}, null, 2);
+            } catch (e) {
+              this.formConfigJson = '';
+            }
+            this.showCreateDevice = true;
+            await this.fetchDeviceTypes();
+          },
+
+          reset() {
+            this.deviceName = '';
+            this.deviceType = '';
+            this.formConfigJson = '';
+            this.error = '';
+            this.submitting = false;
+          },
+
+          async fetchDeviceTypes() {
+            try {
+              const res = await fetch('{{ url_for("get_device_types_list") }}');
+              if (res.ok) this.deviceTypes = await res.json();
+            } catch (e) {
+              // ignore
+            }
+          },
+
+          async fetchConfigExample() {
+            if (!this.deviceType) return;
+            try {
+              const res = await fetch('{{ url_for("get_device_config_example", device_name="__X__") }}'.replace('__X__', this.deviceType));
+              if (res.ok) this.formConfigJson = JSON.stringify(await res.json(), null, 2);
+            } catch (e) {
+              // ignore
+            }
+          },
+
+          async submitForm() {
+            try {
+              this.submitting = true;
+              this.error = '';
+              let payload = {};
+              try {
+                payload = JSON.parse(this.formConfigJson || '{}');
+              } catch (err) {
+                this.error = 'Invalid JSON: ' + err.message;
+                return;
+              }
+              payload.READER = this.deviceType;
+
+              const url = this.isEdit
+                ? '{{ url_for("update_device", device_name="__X__") }}'
+                : '{{ url_for("create_device", device_name="__X__") }}';
+              const method = this.isEdit ? 'PUT' : 'POST';
+
+              const res = await fetch(url.replace('__X__', this.deviceName), {
+                method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload),
+              });
+
+              if (!res.ok) {
+                const txt = await res.text();
+                throw new Error(txt || 'Request failed');
+              }
+
+              // close and notify list to refresh
+              this.close();
+              const eventName = this.isEdit ? 'device-updated' : 'device-created';
+              window.dispatchEvent(new CustomEvent(eventName, { detail: { name: this.deviceName } }));
+              // Use global showAlert (included in base templates)
+              if (window.showAlert) {
+                window.showAlert(this.isEdit ? 'Device updated' : 'Device created', 'success', 3000);
+              }
+            } catch (e) {
+              this.error = e.message || String(e);
+              if (window.showAlert) {
+                window.showAlert(this.error, 'error', 5000);
+              }
+            } finally {
+              this.submitting = false;
+            }
+          },
+        }));
+      });
+    </script>

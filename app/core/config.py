@@ -21,6 +21,19 @@ class Settings:
 				except Exception as e:
 					logging.error(f'Error loading {self._config_path}: {e}')
 
+		# Replace all empty string values with None recursively
+		def replace_empty_with_none(obj):
+			if isinstance(obj, dict):
+				return {k: replace_empty_with_none(v) for k, v in obj.items()}
+			elif isinstance(obj, list):
+				return [replace_empty_with_none(v) for v in obj]
+			elif obj == "":
+				return None
+			else:
+				return obj
+
+		data = replace_empty_with_none(data)
+
 		# Load variables with defaults
 		self.TITLE: str = data.get('TITLE', 'SMARTX')
 		self.LOG_PATH: str = data.get('LOG_PATH', 'Logs')
@@ -40,7 +53,7 @@ class Settings:
 			for key, value in vars(self).items()
 			if not key.startswith('_') and not callable(value)
 		}
-	
+
 	def save(self):
 		"""Save all instance attributes except _config_path to JSON file."""
 		try:
@@ -57,4 +70,3 @@ class Settings:
 
 		except Exception as e:
 			logging.error(f'Error saving config: {e}')
-

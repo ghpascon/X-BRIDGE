@@ -83,31 +83,29 @@
           x-show="open"
           @click.away="open = false"
           class="absolute right-4 top-16 bg-white border border-gray-200 rounded-lg shadow-lg py-2 min-w-[150px]"
+          id="mobile-menu-dropdown"
         >
-          <a href="/" class="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-            >Home</a
-          >
-          <a
-            href="/write_page"
-            class="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-            >Write</a
-          >
-          <a
-            href="/logs"
-            class="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-            >Logs</a
-          >
-          <a
-            href="/docs"
-            class="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-            >Docs</a
-          >
-          <a
-            href="/metrics"
-            class="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-            >Metrics</a
-          >
+          <!-- Links will be cloned here by script -->
         </div>
+      </div>
+      <script>
+        // Clone navbar links into mobile dropdown
+        document.addEventListener('DOMContentLoaded', function () {
+          const desktopNav = document.querySelector('nav.hidden.md\\:flex');
+          const mobileMenu = document.getElementById('mobile-menu-dropdown');
+          if (desktopNav && mobileMenu) {
+            // Remove any previous links
+            mobileMenu.innerHTML = '';
+            desktopNav.querySelectorAll('a').forEach(function (a) {
+              const link = document.createElement('a');
+              link.href = a.href;
+              link.textContent = a.textContent;
+              link.className = 'block px-4 py-2 text-gray-700 hover:bg-gray-100';
+              mobileMenu.appendChild(link);
+            });
+          }
+        });
+      </script>
       </div>
     </div>
   </div>
