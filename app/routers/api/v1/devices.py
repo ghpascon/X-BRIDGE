@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 from fastapi.responses import JSONResponse
 from smartx_rfid.utils.path import get_prefix_from_path
+from app.schemas.protected import ProtectedInventoryModel, ProtectedModeModel
 
 from app.services import rfid_manager
 
@@ -158,3 +159,47 @@ async def stop_inventory_all():
 		'message': f'Inventory stopped on {success_count}/{total_count} devices.',
 		'results': results,
 	}
+
+
+@router.post(
+	'/protected_inventory/{device_name}',
+	summary='Start or stop protected inventory on a device',
+	description='Starts or stops the protected inventory process on the specified device.',
+)
+async def protected_inventory(device_name: str, protected_inventory: ProtectedInventoryModel):
+	success, msg = await rfid_manager.devices.protected_inventory(
+		device_name, **protected_inventory.model_dump()
+	)
+	if success:
+		return JSONResponse(
+			status_code=200,
+			content={
+				'message': f"Command sent successfully to device '{device_name}'.",
+			},
+		)
+	return JSONResponse(
+		status_code=400,
+		content={'message': f"Failed to send command to device '{device_name}'.", 'error': msg},
+	)
+
+
+@router.post(
+	'/protected_mode/{device_name}',
+	summary='Start or stop protected mode on a device',
+	description='Starts or stops the protected mode process on the specified device.',
+)
+async def protected_mode(device_name: str, protected_mode: ProtectedModeModel):
+	success, msg = await rfid_manager.devices.protected_mode(
+		device_name, **protected_mode.model_dump()
+	)
+	if success:
+		return JSONResponse(
+			status_code=200,
+			content={
+				'message': f"Command sent successfully to device '{device_name}'.",
+			},
+		)
+	return JSONResponse(
+		status_code=400,
+		content={'message': f"Failed to send command to device '{device_name}'.", 'error': msg},
+	)

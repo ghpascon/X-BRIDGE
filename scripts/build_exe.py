@@ -98,7 +98,7 @@ PyInstaller.__main__.run(
 		f'--icon={icon_path}',
 		f'--distpath={output_dir}',  # Executable output
 		f'--workpath={work_dir}',  # Build folder,
-		"--noconfirm"
+		'--noconfirm',
 	]
 	+ [f'--hidden-import={h}' for h in hiddenimports + all_manual_hidden]
 	+ [f'--add-data={d}' for d in extra_data]

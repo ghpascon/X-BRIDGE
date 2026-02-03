@@ -12,6 +12,8 @@
   "SESSION": 1,
   "START_READING": true,
   "GPI_START": false,
+  "PROTECTED_INVENTORY_ACTIVE": false,
+  "PROTECTED_INVENTORY_PASSWORD": "12345678",
   "ANT_DICT": {
     "1": {
       "active": true,
