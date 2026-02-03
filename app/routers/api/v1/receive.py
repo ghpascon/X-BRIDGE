@@ -2,7 +2,7 @@ from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse
 from smartx_rfid.utils.path import get_prefix_from_path
 from smartx_rfid.schemas.tag import TagSchema
-from smartx_rfid.schemas.events import EventSchema
+from smartx_rfid.schemas.events import EventSchema, EventDeviceSchema
 
 from app.services import rfid_manager
 
@@ -49,6 +49,28 @@ async def receive_events(device_name: str, events: list[EventSchema] | EventSche
 	return JSONResponse(
 		status_code=200,
 		content={'message': 'Events received successfully.', 'received_count': len(events)},
+	)
+
+
+@router.post(
+	'/x714',
+	summary='Receive X714 events',
+	description='Endpoint to receive non-standardized JSON events from X714 devices.',
+)
+async def receive_x714(events: list[EventDeviceSchema] | EventDeviceSchema):
+	if isinstance(events, EventDeviceSchema):
+		events = [events]
+
+	for event in events:
+		rfid_manager.events.on_event(
+			name=event.device,
+			event_type=event.event_type,
+			event_data=event.event_data,
+		)
+
+	return JSONResponse(
+		status_code=200,
+		content={'message': 'X714 events received successfully.', 'received_count': len(events)},
 	)
 
 
