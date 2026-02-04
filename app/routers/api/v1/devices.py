@@ -185,8 +185,8 @@ async def protected_inventory(device_name: str, protected_inventory: ProtectedIn
 
 @router.post(
 	'/protected_mode/{device_name}',
-	summary='Start or stop protected mode on a device',
-	description='Starts or stops the protected mode process on the specified device.',
+	summary='Activate/deactivate protected mode on a tag',
+	description='Activates or deactivates the protected mode on a tag for the specified device.',
 )
 async def protected_mode(device_name: str, protected_mode: ProtectedModeModel):
 	success, msg = await rfid_manager.devices.protected_mode(
