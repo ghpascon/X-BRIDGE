@@ -30,3 +30,18 @@ class ProtectedModeModel(ProtectedInventoryModel):
 				f'{info.field_name} must contain only hexadecimal characters (0-9, a-f)'
 			)
 		return v.lower()
+
+
+class ProtectListModel(ProtectedInventoryModel):
+	epcs: list[str] = Field(['000000000000000000000001', '000000000000000000000002'])
+
+	@field_validator('epcs')
+	def validate_epc_length_and_hex(cls, v, info: ValidationInfo):
+		for epc in v:
+			if len(epc) != 24:
+				raise ValueError(f'{info.field_name} must have exactly 24 characters')
+			if not re.fullmatch(r'[0-9a-fA-F]{24}', epc):
+				raise ValueError(
+					f'{info.field_name} must contain only hexadecimal characters (0-9, a-f)'
+				)
+		return [epc.lower() for epc in v]
