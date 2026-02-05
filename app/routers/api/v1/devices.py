@@ -1,9 +1,11 @@
+import logging
 from fastapi import APIRouter
 from fastapi.responses import JSONResponse
 from smartx_rfid.utils.path import get_prefix_from_path
 from app.schemas.protected import ProtectedInventoryModel, ProtectedModeModel, ProtectListModel
 
 from app.services import rfid_manager
+from app.schemas.print import PrintModel
 
 router_prefix = get_prefix_from_path(__file__)
 router = APIRouter(prefix=router_prefix, tags=[router_prefix])
@@ -244,8 +246,9 @@ async def protected_list(device_name: str, protect_list: ProtectListModel):
 	summary='If device is a printer, send print command',
 	description='Sends a print command to the specified printer device.',
 )
-async def print_to_device(device_name: str, content: str):
-	success, msg = await rfid_manager.devices.print(device_name, content)
+async def print_to_device(device_name: str, content: PrintModel):
+	logging.info(rfid_manager.devices.get_device_info(device_name))
+	success, msg = rfid_manager.devices.print(device_name, data=content.zpl)
 	if success:
 		return JSONResponse(
 			status_code=200,
@@ -267,8 +270,11 @@ async def print_to_device(device_name: str, content: str):
 	summary='Add print zpl or list of zpl to printer queue',
 	description='Adds a print job to the print queue of the specified printer device.',
 )
-async def add_to_print_queue(device_name: str, content: str | list[str]):
-	success, msg = await rfid_manager.devices.add_to_print_queue(device_name, content)
+async def add_to_print_queue(device_name: str, content: PrintModel | list[PrintModel]):
+	success = rfid_manager.devices.add_to_print_queue(
+		device_name,
+		zpl=content.zpl if isinstance(content, PrintModel) else [item.zpl for item in content],
+	)
 	if success:
 		return JSONResponse(
 			status_code=200,
@@ -280,6 +286,6 @@ async def add_to_print_queue(device_name: str, content: str | list[str]):
 		status_code=400,
 		content={
 			'message': f"Failed to add print job to queue for device '{device_name}'.",
-			'error': msg,
+			'error': 'Device not found or not a printer.',
 		},
 	)

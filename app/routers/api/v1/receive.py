@@ -2,7 +2,8 @@ from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse
 from smartx_rfid.utils.path import get_prefix_from_path
 from smartx_rfid.schemas.tag import TagSchema
-from smartx_rfid.schemas.events import EventSchema, EventDeviceSchema
+from smartx_rfid.schemas.events import EventSchema
+from app.schemas.events import EventDeviceSchema
 
 from app.services import rfid_manager
 
