@@ -237,3 +237,49 @@ async def protected_list(device_name: str, protect_list: ProtectListModel):
 			'errors': errors if error_count > 0 else None,
 		},
 	)
+
+
+@router.post(
+	'/print/{device_name}',
+	summary='If device is a printer, send print command',
+	description='Sends a print command to the specified printer device.',
+)
+async def print_to_device(device_name: str, content: str):
+	success, msg = await rfid_manager.devices.print(device_name, content)
+	if success:
+		return JSONResponse(
+			status_code=200,
+			content={
+				'message': f"Print command sent successfully to device '{device_name}'.",
+			},
+		)
+	return JSONResponse(
+		status_code=400,
+		content={
+			'message': f"Failed to send print command to device '{device_name}'.",
+			'error': msg,
+		},
+	)
+
+
+@router.post(
+	'/add_to_print_queue/{device_name}',
+	summary='Add print zpl or list of zpl to printer queue',
+	description='Adds a print job to the print queue of the specified printer device.',
+)
+async def add_to_print_queue(device_name: str, content: str | list[str]):
+	success, msg = await rfid_manager.devices.add_to_print_queue(device_name, content)
+	if success:
+		return JSONResponse(
+			status_code=200,
+			content={
+				'message': f"Print job added to queue for device '{device_name}'.",
+			},
+		)
+	return JSONResponse(
+		status_code=400,
+		content={
+			'message': f"Failed to add print job to queue for device '{device_name}'.",
+			'error': msg,
+		},
+	)
