@@ -42,6 +42,19 @@ async def clear_tags():
 	)
 
 
+@router.post(
+	'/clear_tags_device/{device_name}',
+	summary='Clear all tags for a specific device',
+	description='Removes all detected RFID tags from the system for a specified device.',
+)
+async def clear_tags_device(device_name: str):
+	rfid_manager.events.tags.remove_tags_by_device(device=device_name)
+	return JSONResponse(
+		status_code=200,
+		content={'message': f'All tags for device {device_name} have been cleared.'},
+	)
+
+
 @router.get(
 	'/get_epcs',
 	summary='Get all EPCs',
