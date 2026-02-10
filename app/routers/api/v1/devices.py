@@ -3,6 +3,7 @@ from fastapi import APIRouter
 from fastapi.responses import JSONResponse
 from smartx_rfid.utils.path import get_prefix_from_path
 from app.schemas.protected import ProtectedInventoryModel, ProtectedModeModel, ProtectListModel
+from smartx_rfid.schemas.devices import GpoSchema
 
 from app.services import rfid_manager
 from app.schemas.print import PrintModel
@@ -287,5 +288,31 @@ async def add_to_print_queue(device_name: str, content: PrintModel | list[PrintM
 		content={
 			'message': f"Failed to add print job to queue for device '{device_name}'.",
 			'error': 'Device not found or not a printer.',
+		},
+	)
+
+
+@router.post(
+	'/write_gpo/{device_name}',
+	summary='Write to GPO pin on a device',
+	description='Writes a value to a specified GPO pin on the device.',
+)
+async def write_gpo(device_name: str, gpo_data: GpoSchema):
+	success, msg = await rfid_manager.devices.write_gpo(
+		device_name=device_name,
+		**gpo_data.model_dump(),
+	)
+	if success:
+		return JSONResponse(
+			status_code=200,
+			content={
+				'message': f"GPO pin {gpo_data.pin} set to {gpo_data.state} on device '{device_name}'.",
+			},
+		)
+	return JSONResponse(
+		status_code=400,
+		content={
+			'message': f"Failed to write to GPO pin on device '{device_name}'.",
+			'error': msg,
 		},
 	)

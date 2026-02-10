@@ -231,8 +231,6 @@
               (res.ok ? "EPC written successfully!" : "Failed to write EPC"),
             res.ok ? "success" : "error",
           );
-
-          if (res.ok) this.resetForm();
         } catch (e) {
           console.error("Error:", e);
           showAlert("Error communicating with server", "error");
