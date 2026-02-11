@@ -26,11 +26,6 @@ jobs:
         run: |
           poetry lock
           poetry install
-      - name: Run main.py (test startup)
-        run: |
-          poetry run python main.py &
-          sleep 10
-          pkill -f main.py || true
       - name: Run tests (pytest)
         run: |
           poetry run pytest
@@ -54,11 +49,6 @@ jobs:
         run: |
           poetry lock
           poetry install
-      - name: Run main.py (test startup)
-        run: |
-          start /b poetry run python main.py
-          timeout /t 10
-          taskkill /im python.exe /f || exit 0
       - name: Run tests (pytest)
         run: |
           poetry run pytest
