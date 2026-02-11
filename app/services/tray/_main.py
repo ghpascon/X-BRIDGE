@@ -62,7 +62,7 @@ class TrayManager:
 		# Total tags
 		widgets.append(
 			pystray.MenuItem(
-				lambda text: f'Total Tags: {len(rfid_manager.events.tags)}',
+				lambda text: f'Total Tags: {len(rfid_manager.tags)}',
 				lambda: None,
 				enabled=False,
 			)

@@ -44,12 +44,12 @@ async def clear_old_tags():
 			await asyncio.sleep(60)
 			continue
 		await asyncio.sleep(settings.CLEAR_OLD_TAGS_INTERVAL)
-		if len(rfid_manager.events.tags) == 0:
+		if len(rfid_manager.tags) == 0:
 			continue
 
 		timestamp = datetime.now() - timedelta(seconds=settings.CLEAR_OLD_TAGS_INTERVAL)
 		logging.info(f'Removing tags before {timestamp}')
-		rfid_manager.events.tags.remove_tags_before_timestamp(timestamp)
+		rfid_manager.tags.remove_tags_before_timestamp(timestamp)
 
 
 async def clear_db():
@@ -72,7 +72,7 @@ async def clear_db():
 			await asyncio.sleep(seconds_until_midnight)
 			continue
 
-		if rfid_manager.events.integration.db_manager is None:
+		if rfid_manager.integration.db_manager is None:
 			logging.warning('Database manager is not initialized. Skipping database cleanup.')
 			await asyncio.sleep(seconds_until_midnight)
 			continue
@@ -85,7 +85,7 @@ async def clear_db():
 		# Get all models
 		models = get_all_models()
 
-		with rfid_manager.events.integration.db_manager.get_session() as session:
+		with rfid_manager.integration.db_manager.get_session() as session:
 			for model in models:
 				# Determine which timestamp column to use (prefer updated_at, fallback to created_at)
 				timestamp_column = None

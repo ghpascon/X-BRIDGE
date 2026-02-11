@@ -312,7 +312,7 @@ async def write_gpo(device_name: str, gpo_data: GpoSchema):
 	return JSONResponse(
 		status_code=400,
 		content={
-			'message': f"Failed to write to GPO pin on device '{device_name}'.",
+			'message': f"Failed to write to GPO pin on device '{device_name}': {msg}",
 			'error': msg,
 		},
 	)

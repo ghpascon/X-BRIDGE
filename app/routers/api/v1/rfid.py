@@ -17,7 +17,7 @@ router = APIRouter(prefix=router_prefix, tags=[router_prefix])
 	description='Returns a list of all detected RFID tags.',
 )
 async def get_tags():
-	return rfid_manager.events.tags.get_all()
+	return rfid_manager.tags.get_all()
 
 
 @router.get(
@@ -26,7 +26,7 @@ async def get_tags():
 	description='Returns the total number of detected RFID tags.',
 )
 async def get_tag_count():
-	return {'count': len(rfid_manager.events.tags)}
+	return {'count': len(rfid_manager.tags)}
 
 
 @router.post(
@@ -35,7 +35,7 @@ async def get_tag_count():
 	description='Removes all detected RFID tags from the system.',
 )
 async def clear_tags():
-	rfid_manager.events.tags.clear()
+	rfid_manager.tags.clear()
 	return JSONResponse(
 		status_code=200,
 		content={'message': 'All tags have been cleared.'},
@@ -48,7 +48,7 @@ async def clear_tags():
 	description='Removes all detected RFID tags from the system for a specified device.',
 )
 async def clear_tags_device(device_name: str):
-	rfid_manager.events.tags.remove_tags_by_device(device=device_name)
+	rfid_manager.tags.remove_tags_by_device(device=device_name)
 	return JSONResponse(
 		status_code=200,
 		content={'message': f'All tags for device {device_name} have been cleared.'},
@@ -61,7 +61,7 @@ async def clear_tags_device(device_name: str):
 	description='Returns a list of all detected EPCs from RFID tags.',
 )
 async def get_epcs():
-	return rfid_manager.events.tags.get_epcs()
+	return rfid_manager.tags.get_epcs()
 
 
 @router.get(
@@ -70,7 +70,7 @@ async def get_epcs():
 	description='Returns a list of all detected TIDs from RFID tags.',
 )
 async def get_tids():
-	tags = rfid_manager.events.tags.get_all()
+	tags = rfid_manager.tags.get_all()
 	return [tag.get('tid') for tag in tags]
 
 
@@ -80,7 +80,7 @@ async def get_tids():
 	description='Returns the total number of unique GTINs from detected RFID tags.',
 )
 async def get_gtin_count():
-	return rfid_manager.events.tags.get_gtin_counts()
+	return rfid_manager.tags.get_gtin_counts()
 
 
 @router.get(
@@ -89,7 +89,7 @@ async def get_gtin_count():
 	description='Returns detailed information about detected RFID tags.',
 )
 async def get_tag_info(epc: str):
-	return rfid_manager.events.tags.get_by_identifier(identifier_value=epc, identifier_type='epc')
+	return rfid_manager.tags.get_by_identifier(identifier_value=epc, identifier_type='epc')
 
 
 @router.get(
@@ -112,7 +112,7 @@ async def generate_table_report(table_name: str, limit: int = 1000, offset: int 
 		return JSONResponse(status_code=400, content={'error': 'Invalid table name'})
 
 	try:
-		return rfid_manager.events.integration.generate_table_report(
+		return rfid_manager.integration.generate_table_report(
 			model=table_model, limit=limit, offset=offset
 		)
 	except Exception as e:

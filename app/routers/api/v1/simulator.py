@@ -24,7 +24,7 @@ async def simulate_tag_event():
 		'ant': 1,
 		'rssi': -50,
 	}
-	rfid_manager.events.on_event(
+	rfid_manager.on_event(
 		name='SIMULATOR',
 		event_type='tag',
 		event_data=sample_tag,
@@ -45,7 +45,7 @@ async def simulate_generic_event():
 		'event_type': 'custom_event',
 		'event_data': {'info': 'This is a simulated event for testing.'},
 	}
-	rfid_manager.events.on_event(
+	rfid_manager.on_event(
 		name='SIMULATOR',
 		event_type=sample_event['event_type'],
 		event_data=sample_event['event_data'],
@@ -87,7 +87,7 @@ async def simulate_tag_list(tag_list: TagListSimulator):
 			}
 
 			# Envia o evento para o sistema
-			if not rfid_manager.events.on_tag(
+			if not rfid_manager.on_tag(
 				name=device_name,
 				tag_data=tag_data,
 			):
@@ -178,7 +178,7 @@ async def gtin_list(tag_generator: TagGtinSimulator):
 			}
 
 			# Send tag event to processing pipeline
-			if not rfid_manager.events.on_tag(
+			if not rfid_manager.on_tag(
 				name=device_name,
 				tag_data=tag_data,
 			):
