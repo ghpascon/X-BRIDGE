@@ -32,6 +32,24 @@ jobs:
       - name: Build executable
         run: |
           poetry run python scripts/build_exe.py
+      - name: Checkout executables repo
+        uses: actions/checkout@v4
+        with:
+          repository: ghpascon/executables
+          token: ${{ secrets.EXECUTABLES_TOKEN }}
+          path: executables-repo
+      - name: Copy executables to repo
+        run: |
+          mkdir -p executables-repo/linux
+          cp -r TEMP/x-bridge/main/* executables-repo/linux/
+      - name: Commit and push executables
+        run: |
+          cd executables-repo
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add .
+          git commit -m "Add new Linux executables from CI" || echo "No changes to commit"
+          git push
 
   build-windows:
     runs-on: windows-latest
@@ -55,3 +73,21 @@ jobs:
       - name: Build executable
         run: |
           poetry run python scripts/build_exe.py
+      - name: Checkout executables repo
+        uses: actions/checkout@v4
+        with:
+          repository: ghpascon/executables
+          token: ${{ secrets.EXECUTABLES_TOKEN }}
+          path: executables-repo
+      - name: Copy executables to repo
+        run: |
+          if not exist executables-repo\windows mkdir executables-repo\windows
+          xcopy /E /Y TEMP\x-bridge\main\* executables-repo\windows\
+      - name: Commit and push executables
+        run: |
+          cd executables-repo
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add .
+          git commit -m "Add new Windows executables from CI" || echo "No changes to commit"
+          git push
