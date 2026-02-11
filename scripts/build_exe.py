@@ -11,8 +11,7 @@ from PyInstaller.utils.hooks import collect_all, collect_submodules
 EXE_PATH = 'TEMP'  # Base folder to store builds
 ENTRY_SCRIPT = 'main.py'  # Main script
 APP_NAME = 'main'  # Final executable name
-EXTRA_FOLDERS = ['app', 'config', 'examples', 'docs']  # Extra folders to include in the build
-
+EXTRA_FOLDERS = ['app', 'examples', 'docs']  # Extra folders to include in the build
 
 # === Icon path (platform dependent) ===
 if os.name == 'nt':
