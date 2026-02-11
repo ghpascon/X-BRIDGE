@@ -29,15 +29,14 @@ jobs:
         run: poetry run pytest
       - name: Build executable
         run: poetry run python scripts/build_exe.py
-      - name: Checkout executables repo
-        uses: actions/checkout@v4
-        with:
-          repository: ghpascon/executables
-          token: ${{ secrets.EXECUTABLES_TOKEN }}
-          path: executables-repo
-          ref: main
+      - name: Show Python and pip info
+        run: |
+          python --version
+          pip list
       - name: List build output
         run: |
+          echo "Conteúdo da pasta principal:"
+          ls -l . || true
           echo "Conteúdo de TEMP/x-bridge:"
           ls -l TEMP/x-bridge || true
           echo "Conteúdo de TEMP/x-bridge/main:"
