@@ -121,32 +121,35 @@ jobs:
           path: executables-repo
           ref: main
 
-      - name: Generate automatic tag
+      - name: Determine tag to use
         run: |
           project_name=$(basename $GITHUB_REPOSITORY)
           cd executables-repo
           git fetch --tags
 
-          # Pega a última tag do projeto
-          last_tag=$(git tag --list "${project_name}-v*" | sort -V | tail -n1)
+          # Tenta pegar a tag mais recente do repo de origem (o repo que disparou o workflow)
+          origin_tag=$(git ls-remote --tags https://github.com/$GITHUB_REPOSITORY.git | awk -F/ '{print $3}' | sort -V | tail -n1)
 
-          if [ -z "$last_tag" ]; then
-            new_tag="${project_name}-v1.0.0"
+          if [ -n "$origin_tag" ]; then
+            NEW_TAG="${project_name}-${origin_tag}"
+            echo "Using tag from origin repo: $NEW_TAG"
           else
-            # Extrai números de versão
-            version="${last_tag##*-v}"         # remove prefixo project_name-v
-            major=$(echo $version | cut -d. -f1)
-            minor=$(echo $version | cut -d. -f2)
-            patch=$(echo $version | cut -d. -f3)
-
-            # Incrementa patch
-            patch=$((patch + 1))
-
-            new_tag="${project_name}-v${major}.${minor}.${patch}"
+            # Se não tiver tag no repo de origem, faz patch incremental
+            last_tag=$(git tag --list "${project_name}-v*" | sort -V | tail -n1)
+            if [ -z "$last_tag" ]; then
+              NEW_TAG="${project_name}-v1.0.0"
+            else
+              version="${last_tag##*-v}"         # remove prefixo project_name-v
+              major=$(echo $version | cut -d. -f1)
+              minor=$(echo $version | cut -d. -f2)
+              patch=$(echo $version | cut -d. -f3)
+              patch=$((patch + 1))
+              NEW_TAG="${project_name}-v${major}.${minor}.${patch}"
+            fi
+            echo "Generated incremental tag: $NEW_TAG"
           fi
 
-          echo "NEW_TAG=$new_tag" >> $GITHUB_ENV
-          echo "Generated tag: $new_tag"
+          echo "NEW_TAG=$NEW_TAG" >> $GITHUB_ENV
 
       - name: Create and push tag
         run: |
