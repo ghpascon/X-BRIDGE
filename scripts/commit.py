@@ -113,6 +113,8 @@ def main():
 	try:
 		# 1. Atualizar versão
 		new_version = update_version(version_type)
+		# Garante que o arquivo version.txt seja atualizado
+		run_command('poetry run python -c "import app"')
 
 		# 2. Adicionar todas as mudanças ao git
 		print('📝 Adicionando mudanças ao git...')
