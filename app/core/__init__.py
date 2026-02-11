@@ -7,7 +7,8 @@ from smartx_rfid.utils.path import get_frozen_path
 
 # DEFAULT VARS
 FILES_PATH = get_frozen_path('config')
-SWAGGER_PATH = get_frozen_path('docs/SWAGGER.md')
+DOCS_PATH = get_frozen_path('docs')
+SWAGGER_PATH = f'{DOCS_PATH}/SWAGGER.md'
 CONFIG_PATH = f'{FILES_PATH}/config.json'
 TEMPLATES_PATH = get_frozen_path('app/templates')
 DEVICES_PATH = f'{FILES_PATH}/devices'

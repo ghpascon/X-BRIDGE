@@ -38,7 +38,16 @@ async def docs():
 @router.get('/tag_details', response_class=HTMLResponse)
 async def tag_details(request: Request):
 	return templates.TemplateResponse(
-		'pages/tag_details/main.html',
-		{'request': request, 'title': 'Tag Details', 'alerts': []},
+		'pages/index/main.html',
+		{'request': request, 'title': settings.TITLE, 'alerts': [], 'table': 'complete'},
+		media_type='text/html; charset=utf-8',
+	)
+
+
+@router.get('/gtin', response_class=HTMLResponse)
+async def gtin(request: Request):
+	return templates.TemplateResponse(
+		'pages/index/main.html',
+		{'request': request, 'title': settings.TITLE, 'alerts': [], 'table': 'gtin'},
 		media_type='text/html; charset=utf-8',
 	)

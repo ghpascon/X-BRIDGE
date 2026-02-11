@@ -1,4 +1,5 @@
 import asyncio
+from app import __version__
 
 from fastapi import APIRouter
 from fastapi.responses import JSONResponse
@@ -83,3 +84,8 @@ async def backup_config():
 @router.post('/import_config', summary='Import the application configuration')
 async def import_config(data: dict):
 	return JSONResponse(content=settings_service.import_config(data))
+
+
+@router.get('/get_version', summary='Get the current application version')
+async def get_version():
+	return JSONResponse(content={'version': __version__})
