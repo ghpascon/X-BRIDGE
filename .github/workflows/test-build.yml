@@ -36,11 +36,22 @@ jobs:
           token: ${{ secrets.EXECUTABLES_TOKEN }}
           path: executables-repo
           ref: main
+      - name: List build output
+        run: |
+          echo "Conteúdo de TEMP/x-bridge:"
+          ls -l TEMP/x-bridge || true
+          echo "Conteúdo de TEMP/x-bridge/main:"
+          ls -l TEMP/x-bridge/main || true
       - name: Copy executables to repo
         run: |
           project_name=$(basename $GITHUB_REPOSITORY)
           mkdir -p executables-repo/linux/$project_name
-          rsync -av --exclude=build/ TEMP/x-bridge/main/ executables-repo/linux/$project_name/
+          if [ -d TEMP/x-bridge/main ]; then
+            rsync -av --exclude=build/ TEMP/x-bridge/main/ executables-repo/linux/$project_name/
+          else
+            echo "Diretório TEMP/x-bridge/main não encontrado, build pode ter falhado."
+            exit 1
+          fi
       - name: Commit and push executables
         run: |
           cd executables-repo
@@ -104,11 +115,19 @@ jobs:
           token: ${{ secrets.EXECUTABLES_TOKEN }}
           path: executables-repo
           ref: main
+      - name: Get latest tag
+        run: |
+          cd executables-repo
+          git fetch --tags
+          latest_tag=$(git tag | sort -V | tail -n 1)
+          if [ -z "$latest_tag" ]; then
+            latest_tag="1.0.0"
+          fi
+          echo "LATEST_TAG=$latest_tag" >> $GITHUB_ENV
       - name: Create and push tag
         run: |
           cd executables-repo
-          TAG_NAME=${{ github.ref_name }}
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-          git tag $TAG_NAME
-          git push origin $TAG_NAME
+          git tag $LATEST_TAG
+          git push origin $LATEST_TAG
