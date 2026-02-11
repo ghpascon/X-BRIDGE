@@ -44,8 +44,8 @@ jobs:
       - name: Copy executables to repo
         run: |
           project_name=$(basename $GITHUB_REPOSITORY)
-          build_dir="TEMP/${project_name}/main"
           mkdir -p executables-repo/linux/$project_name
+          build_dir="TEMP/main"
           if [ -d $build_dir ]; then
             rsync -av --exclude=build/ $build_dir/ executables-repo/linux/$project_name/
           else
