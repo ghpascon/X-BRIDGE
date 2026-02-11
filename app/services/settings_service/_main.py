@@ -8,7 +8,7 @@ from app.core import DEVICES_PATH, EXAMPLE_PATH, FILES_PATH
 from app.services import rfid_manager
 import asyncio
 from typing import Any, Dict, Union
-from app.core.utils import delayed_func
+from smartx_rfid.utils import delayed_function
 from app.services.tray import tray_manager
 
 
@@ -181,7 +181,7 @@ class SettingsService:
 			_write_node(data, root)
 
 			# mark changes and reload if necessary
-			asyncio.create_task(delayed_func(tray_manager.restart_application))
+			asyncio.create_task(delayed_function(tray_manager.restart_application, 1))
 
 			return True, None
 		except Exception as e:

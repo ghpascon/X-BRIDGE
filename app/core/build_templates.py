@@ -35,7 +35,9 @@ class TemplateManager:
 		if not os.path.exists(self.template_dir):
 			error_msg = f'Template directory not found: {self.template_dir}'
 			logging.error(error_msg)
-			raise FileNotFoundError(error_msg)
+			os.makedirs(
+				self.template_dir, exist_ok=True
+			)  # Create the directory to avoid future errors
 
 		try:
 			self.templates = Jinja2Templates(directory=self.template_dir)
@@ -52,7 +54,7 @@ class TemplateManager:
 		except Exception as e:
 			error_msg = f'Failed to initialize templates: {e}'
 			logging.error(error_msg)
-			raise Exception(error_msg) from e
+			raise Exception(error_msg)
 
 	@staticmethod
 	def get_default_globals() -> Dict[str, Any]:

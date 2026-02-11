@@ -1,0 +1,67 @@
+# GitHub Actions Workflow: Test Build on Windows and Linux
+
+name: Test Build on Windows and Linux
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install Poetry
+        run: |
+          pip install poetry
+      - name: Install dependencies (lock & install)
+        run: |
+          poetry lock
+          poetry install
+      - name: Run main.py (test startup)
+        run: |
+          poetry run python main.py &
+          sleep 10
+          pkill -f main.py || true
+      - name: Run tests (pytest)
+        run: |
+          poetry run pytest
+      - name: Build executable
+        run: |
+          poetry run python scripts/build_exe.py
+
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install Poetry
+        run: |
+          pip install poetry
+      - name: Install dependencies (lock & install)
+        run: |
+          poetry lock
+          poetry install
+      - name: Run main.py (test startup)
+        run: |
+          start /b poetry run python main.py
+          timeout /t 10
+          taskkill /im python.exe /f || exit 0
+      - name: Run tests (pytest)
+        run: |
+          poetry run pytest
+      - name: Build executable
+        run: |
+          poetry run python scripts/build_exe.py

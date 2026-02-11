@@ -8,7 +8,7 @@ from smartx_rfid.utils.path import get_prefix_from_path
 from app.services.settings_service import settings_service
 from app.schemas.application import SettingsSchema
 from app.core import settings
-from app.core.utils import delayed_func
+from smartx_rfid.utils import delayed_function
 from app.services.tray import tray_manager
 
 router_prefix = get_prefix_from_path(__file__)
@@ -17,13 +17,13 @@ router = APIRouter(prefix=router_prefix, tags=[router_prefix])
 
 @router.post('/restart_application_route')
 async def restart_application_route():
-	asyncio.create_task(delayed_func(tray_manager.restart_application))
+	asyncio.create_task(delayed_function(tray_manager.restart_application, 1))
 	return JSONResponse(content={'status': 'restarting'})
 
 
 @router.post('/exit_application_route')
 async def exit_application_route():
-	asyncio.create_task(delayed_func(tray_manager.exit_application))
+	asyncio.create_task(delayed_function(tray_manager.exit_application, 1))
 	return JSONResponse(content={'status': 'exiting'})
 
 

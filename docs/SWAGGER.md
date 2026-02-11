@@ -3,102 +3,102 @@
 # 📡 SMARTX CONNECTOR
 [**HOME**](/) | [**LOGS**](/logs) | [**API DOCS**](/docs)
 
-**SMARTX CONNECTOR** is a modern **RFID reader management solution** offering **high performance**, **scalability**, and **real-time monitoring** with comprehensive system integration capabilities.
+**SMARTX CONNECTOR** é uma solução profissional para gestão de leitores RFID, focada em alta performance, escalabilidade, integração e monitoramento em tempo real.
 
 ---
 
-## ⚙️ How It Works
+## ⚙️ Funcionamento Geral
 
-The SMARTX CONNECTOR acts as a **middleware solution** between physical RFID readers and your management systems, providing:
+O SMARTX CONNECTOR atua como middleware entre leitores RFID físicos e sistemas de gestão, oferecendo:
 
-### 🔌 **Universal Connectivity**
-- Support for multiple protocols: **TCP/IP**, **Serial**, **USB**
-- Simultaneous connections with multiple devices
-- Auto-reconnection and device health monitoring
+### 🔌 Conectividade Universal
+- Suporte a múltiplos protocolos: TCP/IP, Serial, USB
+- Conexão simultânea com vários dispositivos
+- Monitoramento de saúde e auto-reconexão
 
-### 📊 **Smart Processing**
-- **Automatic filtering** of duplicate tags
-- **Real-time validation** of EPC/TID data
-- **Antenna control** and power configuration
-- **RSSI monitoring** for proximity analysis
+### 📊 Processamento Inteligente
+- Filtro automático de tags duplicadas
+- Validação em tempo real de EPC/TID
+- Controle de antena e potência
+- Monitoramento RSSI para análise de proximidade
 
-### 🔄 **Flexible Integration**
-- **Database Support**: SQLite, MySQL, PostgreSQL
-- **Webhook Integration** with retry mechanisms
-- **MQTT Connectivity** for IoT platforms
-- **RESTful API** with comprehensive endpoints
-- **Real-time Monitoring** and structured logging
-
----
-
-### 🧪 **Testing & Simulation**
-
-**Perfect for:**
-- ✅ **Integration testing** without physical hardware
-- ✅ **Application development** and debugging
-- ✅ **Data flow validation** across systems
-- ✅ **Team training** and demonstration
-- ✅ **Load testing** with multiple tag simulations
+### 🔄 Integração Flexível
+- Suporte a bancos: SQLite, MySQL, PostgreSQL
+- Webhook com retry
+- MQTT para IoT
+- API RESTful completa
+- Monitoramento e logging estruturado
 
 ---
 
-## 🔄 **Operating Flow**
+### 🧪 Testes & Simulação
 
-1. **Configuration**: Define devices and system settings
-2. **Connection**: Automatically connect to RFID readers
-3. **Processing**: Tags are captured and processed in real-time
-4. **Storage**: Data persisted to configured database
-5. **Integration**: Send data to external systems
-6. **Monitoring**: Real-time logs and system status
-
----
-
-## 📊 **API Features**
-
-### **Device Management**
-- List and configure RFID devices
-- Monitor device status and health
-- Get device examples and templates
-
-### **RFID Operations**
-- Retrieve detected tags and statistics
-- Clear tag memory and reset counters
-- Access EPC and GTIN data
-
-### **Integration**
-- Receive data from external systems
-- Process webhook and MQTT messages
-
-### **Testing Tools**
-- Simulate tag events for development
-- Generate test data for validation
+Ideal para:
+- Integração sem hardware
+- Desenvolvimento e debugging
+- Validação de fluxo de dados
+- Treinamento e demonstração
+- Testes de carga com múltiplas tags
 
 ---
 
-## 🖥️ **Web Interface**
+## 🔄 Fluxo Operacional
 
-### **Dashboard**
-- Real-time device monitoring
-- Tag statistics and activity
-- System health indicators
-
-### **Log Viewer**
-- Live log streaming with auto-refresh
-- Search and filter capabilities
-- Color-coded log levels
-
-### **API Documentation**
-- Interactive testing interface
-- Complete endpoint documentation
-- Request and response examples
+1. **Configuração**: Definição de dispositivos e parâmetros
+2. **Conexão**: Conexão automática aos leitores
+3. **Processamento**: Captura e processamento de tags em tempo real
+4. **Armazenamento**: Persistência dos dados no banco configurado
+5. **Integração**: Envio de dados para sistemas externos
+6. **Monitoramento**: Logs e status em tempo real
 
 ---
 
-## 🛠️ **Technology**
+## 📊 Recursos da API
 
-**Backend**: FastAPI with SQLAlchemy  
-**Frontend**: Modern web interface with real-time updates  
-**Integration**: Webhook, MQTT, and database support  
-**Deployment**: Standalone executable or server installation
+### Device Management
+- Listagem e configuração de dispositivos RFID
+- Monitoramento de status e saúde
+- Exemplos e templates de configuração
+
+### RFID Operations
+- Recuperação de tags e estatísticas
+- Limpeza de memória de tags e reset de contadores
+- Acesso a dados EPC e GTIN
+
+### Integração
+- Recepção de dados externos
+- Processamento de mensagens webhook e MQTT
+
+### Ferramentas de Teste
+- Simulação de eventos de tags
+- Geração de dados para validação
+
+---
+
+## 🖥️ Interface Web
+
+### Dashboard
+- Monitoramento de dispositivos em tempo real
+- Estatísticas de tags e atividades
+- Indicadores de saúde do sistema
+
+### Log Viewer
+- Streaming de logs com auto-refresh
+- Busca e filtros avançados
+- Níveis de log coloridos
+
+### API Documentation
+- Interface interativa para testes
+- Documentação completa dos endpoints
+- Exemplos de requisição e resposta
+
+---
+
+## 🛠️ Tecnologia
+
+- **Backend:** FastAPI + SQLAlchemy
+- **Frontend:** Interface web moderna com atualização em tempo real
+- **Integração:** Webhook, MQTT, suporte a bancos
+- **Deploy:** Executável standalone ou instalação em servidor
 
 ---

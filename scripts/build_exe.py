@@ -8,13 +8,18 @@ import PyInstaller.__main__
 from PyInstaller.utils.hooks import collect_all, collect_submodules
 
 # === USER CONFIGURATION ===
-EXE_PATH = 'C:/Users/DELL/Desktop/PYTHON_BUILDS'  # Base folder to store builds
+EXE_PATH = 'TEMP'  # Base folder to store builds
 ENTRY_SCRIPT = 'main.py'  # Main script
 APP_NAME = 'main'  # Final executable name
 EXTRA_FOLDERS = ['app', 'config', 'examples', 'docs']  # Extra folders to include in the build
 
-# === Icon path ===
-icon_path = os.path.abspath('app/static/icons/logo.ico')
+
+# === Icon path (platform dependent) ===
+if os.name == 'nt':
+	icon_file = 'logo.ico'
+else:
+	icon_file = 'logo.png'  # PyInstaller on Linux usually uses PNG
+icon_path = os.path.abspath(os.path.join('app', 'static', 'icons', icon_file))
 
 # === Define output folder ===
 host_folder = os.path.basename(os.getcwd())  # name of the current working directory
@@ -84,22 +89,35 @@ def collect_all_from_packages(packages):
 packages = read_poetry_dependencies()
 datas, binaries, hiddenimports = collect_all_from_packages(packages)
 
-# === Add extra folders as data ===
-extra_data = [f'{folder}{os.sep};{folder}' for folder in EXTRA_FOLDERS if os.path.exists(folder)]
+
+# === Add extra folders as data (cross-platform) ===
+extra_data = []
+for folder in EXTRA_FOLDERS:
+	if os.path.exists(folder):
+		if os.name == 'nt':
+			# Windows: use ; as separator
+			extra_data.append(f'{folder}{os.sep};{folder}')
+		else:
+			# Linux: use : as separator
+			extra_data.append(f'{folder}{os.sep}:{folder}')
 
 
 # === Run PyInstaller ===
-PyInstaller.__main__.run(
-	[
-		ENTRY_SCRIPT,
-		f'--name={APP_NAME}',
-		'--onedir',
-		'--noconsole',
-		f'--icon={icon_path}',
-		f'--distpath={output_dir}',  # Executable output
-		f'--workpath={work_dir}',  # Build folder,
-		'--noconfirm',
-	]
-	+ [f'--hidden-import={h}' for h in hiddenimports + all_manual_hidden]
-	+ [f'--add-data={d}' for d in extra_data]
-)
+
+# === Platform-specific options ===
+opts = [
+	ENTRY_SCRIPT,
+	f'--name={APP_NAME}',
+	'--onedir',
+	f'--icon={icon_path}',
+	f'--distpath={output_dir}',
+	f'--workpath={work_dir}',
+	'--noconfirm',
+]
+if os.name == 'nt':
+	opts.append('--noconsole')
+
+opts += [f'--hidden-import={h}' for h in hiddenimports + all_manual_hidden]
+opts += [f'--add-data={d}' for d in extra_data]
+
+PyInstaller.__main__.run(opts)
