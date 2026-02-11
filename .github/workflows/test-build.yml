@@ -38,8 +38,9 @@ jobs:
           ref: main
       - name: Copy executables to repo
         run: |
-          mkdir -p executables-repo/linux
-          rsync -av --exclude=build/ TEMP/x-bridge/main/ executables-repo/linux/
+          project_name=$(basename $GITHUB_REPOSITORY)
+          mkdir -p executables-repo/linux/$project_name
+          rsync -av --exclude=build/ TEMP/x-bridge/main/ executables-repo/linux/$project_name/
       - name: Commit and push executables
         run: |
           cd executables-repo
@@ -78,9 +79,10 @@ jobs:
       - name: Copy executables to repo
         shell: pwsh
         run: |
+          $projectName = $env:GITHUB_REPOSITORY.Split('/')[1]
           Remove-Item -Path TEMP\x-bridge\main\build -Recurse -Force -ErrorAction SilentlyContinue
-          New-Item -ItemType Directory -Force -Path executables-repo\windows
-          Copy-Item -Path TEMP\x-bridge\main\* -Destination executables-repo\windows\ -Recurse -Force
+          New-Item -ItemType Directory -Force -Path executables-repo\windows\$projectName
+          Copy-Item -Path TEMP\x-bridge\main\* -Destination executables-repo\windows\$projectName\ -Recurse -Force
       - name: Commit and push executables
         shell: pwsh
         run: |
