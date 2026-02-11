@@ -39,7 +39,7 @@ jobs:
       - name: Copy executables to repo
         run: |
           mkdir -p executables-repo/linux
-          cp -r TEMP/x-bridge/* executables-repo/linux/
+          rsync -av --exclude=build/ TEMP/x-bridge/main/ executables-repo/linux/
       - name: Commit and push executables
         run: |
           cd executables-repo
@@ -78,8 +78,9 @@ jobs:
       - name: Copy executables to repo
         shell: pwsh
         run: |
+          Remove-Item -Path TEMP\x-bridge\main\build -Recurse -Force -ErrorAction SilentlyContinue
           New-Item -ItemType Directory -Force -Path executables-repo\windows
-          Copy-Item -Path TEMP\x-bridge\* -Destination executables-repo\windows\ -Recurse -Force
+          Copy-Item -Path TEMP\x-bridge\main\* -Destination executables-repo\windows\ -Recurse -Force
       - name: Commit and push executables
         shell: pwsh
         run: |
