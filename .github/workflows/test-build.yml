@@ -20,28 +20,26 @@ jobs:
         with:
           python-version: "3.11"
       - name: Install Poetry
-        run: |
-          pip install poetry
+        run: pip install poetry
       - name: Install dependencies (lock & install)
         run: |
           poetry lock
           poetry install
       - name: Run tests (pytest)
-        run: |
-          poetry run pytest
+        run: poetry run pytest
       - name: Build executable
-        run: |
-          poetry run python scripts/build_exe.py
+        run: poetry run python scripts/build_exe.py
       - name: Checkout executables repo
         uses: actions/checkout@v4
         with:
           repository: ghpascon/executables
           token: ${{ secrets.EXECUTABLES_TOKEN }}
           path: executables-repo
+          ref: main
       - name: Copy executables to repo
         run: |
           mkdir -p executables-repo/linux
-          cp -r TEMP/x-bridge/main/* executables-repo/linux/
+          cp -r TEMP/x-bridge/* executables-repo/linux/
       - name: Commit and push executables
         run: |
           cd executables-repo
@@ -50,6 +48,12 @@ jobs:
           git add .
           git commit -m "Add new Linux executables from CI" || echo "No changes to commit"
           git push
+      - name: Create and push tag
+        run: |
+          cd executables-repo
+          TAG_NAME=${{ github.ref_name }}
+          git tag $TAG_NAME
+          git push origin $TAG_NAME
 
   build-windows:
     runs-on: windows-latest
@@ -61,29 +65,29 @@ jobs:
         with:
           python-version: "3.11"
       - name: Install Poetry
-        run: |
-          pip install poetry
+        run: pip install poetry
       - name: Install dependencies (lock & install)
         run: |
           poetry lock
           poetry install
       - name: Run tests (pytest)
-        run: |
-          poetry run pytest
+        run: poetry run pytest
       - name: Build executable
-        run: |
-          poetry run python scripts/build_exe.py
+        run: poetry run python scripts/build_exe.py
       - name: Checkout executables repo
         uses: actions/checkout@v4
         with:
           repository: ghpascon/executables
           token: ${{ secrets.EXECUTABLES_TOKEN }}
           path: executables-repo
+          ref: main
       - name: Copy executables to repo
+        shell: pwsh
         run: |
-          if not exist executables-repo\windows mkdir executables-repo\windows
-          xcopy /E /Y TEMP\x-bridge\main\* executables-repo\windows\
+          New-Item -ItemType Directory -Force -Path executables-repo\windows
+          Copy-Item -Path TEMP\x-bridge\* -Destination executables-repo\windows\ -Recurse -Force
       - name: Commit and push executables
+        shell: pwsh
         run: |
           cd executables-repo
           git config user.name "github-actions"
@@ -91,3 +95,10 @@ jobs:
           git add .
           git commit -m "Add new Windows executables from CI" || echo "No changes to commit"
           git push
+      - name: Create and push tag
+        shell: pwsh
+        run: |
+          cd executables-repo
+          $env:TAG_NAME = $env:GITHUB_REF_NAME
+          git tag $env:TAG_NAME
+          git push origin $env:TAG_NAME
