@@ -22,8 +22,7 @@ else:
 icon_path = os.path.abspath(os.path.join('app', 'static', 'icons', icon_file))
 
 # === Define output folder ===
-host_folder = os.path.basename(os.getcwd())  # name of the current working directory
-output_dir = os.path.join(EXE_PATH, host_folder)
+output_dir = EXE_PATH
 work_dir = os.path.join(output_dir, 'build')
 
 # Create folders if they don't exist

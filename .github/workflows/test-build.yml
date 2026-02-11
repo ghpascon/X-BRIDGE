@@ -37,18 +37,19 @@ jobs:
         run: |
           echo "Conteúdo da pasta principal:"
           ls -l . || true
-          echo "Conteúdo de TEMP/x-bridge:"
-          ls -l TEMP/x-bridge || true
-          echo "Conteúdo de TEMP/x-bridge/main:"
-          ls -l TEMP/x-bridge/main || true
+          echo "Conteúdo de TEMP/main:"
+          ls -l TEMP/main || true
+          echo "Conteúdo de TEMP/main/main:"
+          ls -l TEMP/main/main || true
       - name: Copy executables to repo
         run: |
           project_name=$(basename $GITHUB_REPOSITORY)
+          build_dir="TEMP/${project_name}/main"
           mkdir -p executables-repo/linux/$project_name
-          if [ -d TEMP/x-bridge/main ]; then
-            rsync -av --exclude=build/ TEMP/x-bridge/main/ executables-repo/linux/$project_name/
+          if [ -d $build_dir ]; then
+            rsync -av --exclude=build/ $build_dir/ executables-repo/linux/$project_name/
           else
-            echo "Diretório TEMP/x-bridge/main não encontrado, build pode ter falhado."
+            echo "Diretório $build_dir não encontrado, build pode ter falhado."
             exit 1
           fi
       - name: Commit and push executables
@@ -90,9 +91,9 @@ jobs:
         shell: pwsh
         run: |
           $projectName = $env:GITHUB_REPOSITORY.Split('/')[1]
-          Remove-Item -Path TEMP\x-bridge\main\build -Recurse -Force -ErrorAction SilentlyContinue
+          Remove-Item -Path TEMP\main\build -Recurse -Force -ErrorAction SilentlyContinue
           New-Item -ItemType Directory -Force -Path executables-repo\windows\$projectName
-          Copy-Item -Path TEMP\x-bridge\main\* -Destination executables-repo\windows\$projectName\ -Recurse -Force
+          Copy-Item -Path TEMP\main\* -Destination executables-repo\windows\$projectName\ -Recurse -Force
       - name: Commit and push executables
         shell: pwsh
         run: |
@@ -128,5 +129,5 @@ jobs:
           cd executables-repo
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-          git tag $LATEST_TAG
-          git push origin $LATEST_TAG
+          git tag -f $LATEST_TAG
+          git push origin $LATEST_TAG --force
