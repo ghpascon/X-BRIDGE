@@ -29,7 +29,6 @@ from smartx_rfid.utils.path import get_frozen_path
 # Tray
 from app.services.tray import tray_manager  # noqa: F401
 
-logging.info(f"{'='*60}")
 logging.info('Application starting...')
 
 # Create the FastAPI application instance
