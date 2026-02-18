@@ -76,22 +76,22 @@ jobs:
         with:
           platforms: arm64
 
-      - name: Set up Python 3.11 (arm64)
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
+      - name: Prepare output directory
+        run: mkdir -p arm64-artifacts
 
-      - name: Install Poetry and dependencies
+      - name: Build ARM64 executable in Docker
         run: |
-          pip install poetry
-          poetry lock
-          poetry install
-
-      - name: Run tests
-        run: poetry run pytest
-
-      - name: Build executable
-        run: poetry run python scripts/build_exe.py
+          docker run --rm --platform linux/arm64 \
+            -v "$PWD:/workspace" \
+            -w /workspace \
+            arm64v8/python:3.11 bash -c "\
+              pip install poetry && \
+              poetry lock && \
+              poetry install && \
+              poetry run pytest && \
+              poetry run python scripts/build_exe.py && \
+              mkdir -p /workspace/arm64-artifacts && \
+              cp -r TEMP/main/* /workspace/arm64-artifacts/ || true"
 
       - name: Checkout executables repo
         uses: actions/checkout@v4
@@ -104,17 +104,16 @@ jobs:
       - name: Remove old project folder and copy executables
         run: |
           project_name=$(basename $GITHUB_REPOSITORY)
-          build_dir="TEMP/main"
           dest_dir="executables-repo/linux-arm64/$project_name"
 
           # Remove apenas o projeto antigo
           rm -rf "$dest_dir"
           mkdir -p "$dest_dir"
 
-          if [ -d "$build_dir" ]; then
-            rsync -av --exclude=build/ "$build_dir/" "$dest_dir/"
+          if [ -d "arm64-artifacts" ]; then
+            rsync -av --exclude=build/ arm64-artifacts/ "$dest_dir/"
           else
-            echo "Diretório $build_dir não encontrado, build pode ter falhado."
+            echo "Diretório arm64-artifacts não encontrado, build pode ter falhado."
             exit 1
           fi
 
@@ -125,6 +124,7 @@ jobs:
           git config user.email "github-actions@github.com"
           git add -A
           git commit -m "Update Linux ARM64 executables for $project_name" || echo "No changes to commit"
+          git pull --rebase
           git push
 
   build-windows:
