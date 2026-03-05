@@ -11,7 +11,12 @@ from PyInstaller.utils.hooks import collect_all, collect_submodules
 EXE_PATH = 'TEMP'  # Base folder to store builds
 ENTRY_SCRIPT = 'main.py'  # Main script
 APP_NAME = 'main'  # Final executable name
-EXTRA_FOLDERS = ['app', 'examples', 'docs']  # Extra folders to include in the build
+EXTRA_FOLDERS = [
+	'app',
+	'examples',
+	'docs',
+	'license_files',
+]  # Extra folders to include in the build
 
 # === Icon path (platform dependent) ===
 if os.name == 'nt':
@@ -91,6 +96,7 @@ datas, binaries, hiddenimports = collect_all_from_packages(packages)
 # === Add extra folders as data (cross-platform) ===
 extra_data = []
 for folder in EXTRA_FOLDERS:
+	os.makedirs(folder, exist_ok=True)
 	if os.path.exists(folder):
 		if os.name == 'nt':
 			# Windows: use ; as separator
