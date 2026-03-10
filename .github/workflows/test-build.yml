@@ -42,7 +42,7 @@ jobs:
       - name: Remove old project folder and copy executables
         run: |
           project_name=$(basename $GITHUB_REPOSITORY)
-          build_dir="TEMP/main"
+          build_dir="TEMP"
           dest_dir="executables-repo/linux/$project_name"
 
           # Remove apenas o projeto antigo
