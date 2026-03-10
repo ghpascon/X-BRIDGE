@@ -7,7 +7,7 @@ from smartx_rfid.utils.path import get_frozen_path
 from smartx_rfid.utils import AlertsManager
 
 # DEFAULT VARS
-FILES_PATH = get_frozen_path('config')
+FILES_PATH = 'config'
 DOCS_PATH = get_frozen_path('docs')
 SWAGGER_PATH = f'{DOCS_PATH}/SWAGGER.md'
 CONFIG_PATH = f'{FILES_PATH}/config.json'
@@ -15,7 +15,7 @@ TEMPLATES_PATH = get_frozen_path('app/templates')
 DEVICES_PATH = f'{FILES_PATH}/devices'
 ICON_PATH = get_frozen_path('app/static/icons/logo.ico')
 EXAMPLE_PATH = get_frozen_path('examples')
-LICENSE_PATH = get_frozen_path('license_files')
+LICENSE_PATH = 'license.txt'
 
 ##CONFIG APLICATION
 # settings

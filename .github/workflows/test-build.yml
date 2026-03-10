@@ -65,67 +65,67 @@ jobs:
           git commit -m "Update Linux executables for $project_name" || echo "No changes to commit"
           git push
 
-  build-linux-arm64:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+  # build-linux-arm64:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v4
 
-      - name: Set up QEMU for ARM64
-        uses: docker/setup-qemu-action@v3
-        with:
-          platforms: arm64
+  #     - name: Set up QEMU for ARM64
+  #       uses: docker/setup-qemu-action@v3
+  #       with:
+  #         platforms: arm64
 
-      - name: Prepare output directory
-        run: mkdir -p arm64-artifacts
+  #     - name: Prepare output directory
+  #       run: mkdir -p arm64-artifacts
 
-      - name: Build ARM64 executable in Docker
-        run: |
-          docker run --rm --platform linux/arm64 \
-            -v "$PWD:/workspace" \
-            -w /workspace \
-            arm64v8/python:3.11 bash -c "\
-              pip install poetry && \
-              poetry lock && \
-              poetry install && \
-              poetry run pytest && \
-              poetry run python scripts/build_exe.py && \
-              mkdir -p /workspace/arm64-artifacts && \
-              cp -r TEMP/main/* /workspace/arm64-artifacts/ || true"
+  #     - name: Build ARM64 executable in Docker
+  #       run: |
+  #         docker run --rm --platform linux/arm64 \
+  #           -v "$PWD:/workspace" \
+  #           -w /workspace \
+  #           arm64v8/python:3.11 bash -c "\
+  #             pip install poetry && \
+  #             poetry lock && \
+  #             poetry install && \
+  #             poetry run pytest && \
+  #             poetry run python scripts/build_exe.py && \
+  #             mkdir -p /workspace/arm64-artifacts && \
+  #             cp -r TEMP/main/* /workspace/arm64-artifacts/ || true"
 
-      - name: Checkout executables repo
-        uses: actions/checkout@v4
-        with:
-          repository: ghpascon/executables
-          token: ${{ secrets.EXECUTABLES_TOKEN }}
-          path: executables-repo
-          ref: main
+  #     - name: Checkout executables repo
+  #       uses: actions/checkout@v4
+  #       with:
+  #         repository: ghpascon/executables
+  #         token: ${{ secrets.EXECUTABLES_TOKEN }}
+  #         path: executables-repo
+  #         ref: main
 
-      - name: Remove old project folder and copy executables
-        run: |
-          project_name=$(basename $GITHUB_REPOSITORY)
-          dest_dir="executables-repo/linux-arm64/$project_name"
+  #     - name: Remove old project folder and copy executables
+  #       run: |
+  #         project_name=$(basename $GITHUB_REPOSITORY)
+  #         dest_dir="executables-repo/linux-arm64/$project_name"
 
-          # Remove apenas o projeto antigo
-          rm -rf "$dest_dir"
-          mkdir -p "$dest_dir"
+  #         # Remove apenas o projeto antigo
+  #         rm -rf "$dest_dir"
+  #         mkdir -p "$dest_dir"
 
-          if [ -d "arm64-artifacts" ]; then
-            rsync -av --exclude=build/ arm64-artifacts/ "$dest_dir/"
-          else
-            echo "Diretório arm64-artifacts não encontrado, build pode ter falhado."
-            exit 1
-          fi
+  #         if [ -d "arm64-artifacts" ]; then
+  #           rsync -av --exclude=build/ arm64-artifacts/ "$dest_dir/"
+  #         else
+  #           echo "Diretório arm64-artifacts não encontrado, build pode ter falhado."
+  #           exit 1
+  #         fi
 
-      - name: Commit and push executables
-        run: |
-          cd executables-repo
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
-          git add -A
-          git commit -m "Update Linux ARM64 executables for $project_name" || echo "No changes to commit"
-          git pull --rebase
-          git push
+  #     - name: Commit and push executables
+  #       run: |
+  #         cd executables-repo
+  #         git config user.name "github-actions"
+  #         git config user.email "github-actions@github.com"
+  #         git add -A
+  #         git commit -m "Update Linux ARM64 executables for $project_name" || echo "No changes to commit"
+  #         git pull --rebase
+  #         git push
 
   build-windows:
     runs-on: windows-latest

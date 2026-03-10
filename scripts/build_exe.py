@@ -2,6 +2,8 @@
 poetry run python build_exe.py
 """
 
+# Remove build directory after completion
+import shutil
 import os
 
 import PyInstaller.__main__
@@ -15,7 +17,6 @@ EXTRA_FOLDERS = [
 	'app',
 	'examples',
 	'docs',
-	'license_files',
 ]  # Extra folders to include in the build
 
 # === Icon path (platform dependent) ===
@@ -112,7 +113,7 @@ for folder in EXTRA_FOLDERS:
 opts = [
 	ENTRY_SCRIPT,
 	f'--name={APP_NAME}',
-	'--onedir',
+	'--onefile',
 	f'--icon={icon_path}',
 	f'--distpath={output_dir}',
 	f'--workpath={work_dir}',
@@ -125,3 +126,10 @@ opts += [f'--hidden-import={h}' for h in hiddenimports + all_manual_hidden]
 opts += [f'--add-data={d}' for d in extra_data]
 
 PyInstaller.__main__.run(opts)
+
+
+try:
+	shutil.rmtree(work_dir)
+	print(f'[INFO] Removed build directory: {work_dir}')
+except Exception as e:
+	print(f'[WARN] Could not remove build directory: {e}')
