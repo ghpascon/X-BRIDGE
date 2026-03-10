@@ -316,3 +316,27 @@ async def write_gpo(device_name: str, gpo_data: GpoSchema):
 			'error': msg,
 		},
 	)
+
+
+@router.get(
+	'/get_serial_number/{device_name}',
+	summary='Get device serial number',
+	description='Returns the serial number of the specified device.',
+)
+async def get_serial_number(device_name: str):
+	success, serial_number = rfid_manager.devices.get_serial_number(device_name)
+	if success:
+		return JSONResponse(
+			status_code=200,
+			content={
+				'device_name': device_name,
+				'serial_number': serial_number,
+			},
+		)
+	return JSONResponse(
+		status_code=400,
+		content={
+			'message': f"Failed to get serial number for device '{device_name}': {serial_number}",
+			'error': serial_number,
+		},
+	)

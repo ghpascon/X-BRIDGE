@@ -5,7 +5,6 @@ from smartx_rfid.schemas.tag import WriteTagValidator
 from app.schemas import write_tag_example
 
 from app.services import rfid_manager
-from app.models import get_all_models
 
 router_prefix = get_prefix_from_path(__file__)
 router = APIRouter(prefix=router_prefix, tags=[router_prefix])
@@ -90,33 +89,6 @@ async def get_gtin_count():
 )
 async def get_tag_info(epc: str):
 	return rfid_manager.tags.get_by_identifier(identifier_value=epc, identifier_type='epc')
-
-
-@router.get(
-	'/generate_table_report/{table_name}',
-	summary='Generate table report',
-	description='Generates a report for a specified database table.',
-)
-async def generate_table_report(table_name: str, limit: int = 1000, offset: int = 0):
-	# Validate table
-	models = get_all_models()
-	valid_table = False
-	table_model = None
-	for model in models:
-		if table_name == model.__tablename__:
-			valid_table = True
-			table_model = model
-			break
-
-	if not valid_table:
-		return JSONResponse(status_code=400, content={'error': 'Invalid table name'})
-
-	try:
-		return rfid_manager.integration.generate_table_report(
-			model=table_model, limit=limit, offset=offset
-		)
-	except Exception as e:
-		return JSONResponse(status_code=500, content={'error': str(e)})
 
 
 @router.post(
