@@ -103,7 +103,7 @@ jobs:
           Remove-Item -Path $destDir -Recurse -Force -ErrorAction SilentlyContinue
           New-Item -ItemType Directory -Force -Path $destDir
 
-          Copy-Item -Path TEMP\main\* -Destination $destDir\ -Recurse -Force
+          Copy-Item -Path TEMP\* -Destination $destDir\ -Recurse -Force
 
       - name: Commit and push executables
         shell: pwsh
