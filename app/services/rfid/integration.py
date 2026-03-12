@@ -184,6 +184,9 @@ class Integration:
 			total = session.query(model).count()
 
 			# Get paginated records using yield_per for memory efficiency
+			if limit is None or limit <= 0:
+				limit = total  # If no limit, return all records
+				offset = 0  # Reset offset if returning all records
 			query = session.query(model).limit(limit).offset(offset)
 			records = [record.to_dict() for record in query]
 
