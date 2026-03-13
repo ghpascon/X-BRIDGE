@@ -4,12 +4,12 @@
     "BLE_NAME": "SMTX",
     "BUZZER": true,
     "SESSION": 1,
-    "START_READING": true,
+    "START_READING": false,
     "GPI_START": true,
     "PROTECTED_INVENTORY_ACTIVE": false,
     "PROTECTED_INVENTORY_PASSWORD": "12345678",
     "ACTIVE_ANT": [
         1
     ],
-    "READ_POWER": 27
+    "READ_POWER": 15
 }
