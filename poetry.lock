@@ -20,6 +20,11 @@ typing-extensions = ">=4.12"
 [package.extras]
 tz = ["tzdata"]
 
+[package.source]
+type = "legacy"
+url = "https://pypi.org/simple"
+reference = "pypi-simple"
+
 [[package]]
 name = "altgraph"
 version = "0.17.5"
@@ -32,6 +37,11 @@ files = [
     {file = "altgraph-0.17.5.tar.gz", hash = "sha256:c87b395dd12fabde9c99573a9749d67da8d29ef9de0125c7f536699b4a9bc9e7"},
 ]
 
+[package.source]
+type = "legacy"
+url = "https://pypi.org/simple"
+reference = "pypi-simple"
+
 [[package]]
 name = "annotated-types"
 version = "0.7.0"
@@ -43,6 +53,11 @@ files = [
     {file = "annotated_types-0.7.0-py3-none-any.whl", hash = "sha256:1f02e8b43a8fbbc3f3e0d4f0f4bfc8131bcb4eebe8849b8e5c773f3a1c582a53"},
     {file = "annotated_types-0.7.0.tar.gz", hash = "sha256:aff07c09a53a08bc8cfccb9c85b05f1aa9a2a6f23728d790723543408344ce89"},
 ]
+
+[package.source]
+type = "legacy"
+url = "https://pypi.org/simple"
+reference = "pypi-simple"
 
 [[package]]
 name = "anyio"
@@ -63,6 +78,11 @@ typing_extensions = {version = ">=4.5", markers = "python_version < \"3.13\""}
 [package.extras]
 trio = ["trio (>=0.31.0) ; python_version < \"3.10\"", "trio (>=0.32.0) ; python_version >= \"3.10\""]
 
+[package.source]
+type = "legacy"
+url = "https://pypi.org/simple"
+reference = "pypi-simple"
+
 [[package]]
 name = "argon2-cffi"
 version = "25.1.0"
@@ -77,6 +97,11 @@ files = [
 
 [package.dependencies]
 argon2-cffi-bindings = "*"
+
+[package.source]
+type = "legacy"
+url = "https://pypi.org/simple"
+reference = "pypi-simple"
 
 [[package]]
 name = "argon2-cffi-bindings"
@@ -116,6 +141,11 @@ files = [
 
 [package.dependencies]
 cffi = {version = ">=1.0.1", markers = "python_version < \"3.14\""}
+
+[package.source]
+type = "legacy"
+url = "https://pypi.org/simple"
+reference = "pypi-simple"
 
 [[package]]
 name = "bcrypt"
@@ -194,6 +224,11 @@ files = [
 tests = ["pytest (>=3.2.1,!=3.3.0)"]
 typecheck = ["mypy"]
 
+[package.source]
+type = "legacy"
+url = "https://pypi.org/simple"
+reference = "pypi-simple"
+
 [[package]]
 name = "bleak"
 version = "1.1.1"
@@ -224,6 +259,11 @@ winrt-runtime = {version = ">=3.1", markers = "platform_system == \"Windows\""}
 [package.extras]
 pythonista = ["bleak-pythonista (>=0.1.1)"]
 
+[package.source]
+type = "legacy"
+url = "https://pypi.org/simple"
+reference = "pypi-simple"
+
 [[package]]
 name = "certifi"
 version = "2026.2.25"
@@ -235,6 +275,11 @@ files = [
     {file = "certifi-2026.2.25-py3-none-any.whl", hash = "sha256:027692e4402ad994f1c42e52a4997a9763c646b73e4096e4d5d6db8af1d6f0fa"},
     {file = "certifi-2026.2.25.tar.gz", hash = "sha256:e887ab5cee78ea814d3472169153c2d12cd43b14bd03329a39a9c6e2e80bfba7"},
 ]
+
+[package.source]
+type = "legacy"
+url = "https://pypi.org/simple"
+reference = "pypi-simple"
 
 [[package]]
 name = "cffi"
@@ -332,6 +377,11 @@ files = [
 
 [package.dependencies]
 pycparser = {version = "*", markers = "implementation_name != \"PyPy\""}
+
+[package.source]
+type = "legacy"
+url = "https://pypi.org/simple"
+reference = "pypi-simple"
 
 [[package]]
 name = "charset-normalizer"
@@ -456,6 +506,11 @@ files = [
     {file = "charset_normalizer-3.4.5.tar.gz", hash = "sha256:95adae7b6c42a6c5b5b559b1a99149f090a57128155daeea91732c8d970d8644"},
 ]
 
+[package.source]
+type = "legacy"
+url = "https://pypi.org/simple"
+reference = "pypi-simple"
+
 [[package]]
 name = "click"
 version = "8.3.1"
@@ -471,6 +526,11 @@ files = [
 [package.dependencies]
 colorama = {version = "*", markers = "platform_system == \"Windows\""}
 
+[package.source]
+type = "legacy"
+url = "https://pypi.org/simple"
+reference = "pypi-simple"
+
 [[package]]
 name = "colorama"
 version = "0.4.6"
@@ -484,12 +544,17 @@ files = [
 ]
 markers = {main = "platform_system == \"Windows\"", dev = "sys_platform == \"win32\""}
 
+[package.source]
+type = "legacy"
+url = "https://pypi.org/simple"
+reference = "pypi-simple"
+
 [[package]]
 name = "cryptography"
 version = "46.0.5"
 description = "cryptography is a package which provides cryptographic recipes and primitives to Python developers."
 optional = false
-python-versions = "!=3.9.0,!=3.9.1,>=3.8"
+python-versions = ">=3.8, !=3.9.0, !=3.9.1"
 groups = ["main"]
 files = [
     {file = "cryptography-46.0.5-cp311-abi3-macosx_10_9_universal2.whl", hash = "sha256:351695ada9ea9618b3500b490ad54c739860883df6c1f555e088eaf25b1bbaad"},
@@ -556,6 +621,11 @@ ssh = ["bcrypt (>=3.1.5)"]
 test = ["certifi (>=2024)", "cryptography-vectors (==46.0.5)", "pretend (>=0.7)", "pytest (>=7.4.0)", "pytest-benchmark (>=4.0)", "pytest-cov (>=2.10.1)", "pytest-xdist (>=3.5.0)"]
 test-randomorder = ["pytest-randomly"]
 
+[package.source]
+type = "legacy"
+url = "https://pypi.org/simple"
+reference = "pypi-simple"
+
 [[package]]
 name = "dbus-fast"
 version = "4.0.0"
@@ -604,6 +674,11 @@ files = [
     {file = "dbus_fast-4.0.0.tar.gz", hash = "sha256:e1d3ee49a4a81524d7caaa2d5a31fc71075a1c977b661df958cee24bef86b8fe"},
 ]
 
+[package.source]
+type = "legacy"
+url = "https://pypi.org/simple"
+reference = "pypi-simple"
+
 [[package]]
 name = "dotenv"
 version = "0.9.9"
@@ -617,6 +692,11 @@ files = [
 
 [package.dependencies]
 python-dotenv = "*"
+
+[package.source]
+type = "legacy"
+url = "https://pypi.org/simple"
+reference = "pypi-simple"
 
 [[package]]
 name = "fastapi"
@@ -638,6 +718,11 @@ typing-extensions = ">=4.8.0"
 [package.extras]
 all = ["email-validator (>=2.0.0)", "httpx (>=0.23.0)", "itsdangerous (>=1.1.0)", "jinja2 (>=2.11.2)", "orjson (>=3.2.1)", "pydantic-extra-types (>=2.0.0)", "pydantic-settings (>=2.0.0)", "python-multipart (>=0.0.7)", "pyyaml (>=5.3.1)", "ujson (>=4.0.1,!=4.0.2,!=4.1.0,!=4.2.0,!=4.3.0,!=5.0.0,!=5.1.0)", "uvicorn[standard] (>=0.12.0)"]
 
+[package.source]
+type = "legacy"
+url = "https://pypi.org/simple"
+reference = "pypi-simple"
+
 [[package]]
 name = "gmqtt"
 version = "0.7.0"
@@ -652,6 +737,11 @@ files = [
 
 [package.extras]
 test = ["atomicwrites (>=1.3.0)", "attrs (>=19.1.0)", "codecov (>=2.0.15)", "coverage (>=4.5.3)", "more-itertools (>=7.0.0)", "pluggy (>=0.11.0)", "py (>=1.8.0)", "pytest (>=5.4.0)", "pytest-asyncio (>=0.12.0)", "pytest-cov (>=2.7.1)", "six (>=1.12.0)", "uvloop (>=0.14.0)"]
+
+[package.source]
+type = "legacy"
+url = "https://pypi.org/simple"
+reference = "pypi-simple"
 
 [[package]]
 name = "greenlet"
@@ -721,6 +811,11 @@ files = [
 docs = ["Sphinx", "furo"]
 test = ["objgraph", "psutil", "setuptools"]
 
+[package.source]
+type = "legacy"
+url = "https://pypi.org/simple"
+reference = "pypi-simple"
+
 [[package]]
 name = "h11"
 version = "0.16.0"
@@ -732,6 +827,11 @@ files = [
     {file = "h11-0.16.0-py3-none-any.whl", hash = "sha256:63cf8bbe7522de3bf65932fda1d9c2772064ffb3dae62d55932da54b31cb6c86"},
     {file = "h11-0.16.0.tar.gz", hash = "sha256:4e35b956cf45792e4caa5885e69fba00bdbc6ffafbfa020300e549b208ee5ff1"},
 ]
+
+[package.source]
+type = "legacy"
+url = "https://pypi.org/simple"
+reference = "pypi-simple"
 
 [[package]]
 name = "httpcore"
@@ -754,6 +854,11 @@ asyncio = ["anyio (>=4.0,<5.0)"]
 http2 = ["h2 (>=3,<5)"]
 socks = ["socksio (==1.*)"]
 trio = ["trio (>=0.22.0,<1.0)"]
+
+[package.source]
+type = "legacy"
+url = "https://pypi.org/simple"
+reference = "pypi-simple"
 
 [[package]]
 name = "httpx"
@@ -780,6 +885,11 @@ http2 = ["h2 (>=3,<5)"]
 socks = ["socksio (==1.*)"]
 zstd = ["zstandard (>=0.18.0)"]
 
+[package.source]
+type = "legacy"
+url = "https://pypi.org/simple"
+reference = "pypi-simple"
+
 [[package]]
 name = "idna"
 version = "3.11"
@@ -795,6 +905,11 @@ files = [
 [package.extras]
 all = ["flake8 (>=7.1.1)", "mypy (>=1.11.2)", "pytest (>=8.3.2)", "ruff (>=0.6.2)"]
 
+[package.source]
+type = "legacy"
+url = "https://pypi.org/simple"
+reference = "pypi-simple"
+
 [[package]]
 name = "iniconfig"
 version = "2.3.0"
@@ -807,6 +922,11 @@ files = [
     {file = "iniconfig-2.3.0.tar.gz", hash = "sha256:c76315c77db068650d49c5b56314774a7804df16fee4402c1f19d6d15d8c4730"},
 ]
 
+[package.source]
+type = "legacy"
+url = "https://pypi.org/simple"
+reference = "pypi-simple"
+
 [[package]]
 name = "itsdangerous"
 version = "2.1.2"
@@ -818,6 +938,11 @@ files = [
     {file = "itsdangerous-2.1.2-py3-none-any.whl", hash = "sha256:2c2349112351b88699d8d4b6b075022c0808887cb7ad10069318a8b0bc88db44"},
     {file = "itsdangerous-2.1.2.tar.gz", hash = "sha256:5dbbc68b317e5e42f327f9021763545dc3fc3bfe22e6deb96aaf1fc38874156a"},
 ]
+
+[package.source]
+type = "legacy"
+url = "https://pypi.org/simple"
+reference = "pypi-simple"
 
 [[package]]
 name = "jinja2"
@@ -837,6 +962,11 @@ MarkupSafe = ">=2.0"
 [package.extras]
 i18n = ["Babel (>=2.7)"]
 
+[package.source]
+type = "legacy"
+url = "https://pypi.org/simple"
+reference = "pypi-simple"
+
 [[package]]
 name = "macholib"
 version = "1.16.4"
@@ -852,6 +982,11 @@ files = [
 
 [package.dependencies]
 altgraph = ">=0.17"
+
+[package.source]
+type = "legacy"
+url = "https://pypi.org/simple"
+reference = "pypi-simple"
 
 [[package]]
 name = "mako"
@@ -872,6 +1007,11 @@ MarkupSafe = ">=0.9.2"
 babel = ["Babel"]
 lingua = ["lingua"]
 testing = ["pytest"]
+
+[package.source]
+type = "legacy"
+url = "https://pypi.org/simple"
+reference = "pypi-simple"
 
 [[package]]
 name = "markupsafe"
@@ -972,6 +1112,11 @@ files = [
     {file = "markupsafe-3.0.3.tar.gz", hash = "sha256:722695808f4b6457b320fdc131280796bdceb04ab50fe1795cd540799ebe1698"},
 ]
 
+[package.source]
+type = "legacy"
+url = "https://pypi.org/simple"
+reference = "pypi-simple"
+
 [[package]]
 name = "packaging"
 version = "26.0"
@@ -983,6 +1128,11 @@ files = [
     {file = "packaging-26.0-py3-none-any.whl", hash = "sha256:b36f1fef9334a5588b4166f8bcd26a14e521f2b55e6b9de3aaa80d3ff7a37529"},
     {file = "packaging-26.0.tar.gz", hash = "sha256:00243ae351a257117b6a241061796684b084ed1c516a08c48a3f7e147a9d80b4"},
 ]
+
+[package.source]
+type = "legacy"
+url = "https://pypi.org/simple"
+reference = "pypi-simple"
 
 [[package]]
 name = "passlib"
@@ -1005,6 +1155,11 @@ bcrypt = ["bcrypt (>=3.1.0)"]
 build-docs = ["cloud-sptheme (>=1.10.1)", "sphinx (>=1.6)", "sphinxcontrib-fulltoc (>=1.2.0)"]
 totp = ["cryptography"]
 
+[package.source]
+type = "legacy"
+url = "https://pypi.org/simple"
+reference = "pypi-simple"
+
 [[package]]
 name = "pefile"
 version = "2024.8.26"
@@ -1017,6 +1172,11 @@ files = [
     {file = "pefile-2024.8.26-py3-none-any.whl", hash = "sha256:76f8b485dcd3b1bb8166f1128d395fa3d87af26360c2358fb75b80019b957c6f"},
     {file = "pefile-2024.8.26.tar.gz", hash = "sha256:3ff6c5d8b43e8c37bb6e6dd5085658d658a7a0bdcd20b6a07b1fcfc1c4e9d632"},
 ]
+
+[package.source]
+type = "legacy"
+url = "https://pypi.org/simple"
+reference = "pypi-simple"
 
 [[package]]
 name = "pillow"
@@ -1127,6 +1287,11 @@ test-arrow = ["arro3-compute", "arro3-core", "nanoarrow", "pyarrow"]
 tests = ["check-manifest", "coverage (>=7.4.2)", "defusedxml", "markdown2", "olefile", "packaging", "pyroma (>=5)", "pytest", "pytest-cov", "pytest-timeout", "pytest-xdist", "trove-classifiers (>=2024.10.12)"]
 xmp = ["defusedxml"]
 
+[package.source]
+type = "legacy"
+url = "https://pypi.org/simple"
+reference = "pypi-simple"
+
 [[package]]
 name = "pluggy"
 version = "1.6.0"
@@ -1142,6 +1307,11 @@ files = [
 [package.extras]
 dev = ["pre-commit", "tox"]
 testing = ["coverage", "pytest", "pytest-benchmark"]
+
+[package.source]
+type = "legacy"
+url = "https://pypi.org/simple"
+reference = "pypi-simple"
 
 [[package]]
 name = "prometheus-client"
@@ -1160,6 +1330,11 @@ aiohttp = ["aiohttp"]
 django = ["django"]
 twisted = ["twisted"]
 
+[package.source]
+type = "legacy"
+url = "https://pypi.org/simple"
+reference = "pypi-simple"
+
 [[package]]
 name = "prometheus-fastapi-instrumentator"
 version = "7.1.0"
@@ -1175,6 +1350,11 @@ files = [
 [package.dependencies]
 prometheus-client = ">=0.8.0,<1.0.0"
 starlette = ">=0.30.0,<1.0.0"
+
+[package.source]
+type = "legacy"
+url = "https://pypi.org/simple"
+reference = "pypi-simple"
 
 [[package]]
 name = "psycopg2"
@@ -1193,6 +1373,31 @@ files = [
     {file = "psycopg2-2.9.11.tar.gz", hash = "sha256:964d31caf728e217c697ff77ea69c2ba0865fa41ec20bb00f0977e62fdcc52e3"},
 ]
 
+[package.source]
+type = "legacy"
+url = "https://pypi.org/simple"
+reference = "pypi-simple"
+
+[[package]]
+name = "py-machineid"
+version = "1.0.0"
+description = "Get the unique machine ID of any host (without admin privileges)"
+optional = false
+python-versions = "*"
+groups = ["main"]
+files = [
+    {file = "py_machineid-1.0.0-py3-none-any.whl", hash = "sha256:910df0d5f2663bcf6739d835c4949f4e9cc6bb090a58b3dd766e12e5f768e3b9"},
+    {file = "py_machineid-1.0.0.tar.gz", hash = "sha256:8a902a00fae8c6d6433f463697c21dc4ce98c6e55a2e0535c0273319acb0047a"},
+]
+
+[package.dependencies]
+winregistry = {version = ">=2.0.1,<3.0.0", markers = "sys_platform == \"win32\""}
+
+[package.source]
+type = "legacy"
+url = "https://pypi.org/simple"
+reference = "pypi-simple"
+
 [[package]]
 name = "pycparser"
 version = "3.0"
@@ -1205,6 +1410,11 @@ files = [
     {file = "pycparser-3.0-py3-none-any.whl", hash = "sha256:b727414169a36b7d524c1c3e31839a521725078d7b2ff038656844266160a992"},
     {file = "pycparser-3.0.tar.gz", hash = "sha256:600f49d217304a5902ac3c37e1281c9fe94e4d0489de643a9504c5cdfdfc6b29"},
 ]
+
+[package.source]
+type = "legacy"
+url = "https://pypi.org/simple"
+reference = "pypi-simple"
 
 [[package]]
 name = "pydantic"
@@ -1227,6 +1437,11 @@ typing-inspection = ">=0.4.2"
 [package.extras]
 email = ["email-validator (>=2.0.0)"]
 timezone = ["tzdata ; python_version >= \"3.9\" and platform_system == \"Windows\""]
+
+[package.source]
+type = "legacy"
+url = "https://pypi.org/simple"
+reference = "pypi-simple"
 
 [[package]]
 name = "pydantic-core"
@@ -1362,6 +1577,11 @@ files = [
 [package.dependencies]
 typing-extensions = ">=4.14.1"
 
+[package.source]
+type = "legacy"
+url = "https://pypi.org/simple"
+reference = "pypi-simple"
+
 [[package]]
 name = "pyepc"
 version = "0.5.0"
@@ -1376,6 +1596,11 @@ files = [
 
 [package.dependencies]
 requests = "*"
+
+[package.source]
+type = "legacy"
+url = "https://pypi.org/simple"
+reference = "pypi-simple"
 
 [[package]]
 name = "pygame"
@@ -1447,6 +1672,11 @@ files = [
     {file = "pygame-2.6.1.tar.gz", hash = "sha256:56fb02ead529cee00d415c3e007f75e0780c655909aaa8e8bf616ee09c9feb1f"},
 ]
 
+[package.source]
+type = "legacy"
+url = "https://pypi.org/simple"
+reference = "pypi-simple"
+
 [[package]]
 name = "pyinstaller"
 version = "6.19.0"
@@ -1482,6 +1712,11 @@ setuptools = ">=42.0.0"
 completion = ["argcomplete"]
 hook-testing = ["execnet (>=1.5.0)", "psutil", "pytest (>=2.7.3)"]
 
+[package.source]
+type = "legacy"
+url = "https://pypi.org/simple"
+reference = "pypi-simple"
+
 [[package]]
 name = "pyinstaller-hooks-contrib"
 version = "2026.3"
@@ -1498,16 +1733,21 @@ files = [
 packaging = ">=22.0"
 setuptools = ">=42.0.0"
 
+[package.source]
+type = "legacy"
+url = "https://pypi.org/simple"
+reference = "pypi-simple"
+
 [[package]]
 name = "pyjwt"
-version = "2.12.0"
+version = "2.12.1"
 description = "JSON Web Token implementation in Python"
 optional = false
 python-versions = ">=3.9"
 groups = ["main"]
 files = [
-    {file = "pyjwt-2.12.0-py3-none-any.whl", hash = "sha256:9bb459d1bdd0387967d287f5656bf7ec2b9a26645d1961628cda1764e087fd6e"},
-    {file = "pyjwt-2.12.0.tar.gz", hash = "sha256:2f62390b667cd8257de560b850bb5a883102a388829274147f1d724453f8fb02"},
+    {file = "pyjwt-2.12.1-py3-none-any.whl", hash = "sha256:28ca37c070cad8ba8cd9790cd940535d40274d22f80ab87f3ac6a713e6e8454c"},
+    {file = "pyjwt-2.12.1.tar.gz", hash = "sha256:c74a7a2adf861c04d002db713dd85f84beb242228e671280bf709d765b03672b"},
 ]
 
 [package.extras]
@@ -1515,6 +1755,11 @@ crypto = ["cryptography (>=3.4.0)"]
 dev = ["coverage[toml] (==7.10.7)", "cryptography (>=3.4.0)", "pre-commit", "pytest (>=8.4.2,<9.0.0)", "sphinx", "sphinx-rtd-theme", "zope.interface"]
 docs = ["sphinx", "sphinx-rtd-theme", "zope.interface"]
 tests = ["coverage[toml] (==7.10.7)", "pytest (>=8.4.2,<9.0.0)"]
+
+[package.source]
+type = "legacy"
+url = "https://pypi.org/simple"
+reference = "pypi-simple"
 
 [[package]]
 name = "pymysql"
@@ -1531,6 +1776,11 @@ files = [
 [package.extras]
 ed25519 = ["PyNaCl (>=1.4.0)"]
 rsa = ["cryptography"]
+
+[package.source]
+type = "legacy"
+url = "https://pypi.org/simple"
+reference = "pypi-simple"
 
 [[package]]
 name = "pyobjc-core"
@@ -1550,6 +1800,11 @@ files = [
     {file = "pyobjc_core-12.1-cp314-cp314t-macosx_10_15_universal2.whl", hash = "sha256:453b191df1a4b80e756445b935491b974714456ae2cbae816840bd96f86db882"},
     {file = "pyobjc_core-12.1.tar.gz", hash = "sha256:2bb3903f5387f72422145e1466b3ac3f7f0ef2e9960afa9bcd8961c5cbf8bd21"},
 ]
+
+[package.source]
+type = "legacy"
+url = "https://pypi.org/simple"
+reference = "pypi-simple"
 
 [[package]]
 name = "pyobjc-framework-cocoa"
@@ -1572,6 +1827,11 @@ files = [
 
 [package.dependencies]
 pyobjc-core = ">=12.1"
+
+[package.source]
+type = "legacy"
+url = "https://pypi.org/simple"
+reference = "pypi-simple"
 
 [[package]]
 name = "pyobjc-framework-corebluetooth"
@@ -1596,6 +1856,11 @@ files = [
 pyobjc-core = ">=12.1"
 pyobjc-framework-Cocoa = ">=12.1"
 
+[package.source]
+type = "legacy"
+url = "https://pypi.org/simple"
+reference = "pypi-simple"
+
 [[package]]
 name = "pyobjc-framework-libdispatch"
 version = "12.1"
@@ -1618,6 +1883,11 @@ files = [
 [package.dependencies]
 pyobjc-core = ">=12.1"
 pyobjc-framework-Cocoa = ">=12.1"
+
+[package.source]
+type = "legacy"
+url = "https://pypi.org/simple"
+reference = "pypi-simple"
 
 [[package]]
 name = "pyobjc-framework-quartz"
@@ -1642,6 +1912,11 @@ files = [
 pyobjc-core = ">=12.1"
 pyobjc-framework-Cocoa = ">=12.1"
 
+[package.source]
+type = "legacy"
+url = "https://pypi.org/simple"
+reference = "pypi-simple"
+
 [[package]]
 name = "pyserial"
 version = "3.5"
@@ -1657,6 +1932,11 @@ files = [
 [package.extras]
 cp2110 = ["hidapi"]
 
+[package.source]
+type = "legacy"
+url = "https://pypi.org/simple"
+reference = "pypi-simple"
+
 [[package]]
 name = "pyserial-asyncio"
 version = "0.6"
@@ -1671,6 +1951,11 @@ files = [
 
 [package.dependencies]
 pyserial = "*"
+
+[package.source]
+type = "legacy"
+url = "https://pypi.org/simple"
+reference = "pypi-simple"
 
 [[package]]
 name = "pystray"
@@ -1688,6 +1973,11 @@ Pillow = "*"
 pyobjc-framework-Quartz = {version = ">=7.0", markers = "sys_platform == \"darwin\""}
 python-xlib = {version = ">=0.17", markers = "sys_platform == \"linux\""}
 six = "*"
+
+[package.source]
+type = "legacy"
+url = "https://pypi.org/simple"
+reference = "pypi-simple"
 
 [[package]]
 name = "pytest"
@@ -1710,6 +2000,11 @@ pluggy = ">=0.12,<2.0"
 [package.extras]
 testing = ["argcomplete", "attrs (>=19.2.0)", "hypothesis (>=3.56)", "mock", "nose", "pygments (>=2.7.2)", "requests", "setuptools", "xmlschema"]
 
+[package.source]
+type = "legacy"
+url = "https://pypi.org/simple"
+reference = "pypi-simple"
+
 [[package]]
 name = "python-dotenv"
 version = "1.2.2"
@@ -1725,6 +2020,11 @@ files = [
 [package.extras]
 cli = ["click (>=5.0)"]
 
+[package.source]
+type = "legacy"
+url = "https://pypi.org/simple"
+reference = "pypi-simple"
+
 [[package]]
 name = "python-multipart"
 version = "0.0.9"
@@ -1739,6 +2039,11 @@ files = [
 
 [package.extras]
 dev = ["atomicwrites (==1.4.1)", "attrs (==23.2.0)", "coverage (==7.4.1)", "hatch", "invoke (==2.2.0)", "more-itertools (==10.2.0)", "pbr (==6.0.0)", "pluggy (==1.4.0)", "py (==1.11.0)", "pytest (==8.0.0)", "pytest-cov (==4.1.0)", "pytest-timeout (==2.2.0)", "pyyaml (==6.0.1)", "ruff (==0.2.1)"]
+
+[package.source]
+type = "legacy"
+url = "https://pypi.org/simple"
+reference = "pypi-simple"
 
 [[package]]
 name = "python-xlib"
@@ -1756,6 +2061,11 @@ files = [
 [package.dependencies]
 six = ">=1.10.0"
 
+[package.source]
+type = "legacy"
+url = "https://pypi.org/simple"
+reference = "pypi-simple"
+
 [[package]]
 name = "pywin32-ctypes"
 version = "0.2.3"
@@ -1768,6 +2078,11 @@ files = [
     {file = "pywin32-ctypes-0.2.3.tar.gz", hash = "sha256:d162dc04946d704503b2edc4d55f3dba5c1d539ead017afa00142c38b9885755"},
     {file = "pywin32_ctypes-0.2.3-py3-none-any.whl", hash = "sha256:8a1513379d709975552d202d942d9837758905c8d01eb82b8bcc30918929e7b8"},
 ]
+
+[package.source]
+type = "legacy"
+url = "https://pypi.org/simple"
+reference = "pypi-simple"
 
 [[package]]
 name = "requests"
@@ -1790,6 +2105,11 @@ urllib3 = ">=1.21.1,<3"
 [package.extras]
 socks = ["PySocks (>=1.5.6,!=1.5.7)"]
 use-chardet-on-py3 = ["chardet (>=3.0.2,<6)"]
+
+[package.source]
+type = "legacy"
+url = "https://pypi.org/simple"
+reference = "pypi-simple"
 
 [[package]]
 name = "ruff"
@@ -1819,6 +2139,11 @@ files = [
     {file = "ruff-0.8.6.tar.gz", hash = "sha256:dcad24b81b62650b0eb8814f576fc65cfee8674772a6e24c9b747911801eeaa5"},
 ]
 
+[package.source]
+type = "legacy"
+url = "https://pypi.org/simple"
+reference = "pypi-simple"
+
 [[package]]
 name = "setuptools"
 version = "82.0.1"
@@ -1840,28 +2165,38 @@ enabler = ["pytest-enabler (>=2.2)"]
 test = ["build[virtualenv] (>=1.0.3)", "filelock (>=3.4.0)", "ini2toml[lite] (>=0.14)", "jaraco.develop (>=7.21) ; python_version >= \"3.9\" and sys_platform != \"cygwin\"", "jaraco.envs (>=2.2)", "jaraco.path (>=3.7.2)", "jaraco.test (>=5.5)", "packaging (>=24.2)", "pip (>=19.1)", "pyproject-hooks (!=1.1)", "pytest (>=6,!=8.1.*)", "pytest-home (>=0.5)", "pytest-perf ; sys_platform != \"cygwin\"", "pytest-subprocess", "pytest-timeout", "pytest-xdist (>=3)", "tomli-w (>=1.0.0)", "virtualenv (>=13.0.0)", "wheel (>=0.44.0)"]
 type = ["importlib_metadata (>=7.0.2) ; python_version < \"3.10\"", "jaraco.develop (>=7.21) ; sys_platform != \"cygwin\"", "mypy (==1.18.*)", "pytest-mypy"]
 
+[package.source]
+type = "legacy"
+url = "https://pypi.org/simple"
+reference = "pypi-simple"
+
 [[package]]
 name = "six"
 version = "1.17.0"
 description = "Python 2 and 3 compatibility utilities"
 optional = false
-python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,>=2.7"
+python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*"
 groups = ["main"]
 files = [
     {file = "six-1.17.0-py2.py3-none-any.whl", hash = "sha256:4721f391ed90541fddacab5acf947aa0d3dc7d27b2e1e8eda2be8970586c3274"},
     {file = "six-1.17.0.tar.gz", hash = "sha256:ff70335d468e7eb6ec65b95b99d3a2836546063f63acc5171de367e834932a81"},
 ]
 
+[package.source]
+type = "legacy"
+url = "https://pypi.org/simple"
+reference = "pypi-simple"
+
 [[package]]
 name = "smartx-rfid"
-version = "7.2.6"
+version = "7.2.7"
 description = "SmartX RFID library"
 optional = false
-python-versions = "<4.0,>=3.11"
+python-versions = ">=3.11,<4.0"
 groups = ["main"]
 files = [
-    {file = "smartx_rfid-7.2.6-py3-none-any.whl", hash = "sha256:e4ffd6f16e60a1753ce5a1460e43ea4e7565b5c429fbc3d1c1ead31c6b37a38c"},
-    {file = "smartx_rfid-7.2.6.tar.gz", hash = "sha256:1c4c47441101b3755a5b20355f03b307731bcd9385112305ad04313e63131096"},
+    {file = "smartx_rfid-7.2.7-py3-none-any.whl", hash = "sha256:239741ee8149fee1b4d720a15aba671a841e107229111f40e57aa114acaff372"},
+    {file = "smartx_rfid-7.2.7.tar.gz", hash = "sha256:994da2c1afa02c76be25cf346e07553f66028005c41932d56092359acbda36ae"},
 ]
 
 [package.dependencies]
@@ -1871,6 +2206,7 @@ cryptography = ">=46.0.5,<47.0.0"
 dotenv = ">=0.9.9,<0.10.0"
 httpx = "0.28.1"
 psycopg2 = ">=2.9.11,<3.0.0"
+py-machineid = ">=1.0.0,<2.0.0"
 pydantic = ">=2.12.5,<3.0.0"
 pyepc = "0.5.0"
 pyjwt = ">=2.11.0,<3.0.0"
@@ -1878,6 +2214,11 @@ pymysql = "1.1.1"
 pyserial = "3.5"
 pyserial-asyncio = "0.6"
 sqlalchemy = "2.0.29"
+
+[package.source]
+type = "legacy"
+url = "https://pypi.org/simple"
+reference = "pypi-simple"
 
 [[package]]
 name = "sqlalchemy"
@@ -1945,7 +2286,7 @@ typing-extensions = ">=4.6.0"
 [package.extras]
 aiomysql = ["aiomysql (>=0.2.0)", "greenlet (!=0.4.17)"]
 aioodbc = ["aioodbc", "greenlet (!=0.4.17)"]
-aiosqlite = ["aiosqlite", "greenlet (!=0.4.17)", "typing_extensions (!=3.10.0.1)"]
+aiosqlite = ["aiosqlite", "greenlet (!=0.4.17)", "typing-extensions (!=3.10.0.1)"]
 asyncio = ["greenlet (!=0.4.17)"]
 asyncmy = ["asyncmy (>=0.2.3,!=0.2.4,!=0.2.6)", "greenlet (!=0.4.17)"]
 mariadb-connector = ["mariadb (>=1.0.1,!=1.1.2,!=1.1.5)"]
@@ -1955,7 +2296,7 @@ mssql-pyodbc = ["pyodbc"]
 mypy = ["mypy (>=0.910)"]
 mysql = ["mysqlclient (>=1.4.0)"]
 mysql-connector = ["mysql-connector-python"]
-oracle = ["cx_oracle (>=8)"]
+oracle = ["cx-oracle (>=8)"]
 oracle-oracledb = ["oracledb (>=1.0.1)"]
 postgresql = ["psycopg2 (>=2.7)"]
 postgresql-asyncpg = ["asyncpg", "greenlet (!=0.4.17)"]
@@ -1965,7 +2306,12 @@ postgresql-psycopg2binary = ["psycopg2-binary"]
 postgresql-psycopg2cffi = ["psycopg2cffi"]
 postgresql-psycopgbinary = ["psycopg[binary] (>=3.0.7)"]
 pymysql = ["pymysql"]
-sqlcipher = ["sqlcipher3_binary"]
+sqlcipher = ["sqlcipher3-binary"]
+
+[package.source]
+type = "legacy"
+url = "https://pypi.org/simple"
+reference = "pypi-simple"
 
 [[package]]
 name = "starlette"
@@ -1985,6 +2331,11 @@ anyio = ">=3.4.0,<5"
 [package.extras]
 full = ["httpx (>=0.22.0)", "itsdangerous", "jinja2", "python-multipart (>=0.0.7)", "pyyaml"]
 
+[package.source]
+type = "legacy"
+url = "https://pypi.org/simple"
+reference = "pypi-simple"
+
 [[package]]
 name = "toml"
 version = "0.10.2"
@@ -1996,6 +2347,11 @@ files = [
     {file = "toml-0.10.2-py2.py3-none-any.whl", hash = "sha256:806143ae5bfb6a3c6e736a764057db0e6a0e05e338b5630894a5f779cabb4f9b"},
     {file = "toml-0.10.2.tar.gz", hash = "sha256:b3bda1d108d5dd99f4a20d24d9c348e91c4db7ab1b749200bded2f839ccbe68f"},
 ]
+
+[package.source]
+type = "legacy"
+url = "https://pypi.org/simple"
+reference = "pypi-simple"
 
 [[package]]
 name = "tomli"
@@ -2054,6 +2410,11 @@ files = [
     {file = "tomli-2.4.0.tar.gz", hash = "sha256:aa89c3f6c277dd275d8e243ad24f3b5e701491a860d5121f2cdd399fbb31fc9c"},
 ]
 
+[package.source]
+type = "legacy"
+url = "https://pypi.org/simple"
+reference = "pypi-simple"
+
 [[package]]
 name = "typing-extensions"
 version = "4.15.0"
@@ -2065,6 +2426,11 @@ files = [
     {file = "typing_extensions-4.15.0-py3-none-any.whl", hash = "sha256:f0fa19c6845758ab08074a0cfa8b7aecb71c999ca73d62883bc25cc018c4e548"},
     {file = "typing_extensions-4.15.0.tar.gz", hash = "sha256:0cea48d173cc12fa28ecabc3b837ea3cf6f38c6d1136f85cbaaf598984861466"},
 ]
+
+[package.source]
+type = "legacy"
+url = "https://pypi.org/simple"
+reference = "pypi-simple"
 
 [[package]]
 name = "typing-inspection"
@@ -2080,6 +2446,11 @@ files = [
 
 [package.dependencies]
 typing-extensions = ">=4.12.0"
+
+[package.source]
+type = "legacy"
+url = "https://pypi.org/simple"
+reference = "pypi-simple"
 
 [[package]]
 name = "urllib3"
@@ -2099,6 +2470,11 @@ h2 = ["h2 (>=4,<5)"]
 socks = ["pysocks (>=1.5.6,!=1.5.7,<2.0)"]
 zstd = ["backports-zstd (>=1.0.0) ; python_version < \"3.14\""]
 
+[package.source]
+type = "legacy"
+url = "https://pypi.org/simple"
+reference = "pypi-simple"
+
 [[package]]
 name = "uvicorn"
 version = "0.29.0"
@@ -2117,6 +2493,29 @@ h11 = ">=0.8"
 
 [package.extras]
 standard = ["colorama (>=0.4) ; sys_platform == \"win32\"", "httptools (>=0.5.0)", "python-dotenv (>=0.13)", "pyyaml (>=5.1)", "uvloop (>=0.14.0,!=0.15.0,!=0.15.1) ; sys_platform != \"win32\" and sys_platform != \"cygwin\" and platform_python_implementation != \"PyPy\"", "watchfiles (>=0.13)", "websockets (>=10.4)"]
+
+[package.source]
+type = "legacy"
+url = "https://pypi.org/simple"
+reference = "pypi-simple"
+
+[[package]]
+name = "winregistry"
+version = "2.1.4"
+description = "A Python library for interacting with the Windows registry"
+optional = false
+python-versions = ">=3.8"
+groups = ["main"]
+markers = "sys_platform == \"win32\""
+files = [
+    {file = "winregistry-2.1.4-py3-none-any.whl", hash = "sha256:8a2ead541bf9737d2cf4aa7c36363054a792a9f5c8fdaf0f7e3739ff9ddb092f"},
+    {file = "winregistry-2.1.4.tar.gz", hash = "sha256:c557e6ec26a2827625451bbcee394b2d4c1fbccb6d7dca066335f397c0be1f89"},
+]
+
+[package.source]
+type = "legacy"
+url = "https://pypi.org/simple"
+reference = "pypi-simple"
 
 [[package]]
 name = "winrt-runtime"
@@ -2150,6 +2549,11 @@ files = [
 
 [package.dependencies]
 typing_extensions = ">=4.12.2"
+
+[package.source]
+type = "legacy"
+url = "https://pypi.org/simple"
+reference = "pypi-simple"
 
 [[package]]
 name = "winrt-windows-devices-bluetooth"
@@ -2187,6 +2591,11 @@ winrt-runtime = ">=3.2.1.0,<3.3.0.0"
 [package.extras]
 all = ["winrt-Windows.Devices.Bluetooth.GenericAttributeProfile[all] (>=3.2.1.0,<3.3.0.0)", "winrt-Windows.Devices.Bluetooth.Rfcomm[all] (>=3.2.1.0,<3.3.0.0)", "winrt-Windows.Devices.Enumeration[all] (>=3.2.1.0,<3.3.0.0)", "winrt-Windows.Devices.Radios[all] (>=3.2.1.0,<3.3.0.0)", "winrt-Windows.Foundation.Collections[all] (>=3.2.1.0,<3.3.0.0)", "winrt-Windows.Foundation[all] (>=3.2.1.0,<3.3.0.0)", "winrt-Windows.Networking[all] (>=3.2.1.0,<3.3.0.0)", "winrt-Windows.Storage.Streams[all] (>=3.2.1.0,<3.3.0.0)"]
 
+[package.source]
+type = "legacy"
+url = "https://pypi.org/simple"
+reference = "pypi-simple"
+
 [[package]]
 name = "winrt-windows-devices-bluetooth-advertisement"
 version = "3.2.1"
@@ -2222,6 +2631,11 @@ winrt-runtime = ">=3.2.1.0,<3.3.0.0"
 
 [package.extras]
 all = ["winrt-Windows.Devices.Bluetooth[all] (>=3.2.1.0,<3.3.0.0)", "winrt-Windows.Foundation.Collections[all] (>=3.2.1.0,<3.3.0.0)", "winrt-Windows.Foundation[all] (>=3.2.1.0,<3.3.0.0)", "winrt-Windows.Storage.Streams[all] (>=3.2.1.0,<3.3.0.0)"]
+
+[package.source]
+type = "legacy"
+url = "https://pypi.org/simple"
+reference = "pypi-simple"
 
 [[package]]
 name = "winrt-windows-devices-bluetooth-genericattributeprofile"
@@ -2259,6 +2673,11 @@ winrt-runtime = ">=3.2.1.0,<3.3.0.0"
 [package.extras]
 all = ["winrt-Windows.Devices.Bluetooth[all] (>=3.2.1.0,<3.3.0.0)", "winrt-Windows.Devices.Enumeration[all] (>=3.2.1.0,<3.3.0.0)", "winrt-Windows.Foundation.Collections[all] (>=3.2.1.0,<3.3.0.0)", "winrt-Windows.Foundation[all] (>=3.2.1.0,<3.3.0.0)", "winrt-Windows.Storage.Streams[all] (>=3.2.1.0,<3.3.0.0)"]
 
+[package.source]
+type = "legacy"
+url = "https://pypi.org/simple"
+reference = "pypi-simple"
+
 [[package]]
 name = "winrt-windows-devices-enumeration"
 version = "3.2.1"
@@ -2294,6 +2713,11 @@ winrt-runtime = ">=3.2.1.0,<3.3.0.0"
 
 [package.extras]
 all = ["winrt-Windows.ApplicationModel.Background[all] (>=3.2.1.0,<3.3.0.0)", "winrt-Windows.Foundation.Collections[all] (>=3.2.1.0,<3.3.0.0)", "winrt-Windows.Foundation[all] (>=3.2.1.0,<3.3.0.0)", "winrt-Windows.Security.Credentials[all] (>=3.2.1.0,<3.3.0.0)", "winrt-Windows.Storage.Streams[all] (>=3.2.1.0,<3.3.0.0)", "winrt-Windows.UI.Popups[all] (>=3.2.1.0,<3.3.0.0)", "winrt-Windows.UI[all] (>=3.2.1.0,<3.3.0.0)"]
+
+[package.source]
+type = "legacy"
+url = "https://pypi.org/simple"
+reference = "pypi-simple"
 
 [[package]]
 name = "winrt-windows-foundation"
@@ -2331,6 +2755,11 @@ winrt-runtime = ">=3.2.1.0,<3.3.0.0"
 [package.extras]
 all = ["winrt-Windows.Foundation.Collections[all] (>=3.2.1.0,<3.3.0.0)"]
 
+[package.source]
+type = "legacy"
+url = "https://pypi.org/simple"
+reference = "pypi-simple"
+
 [[package]]
 name = "winrt-windows-foundation-collections"
 version = "3.2.1"
@@ -2366,6 +2795,11 @@ winrt-runtime = ">=3.2.1.0,<3.3.0.0"
 
 [package.extras]
 all = ["winrt-Windows.Foundation[all] (>=3.2.1.0,<3.3.0.0)"]
+
+[package.source]
+type = "legacy"
+url = "https://pypi.org/simple"
+reference = "pypi-simple"
 
 [[package]]
 name = "winrt-windows-storage-streams"
@@ -2403,7 +2837,12 @@ winrt-runtime = ">=3.2.1.0,<3.3.0.0"
 [package.extras]
 all = ["winrt-Windows.Foundation.Collections[all] (>=3.2.1.0,<3.3.0.0)", "winrt-Windows.Foundation[all] (>=3.2.1.0,<3.3.0.0)", "winrt-Windows.Storage[all] (>=3.2.1.0,<3.3.0.0)", "winrt-Windows.System[all] (>=3.2.1.0,<3.3.0.0)"]
 
+[package.source]
+type = "legacy"
+url = "https://pypi.org/simple"
+reference = "pypi-simple"
+
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.11, <3.12"
-content-hash = "8905cf8c7daaa1a3b2fd4f90695c39489f7bfb00e176a485e85261550826090b"
+content-hash = "1f39f48b0a8e49187b1b2d35fc316dbd49af1b696ac28deb8dea4271c4e49a27"
