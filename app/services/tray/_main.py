@@ -148,7 +148,11 @@ class TrayManager:
 		webbrowser.open(url)
 
 	def restart_application(self):
-		subprocess.Popen([sys.executable] + sys.argv)
+		if getattr(sys, 'frozen', False):
+			# PyInstaller onefile: sys.argv[0] já é o próprio executável
+			subprocess.Popen([sys.executable] + sys.argv[1:])
+		else:
+			subprocess.Popen([sys.executable] + sys.argv)
 		self.exit_application()
 
 	def exit_application(self):
