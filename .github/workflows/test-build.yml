@@ -60,7 +60,7 @@ jobs:
 
   build-linux:
     needs: [build-windows]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -69,6 +69,9 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+
+      - name: Export project name
+        run: echo "PROJECT_NAME=$(basename $GITHUB_REPOSITORY)" >> $GITHUB_ENV
 
       - name: Install Poetry and dependencies
         run: |
@@ -92,9 +95,8 @@ jobs:
 
       - name: Remove old project folder and copy executables
         run: |
-          project_name=$(basename $GITHUB_REPOSITORY)
           build_dir="TEMP"
-          dest_dir="executables-repo/linux/$project_name"
+          dest_dir="executables-repo/linux/$PROJECT_NAME"
 
           # Remove apenas o projeto antigo
           rm -rf "$dest_dir"
@@ -113,7 +115,7 @@ jobs:
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
           git add -A
-          git commit -m "Update Linux executables for $project_name" || echo "No changes to commit"
+          git commit -m "Update Linux executables for $PROJECT_NAME" || echo "No changes to commit"
           git push
 
   tag-executables:
