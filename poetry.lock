@@ -140,7 +140,10 @@ files = [
 ]
 
 [package.dependencies]
-cffi = {version = ">=1.0.1", markers = "python_version < \"3.14\""}
+cffi = [
+    {version = ">=1.0.1", markers = "python_version < \"3.14\""},
+    {version = ">=2.0.0b1", markers = "python_version >= \"3.14\""},
+]
 
 [package.source]
 type = "legacy"
@@ -2860,5 +2863,5 @@ reference = "pypi-simple"
 
 [metadata]
 lock-version = "2.1"
-python-versions = ">=3.11, <3.12"
-content-hash = "7c308ab01974af0108eadd9926b7e2826c94fdadb1435d01923364b400a84590"
+python-versions = ">=3.11, <3.15"
+content-hash = "fc60ee05cd6f472d263f780c7f5095a76a79e1c882ce764e07c61982730e72f4"
