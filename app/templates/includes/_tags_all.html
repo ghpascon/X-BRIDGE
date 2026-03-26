@@ -83,6 +83,7 @@
         // Format timestamp to show only HMS
         if (
           header.toLowerCase().includes("timestamp") ||
+          header.toLowerCase().includes("first_seen") ||
           header.toLowerCase().includes("time")
         ) {
           try {
