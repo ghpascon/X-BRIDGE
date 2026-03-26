@@ -24,7 +24,12 @@ if os.name == 'nt':
 	icon_file = 'logo.ico'
 else:
 	icon_file = 'logo.png'  # PyInstaller on Linux usually uses PNG
-icon_path = os.path.abspath(os.path.join('app', 'static', 'icons', icon_file))
+
+try:
+	icon_path = os.path.abspath(os.path.join('app', 'static', 'icons', icon_file))
+except Exception as e:
+	print(f'[WARN] Could not find icon file: {e}')
+	icon_path = None
 
 # === Define output folder ===
 output_dir = EXE_PATH
@@ -114,7 +119,7 @@ opts = [
 	ENTRY_SCRIPT,
 	f'--name={APP_NAME}',
 	'--onefile',
-	f'--icon={icon_path}',
+	f'--icon={icon_path}' if icon_path else '',
 	f'--distpath={output_dir}',
 	f'--workpath={work_dir}',
 	'--noconfirm',
