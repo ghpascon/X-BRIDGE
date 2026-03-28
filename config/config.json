@@ -5,7 +5,7 @@
     "OPEN_BROWSER": false,
     "BEEP": false,
     "CLEAR_OLD_TAGS_INTERVAL": null,
-    "TAG_PREFIX": null,
+    "TAG_PREFIX": "e",
     "WEBHOOK_URL": null,
     "DATABASE_URL": null,
     "XTRACK_URL": null,

@@ -1,0 +1,19 @@
+{
+    "READER": "R700_IOT",
+    "IP": "192.168.1.101",
+    "USERNAME": "root",
+    "PASSWORD": "impinj",
+    "START_READING": true,
+    "SESSION": 1,
+    "ACTIVE_ANT": [
+        1,
+        2,
+        3,
+        4
+    ],
+    "READ_POWER": 33,
+    "READ_RSSI": -50,
+    "SEARCH_MODE": "single-target",
+    "RF_MODE": 1110,
+    "GPI_START": false
+}
