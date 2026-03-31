@@ -1,6 +1,7 @@
 from smartx_rfid.license import LicenseManager
 from app.core import LICENSE_PATH
 import logging
+from app.core import alerts_manager
 
 PUBLIC_KEY = """-----BEGIN PUBLIC KEY-----
 MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA00QgDyPjuscTBoWBnS1p
@@ -27,5 +28,17 @@ license_manager = LicenseManager(
 try:
 	license_manager.load_license(LICENCE_STR)
 	logging.info(f'License data: {license_manager.license_data}')
+	expire_in = license_manager.expires_in()
+	if expire_in is None:
+		logging.error('Error to get license expire time')
+	elif expire_in <= 0:
+		logging.error('License has expired')
+	elif expire_in <= 30:
+		message = f'License will expire in {expire_in} days'
+		logging.warning(message)
+		if expire_in <= 7:
+			alerts_manager.add_error(message)
+		else:
+			alerts_manager.add_warning(message)
 except Exception as e:
 	logging.error(f'Error loading license: {e}')
