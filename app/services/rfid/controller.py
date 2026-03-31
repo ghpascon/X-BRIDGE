@@ -11,7 +11,6 @@ import asyncio
 
 class Controller:
 	def __init__(self, devices: DeviceManager, tags: TagList, integration: Integration):
-		self.box_info: dict = {}
 		self.tags = tags
 		self.devices = devices
 		self.integration = integration
