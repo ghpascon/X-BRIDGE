@@ -3,8 +3,20 @@ import os
 from typing import Any, Callable, Dict
 
 from fastapi.templating import Jinja2Templates
+from jinja2 import pass_context
 
 from smartx_rfid.utils.path import get_frozen_path
+
+
+@pass_context
+def relative_url_for(context: Dict[str, Any], name: str, **path_params: Any) -> str:
+	"""
+	Build template URLs as relative paths (e.g. /auth/login).
+	"""
+	request = context.get('request')
+	if request is None:
+		raise ValueError("Template context missing 'request' for url_for")
+	return request.url_for(name, **path_params).path
 
 
 class TemplateManager:
@@ -41,6 +53,7 @@ class TemplateManager:
 
 		try:
 			self.templates = Jinja2Templates(directory=self.template_dir)
+			self.templates.env.globals['url_for'] = relative_url_for
 			# Register default globals
 			self._globals = self.get_default_globals()
 			for name, func in self._globals.items():
