@@ -36,11 +36,20 @@ class Settings:
 
 		# Load variables with defaults
 		self.TITLE: str = data.get('TITLE', 'SMARTX')
+		if not isinstance(self.TITLE, str) or len(self.TITLE) == 0:
+			self.TITLE = ' '
+
 		self.LOG_PATH: str = data.get('LOG_PATH', 'Logs')
+
 		self.STORAGE_DAYS: int = data.get('STORAGE_DAYS', 7)
+
 		self.OPEN_BROWSER: bool = data.get('OPEN_BROWSER', True)
 		self.BEEP: bool = data.get('BEEP', False)
+
 		self.CLEAR_OLD_TAGS_INTERVAL: int | None = data.get('CLEAR_OLD_TAGS_INTERVAL', None)
+		if self.CLEAR_OLD_TAGS_INTERVAL is not None and self.CLEAR_OLD_TAGS_INTERVAL <= 0:
+			self.CLEAR_OLD_TAGS_INTERVAL = None
+
 		self.TAG_PREFIX: str | None | list[str] = data.get('TAG_PREFIX', None)
 		self.WEBHOOK_URL: str | None = data.get('WEBHOOK_URL', None)
 		self.DATABASE_URL: str | None = data.get('DATABASE_URL', None)
