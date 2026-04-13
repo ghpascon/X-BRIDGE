@@ -17,7 +17,7 @@ def _get_version():
 	try:
 		with open(pyproject_path, 'r', encoding='utf-8') as f:
 			pyproject_data = toml.load(f)
-		version = pyproject_data.get('project', {}).get('version')
+		version = pyproject_data.get('tool', {}).get('poetry', {}).get('version')
 		if version:
 			# Save version to version.txt
 			os.makedirs(DOCS_PATH, exist_ok=True)

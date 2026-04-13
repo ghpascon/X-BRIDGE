@@ -9,7 +9,7 @@ def get_toml_version():
 	toml_path = Path(__file__).parent.parent / 'pyproject.toml'
 	with open(toml_path, 'rb') as f:
 		data = tomli.load(f)
-		return data['project']['version']
+		return data['tool']['poetry']['version']
 	raise RuntimeError('Version not found in pyproject.toml')
 
 
