@@ -35,6 +35,7 @@ jobs:
           token: ${{ secrets.EXECUTABLES_TOKEN }}
           path: executables-repo
           ref: main
+          fetch-depth: 1
 
       - name: Remove old project folder and copy executables
         shell: pwsh
@@ -92,6 +93,7 @@ jobs:
           token: ${{ secrets.EXECUTABLES_TOKEN }}
           path: executables-repo
           ref: main
+          fetch-depth: 1
 
       - name: Remove old project folder and copy executables
         run: |
@@ -129,6 +131,7 @@ jobs:
           token: ${{ secrets.EXECUTABLES_TOKEN }}
           path: executables-repo
           ref: main
+          fetch-depth: 1
 
       - name: Determine tag to use
         run: |
