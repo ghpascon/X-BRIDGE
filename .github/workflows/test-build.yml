@@ -1,3 +1,6 @@
+# Atenção: o uso de --force pode impactar histórico de tags, avalie se é realmente necessário
+# Otimização: adiciona apenas a pasta do projeto, evitando git add -A que pode ser lento em repositórios grandes
+# Otimização: adiciona apenas a pasta do projeto, evitando git add -A que pode ser lento em repositórios grandes
 name: Test Build on Windows and Linux
 
 on:
@@ -55,8 +58,8 @@ jobs:
           cd executables-repo
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-          git add -A
-          git commit -m "Update Windows executables for $projectName" || echo "No changes to commit"
+          git add windows/$projectName
+          git commit -m "Atualiza executáveis Windows para $projectName" || echo "Nenhuma alteração para commitar"
           git push
 
   build-linux:
@@ -111,13 +114,13 @@ jobs:
             exit 1
           fi
 
-      - name: Commit and push executables
+      - name: Commit e push dos executáveis
         run: |
           cd executables-repo
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-          git add -A
-          git commit -m "Update Linux executables for $PROJECT_NAME" || echo "No changes to commit"
+          git add linux/$PROJECT_NAME
+          git commit -m "Atualiza executáveis Linux para $PROJECT_NAME" || echo "Nenhuma alteração para commitar"
           git push
 
   tag-executables:
