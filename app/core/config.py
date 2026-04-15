@@ -51,9 +51,15 @@ class Settings:
 			self.CLEAR_OLD_TAGS_INTERVAL = None
 
 		self.TAG_PREFIX: str | None | list[str] = data.get('TAG_PREFIX', None)
+
+		self.ALWAYS_SEND: bool = data.get('ALWAYS_SEND', False)
+		if not isinstance(self.ALWAYS_SEND, bool):
+			self.ALWAYS_SEND = False
+
 		self.WEBHOOK_URL: str | None = data.get('WEBHOOK_URL', None)
 		self.DATABASE_URL: str | None = data.get('DATABASE_URL', None)
 		self.XTRACK_URL: str | None = data.get('XTRACK_URL', None)
+
 		self.PORT: int = data.get('PORT', 5000)
 
 	def get_current_settings(self):

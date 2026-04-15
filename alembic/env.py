@@ -9,7 +9,8 @@ from sqlalchemy import pool
 from alembic import context
 
 # Load models and Base
-from app.models import get_all_models, Base
+from app.models import get_all_models
+from smartx_rfid.models import Base
 
 # Add project root to path to allow imports
 project_root = os.path.dirname(os.path.dirname(__file__))

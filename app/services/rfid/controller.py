@@ -7,6 +7,7 @@ from smartx_rfid.devices import DeviceManager
 from smartx_rfid.utils import TagList
 from .integration import Integration
 import asyncio
+from app.core import settings
 
 
 class Controller:
@@ -35,4 +36,5 @@ class Controller:
 		asyncio.create_task(self.integration.on_tag_integration(tag=tag))
 
 	def on_existing_tag(self, tag: dict):
-		pass
+		if settings.ALWAYS_SEND:
+			asyncio.create_task(self.integration.on_tag_integration(tag=tag))
