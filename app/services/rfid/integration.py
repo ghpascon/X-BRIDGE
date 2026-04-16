@@ -98,7 +98,9 @@ class Integration:
 		if self.webhook_manager is not None:
 			logging.info('[ EVENT INTEGRATION ] WEBHOOK')
 			tasks.append(
-				self.webhook_manager.post(device=name, event_type=event_type, event_data=event_data)
+				self.webhook_manager.post_event(
+					device=name, event_type=event_type, event_data=event_data
+				)
 			)
 
 		# Execute all tasks concurrently
@@ -138,7 +140,7 @@ class Integration:
 		if self.webhook_manager is not None:
 			logging.info('[ TAG INTEGRATION ] WEBHOOK')
 			tasks.append(
-				self.webhook_manager.post(
+				self.webhook_manager.post_event(
 					device=tag.get('device'), event_type='tag', event_data=tag
 				)
 			)
