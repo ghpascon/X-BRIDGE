@@ -40,7 +40,7 @@ async def connect_on_startup():
 
 async def clear_old_tags():
 	while True:
-		if settings.CLEAR_OLD_TAGS_INTERVAL is None:
+		if settings.CLEAR_OLD_TAGS_INTERVAL is None or settings.CLEAR_OLD_TAGS_INTERVAL <= 0:
 			await asyncio.sleep(60)
 			continue
 		await asyncio.sleep(1)

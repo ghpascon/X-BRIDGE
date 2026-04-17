@@ -5,8 +5,6 @@ Defines the Tag and Event models for storing RFID reader data
 with proper indexing and relationships.
 """
 
-from sqlalchemy import DateTime, func
-
 from sqlalchemy import Column, Index, Integer, String, Text
 
 from smartx_rfid.models import Base, BaseMixin
@@ -69,13 +67,6 @@ class Event(Base, BaseMixin):
 	# Event data
 	event_data = Column(Text, nullable=False)
 
-	# timestamps
-	created_at = Column(
-		DateTime(timezone=True),
-		server_default=func.now(),
-		nullable=False,
-	)
-
 	# Indexes for optimal query performance
 	__table_args__ = (
 		# Individual indexes
@@ -84,6 +75,4 @@ class Event(Base, BaseMixin):
 		Index('ix_events_created_at', 'created_at'),
 		# Composite indexes
 		Index('ix_events_device_type', 'device', 'event_type'),
-		Index('ix_events_device_created', 'device', 'created_at'),
-		Index('ix_events_type_created', 'event_type', 'created_at'),
 	)
