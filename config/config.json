@@ -4,10 +4,10 @@
     "STORAGE_DAYS": 7,
     "OPEN_BROWSER": false,
     "BEEP": false,
-    "CLEAR_OLD_TAGS_INTERVAL": null,
+    "CLEAR_OLD_TAGS_INTERVAL": 2,
     "TAG_PREFIX": null,
-    "ALWAYS_SEND": true,
-    "WEBHOOK_URL": "http://localhost:5001",
+    "ALWAYS_SEND": false,
+    "WEBHOOK_URL": null,
     "DATABASE_URL": null,
     "XTRACK_URL": null,
     "PORT": 5000

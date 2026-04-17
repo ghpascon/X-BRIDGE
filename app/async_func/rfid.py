@@ -43,13 +43,14 @@ async def clear_old_tags():
 		if settings.CLEAR_OLD_TAGS_INTERVAL is None:
 			await asyncio.sleep(60)
 			continue
-		await asyncio.sleep(settings.CLEAR_OLD_TAGS_INTERVAL)
+		await asyncio.sleep(1)
 		if len(rfid_manager.tags) == 0:
 			continue
 
 		timestamp = datetime.now() - timedelta(seconds=settings.CLEAR_OLD_TAGS_INTERVAL)
-		logging.info(f'Removing tags before {timestamp}')
-		rfid_manager.tags.remove_tags_before_timestamp(timestamp)
+		removed_tags = rfid_manager.tags.remove_tags_before_timestamp(timestamp)
+		if removed_tags:
+			logging.info(f'Removed {len(removed_tags)} old tags: {removed_tags}')
 
 
 async def clear_db():
