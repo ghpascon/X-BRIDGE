@@ -4,7 +4,7 @@
     "STORAGE_DAYS": 7,
     "OPEN_BROWSER": false,
     "BEEP": false,
-    "CLEAR_OLD_TAGS_INTERVAL": 2,
+    "CLEAR_OLD_TAGS_INTERVAL": null,
     "TAG_PREFIX": null,
     "ALWAYS_SEND": false,
     "WEBHOOK_URL": null,
