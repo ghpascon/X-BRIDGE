@@ -9,6 +9,7 @@ from app.core import Indicator
 from typing import Any
 
 from app.models import Base
+from app.services.license import license_manager
 
 
 class Integration:
@@ -21,7 +22,7 @@ class Integration:
 
 	async def _run_integration_tasks(self, context: str, tasks: list):
 		"""Run integration tasks without letting one failure abort the others."""
-		if not tasks:
+		if not tasks or not license_manager.validate_license():
 			return
 
 		logging.info(f'[{context}] Executing {len(tasks)} tasks concurrently')
