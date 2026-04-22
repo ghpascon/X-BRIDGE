@@ -1,8 +1,5 @@
 <!-- Events Widget -->
-<div
-  class="bg-white rounded-lg shadow-lg border p-4 w-full"
-  x-data="eventsSummary()"
->
+<div class="bg-white rounded-lg shadow-lg border p-4 w-full" x-data="eventsSummary()">
   <!-- Header -->
   <div class="text-sm">
     <!-- Tag Count Display -->
@@ -12,17 +9,9 @@
     </div>
 
     <!-- Clear Button Form -->
-    <form
-      action="{{ url_for('clear_tags') }}"
-      method="post"
-      class="w-full"
-      target="hidden_iframe"
-    >
-      <button
-        type="submit"
-        :disabled="loading"
-        class="w-full bg-gray-500 hover:bg-red-600 text-white font-medium py-3 px-4 rounded"
-      >
+    <form action="{{ url_for('clear_tags') }}" method="post" class="w-full" target="hidden_iframe">
+      <button type="submit" :disabled="loading"
+        class="w-full bg-gray-500 hover:bg-red-600 text-white font-medium py-3 px-4 rounded">
         <span>🗑️ Clear All Tags</span>
       </button>
     </form>
@@ -33,28 +22,33 @@
   function eventsSummary() {
     return {
       tagCount: 0,
-
       loading: false,
+      pollHandle: null,
+      visibilityHandler: null,
 
       async init() {
         await this.loadTagCount();
-        // Auto-refresh every 1 second
-        setInterval(() => {
-          if (!this.loading) {
-            this.loadTagCount();
-          }
-        }, 1000);
+        TemplateUtils.bindVisibilityPolling(this, this.loadTagCount, 1000);
+      },
+
+      destroy() {
+        TemplateUtils.unbindVisibilityPolling(this);
       },
 
       async loadTagCount() {
+        if (this.loading) {
+          return;
+        }
+
+        this.loading = true;
+
         try {
-          const response = await fetch("{{ url_for('get_tag_count') }}");
-          if (response.ok) {
-            const data = await response.json();
-            this.tagCount = data.count || 0;
-          }
+          const data = await TemplateUtils.fetchJson("{{ url_for('get_tag_count') }}");
+          this.tagCount = data.count || 0;
         } catch (error) {
           console.error("Error loading tag count:", error);
+        } finally {
+          this.loading = false;
         }
       },
     };

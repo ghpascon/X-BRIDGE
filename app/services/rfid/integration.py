@@ -6,6 +6,7 @@ from app.models.rfid import Tag, Event
 from app.core import settings
 import asyncio
 from app.core import Indicator
+from typing import Any
 
 from app.models import Base
 
@@ -15,8 +16,22 @@ class Integration:
 		self.db_manager: DatabaseManager | None = None
 		self.webhook_manager: WebhookManager | None = None
 		self.webhook_xtrack: WebhookXtrack | None = None
-		self.indicator = Indicator()
+		self.indicator: Indicator | None = Indicator() if settings.BEEP else None
 		self.setup_integration()
+
+	async def _run_integration_tasks(self, context: str, tasks: list):
+		"""Run integration tasks without letting one failure abort the others."""
+		if not tasks:
+			return
+
+		logging.info(f'[{context}] Executing {len(tasks)} tasks concurrently')
+		results = await asyncio.gather(*tasks, return_exceptions=True)
+		for result in results:
+			if isinstance(result, Exception):
+				logging.error(
+					f'[{context}] Task failed: {result}',
+					exc_info=(type(result), result, result.__traceback__),
+				)
 
 	# [ SETUP ]
 	def setup_integration(self):
@@ -71,7 +86,7 @@ class Integration:
 			return False
 
 	# [ EVENT ]
-	async def on_event_integration(self, name: str, event_type: str, event_data: dict):
+	async def on_event_integration(self, name: str, event_type: str, event_data: Any):
 		"""
 		Handle integration of events into the database.
 
@@ -103,10 +118,7 @@ class Integration:
 				)
 			)
 
-		# Execute all tasks concurrently
-		if tasks:
-			logging.info(f'[ EVENT INTEGRATION ] Executing {len(tasks)} tasks concurrently')
-			await asyncio.gather(*tasks)
+		await self._run_integration_tasks('EVENT INTEGRATION', tasks)
 
 	def _event_database_integration(self, name: str, event_type: str, event_data: dict):
 		"""Save event to database."""
@@ -151,14 +163,11 @@ class Integration:
 			tasks.append(self.webhook_xtrack.post(tag))
 
 		# Beep
-		if settings.BEEP:
+		if settings.BEEP and self.indicator is not None:
 			logging.info('[ TAG INTEGRATION ] BEEP')
 			tasks.append(self.indicator.beep())
 
-		# Execute all tasks concurrently
-		if tasks:
-			logging.info(f'[ TAG INTEGRATION ] Executing {len(tasks)} tasks concurrently')
-			await asyncio.gather(*tasks)
+		await self._run_integration_tasks('TAG INTEGRATION', tasks)
 
 	def _tag_database_integration(self, data: dict):
 		"""Save tag to database."""

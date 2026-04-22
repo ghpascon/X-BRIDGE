@@ -1,8 +1,5 @@
 <!-- EPCs Table Widget -->
-<div
-  class="bg-white rounded-lg shadow border p-4 flex flex-col lg:flex-row gap-4 w-full h-[75vh]"
-  x-data="tagsTable()"
->
+<div class="bg-white rounded-lg shadow border p-4 flex flex-col lg:flex-row gap-4 w-full h-[75vh]" x-data="tagsTable()">
   <!-- Left - EPCs List -->
   <div class="flex-1">
     <div class="justify-between flex items-center mb-4">
@@ -10,24 +7,15 @@
         EPCs (<span x-text="epcs.length"></span>)
       </h4>
 
-      <a
-        href="{{ url_for('gtin') }}"
-        class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded text-sm"
-      >
+      <a href="{{ url_for('gtin') }}" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded text-sm">
         View GTIN Summary
       </a>
 
-      <a
-        href="{{ url_for('tag_details') }}"
-        class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded text-sm"
-      >
+      <a href="{{ url_for('tag_details') }}" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded text-sm">
         View All Details
       </a>
     </div>
-    <div
-      class="border rounded overflow-hidden"
-      style="height: calc(100% - 60px)"
-    >
+    <div class="border rounded overflow-hidden" style="height: calc(100% - 60px)">
       <div class="bg-gray-50 p-3 border-b">
         <div class="grid grid-cols-3 gap-4 font-medium text-sm">
           <div class="col-span-2">EPC</div>
@@ -40,10 +28,8 @@
           <div class="border-b p-3 hover:bg-gray-50">
             <div class="grid grid-cols-3 gap-4 items-center text-sm">
               <div class="font-mono truncate col-span-2" x-text="epc"></div>
-              <button
-                @click="loadTagDetails(epc)"
-                class="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded text-xs w-fit"
-              >
+              <button @click="loadTagDetails(epc)"
+                class="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded text-xs w-fit">
                 View
               </button>
             </div>
@@ -59,8 +45,7 @@
 
   <!-- Right - Details -->
   <div
-    class="w-full lg:w-96 border-t lg:border-t-0 lg:border-l pt-4 lg:pt-0 lg:pl-4 flex flex-col min-h-[300px] lg:min-h-0"
-  >
+    class="w-full lg:w-96 border-t lg:border-t-0 lg:border-l pt-4 lg:pt-0 lg:pl-4 flex flex-col min-h-[300px] lg:min-h-0">
     <h4 class="text-lg font-semibold mb-4 flex-shrink-0">Details</h4>
 
     <div class="flex-1 overflow-hidden">
@@ -70,10 +55,7 @@
 
       <div x-show="loadingDetails" class="p-8 text-center">Loading...</div>
 
-      <div
-        x-show="selectedEpc && !loadingDetails && tagDetails"
-        class="h-full overflow-y-auto"
-      >
+      <div x-show="selectedEpc && !loadingDetails && tagDetails" class="h-full overflow-y-auto">
         <div class="bg-blue-50 p-3 rounded mb-4">
           <div class="text-xs text-gray-500">EPC:</div>
           <div class="font-mono text-sm break-all" x-text="selectedEpc"></div>
@@ -82,23 +64,14 @@
         <div class="space-y-2">
           <template x-for="(value, key) in tagDetails" :key="key">
             <div class="border-b pb-2 flex justify-between">
-              <div
-                class="text-xs text-gray-500 flex-shrink-0 mr-2"
-                x-text="key.replace(/_/g, ' ')"
-              ></div>
-              <div
-                class="text-sm font-mono break-all text-right"
-                x-text="value || '-'"
-              ></div>
+              <div class="text-xs text-gray-500 flex-shrink-0 mr-2" x-text="key.replace(/_/g, ' ')"></div>
+              <div class="text-sm font-mono break-all text-right" x-text="value || '-'"></div>
             </div>
           </template>
         </div>
       </div>
 
-      <div
-        x-show="selectedEpc && !loadingDetails && !tagDetails"
-        class="p-8 text-center text-red-400"
-      >
+      <div x-show="selectedEpc && !loadingDetails && !tagDetails" class="p-8 text-center text-red-400">
         Error loading details
       </div>
     </div>
@@ -112,39 +85,75 @@
       selectedEpc: null,
       tagDetails: null,
       loadingDetails: false,
+      pollHandle: null,
+      visibilityHandler: null,
+      lastEpcsPayload: "",
+      detailsCache: {},
+      loadingEpcs: false,
 
       async init() {
         await this.loadEpcs();
-        setInterval(() => this.loadEpcs(), 1000);
+        TemplateUtils.bindVisibilityPolling(this, this.loadEpcs, 2000);
+      },
+
+      destroy() {
+        TemplateUtils.unbindVisibilityPolling(this);
       },
 
       async loadEpcs() {
+        if (this.loadingEpcs) {
+          return;
+        }
+
+        this.loadingEpcs = true;
+
         try {
-          const response = await fetch("{{ url_for('get_epcs') }}");
-          if (response.ok) {
-            const data = await response.json();
+          const result = await TemplateUtils.fetchJsonIfChanged(
+            "{{ url_for('get_epcs') }}",
+            this.lastEpcsPayload,
+          );
+
+          if (result.changed) {
+            this.lastEpcsPayload = result.payload;
+            const data = result.data;
             this.epcs = Array.isArray(data) ? data : data.epcs || [];
+
+            if (this.selectedEpc && !this.epcs.includes(this.selectedEpc)) {
+              this.selectedEpc = null;
+              this.tagDetails = null;
+            }
           }
         } catch (error) {
           console.error("Error loading EPCs:", error);
+        } finally {
+          this.loadingEpcs = false;
         }
       },
 
       async loadTagDetails(epc) {
+        if (this.selectedEpc === epc && this.tagDetails) {
+          return;
+        }
+
         this.selectedEpc = epc;
         this.loadingDetails = true;
+
+        if (this.detailsCache[epc]) {
+          this.tagDetails = this.detailsCache[epc];
+          this.loadingDetails = false;
+          return;
+        }
+
         this.tagDetails = null;
 
         try {
-          const response = await fetch(
+          this.tagDetails = await TemplateUtils.fetchJson(
             "{{ url_for('get_tag_info', epc='placeholder') }}".replace(
               "placeholder",
               encodeURIComponent(epc),
             ),
           );
-          if (response.ok) {
-            this.tagDetails = await response.json();
-          }
+          this.detailsCache[epc] = this.tagDetails;
         } catch (error) {
           console.error("Error loading tag details:", error);
         } finally {

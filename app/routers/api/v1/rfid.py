@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Path
 from fastapi.responses import JSONResponse
 from smartx_rfid.utils.path import get_prefix_from_path
 from smartx_rfid.schemas.tag import WriteTagValidator
@@ -17,6 +17,15 @@ router = APIRouter(prefix=router_prefix, tags=[router_prefix])
 )
 async def get_tags():
 	return rfid_manager.tags.get_all()
+
+
+@router.get(
+	'/get_n_tags/{limit}',
+	summary='Get limited tags',
+	description='Returns only the first N detected RFID tags.',
+)
+async def get_n_tags(limit: int = Path(..., ge=0)):
+	return rfid_manager.tags.get_all()[:limit]
 
 
 @router.get(
