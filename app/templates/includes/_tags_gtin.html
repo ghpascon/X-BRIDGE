@@ -1,6 +1,20 @@
 <!-- Tags Table Widget -->
 <div class="bg-white rounded-lg shadow border p-4 flex flex-col w-full h-[75vh]" x-data="gtinTable()">
   <div class="justify-between flex items-center mb-4 flex-shrink-0">
+    <div class="flex items-center gap-2">
+      <a href="{{ url_for('index') }}"
+        class="bg-white border border-blue-300 hover:bg-blue-50 text-blue-700 px-4 py-2 rounded text-sm font-medium">
+        EPCs
+      </a>
+      <span class="bg-blue-600 text-white px-4 py-2 rounded text-sm font-medium">
+        GTIN
+      </span>
+      <a href="{{ url_for('tag_details') }}"
+        class="bg-white border border-blue-300 hover:bg-blue-50 text-blue-700 px-4 py-2 rounded text-sm font-medium">
+        All
+      </a>
+    </div>
+
     <div>
       <h4 class="text-lg font-semibold">
         GTINs: <span x-text="gtins.length"></span> | Total Tags:

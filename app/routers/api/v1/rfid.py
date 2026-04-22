@@ -73,6 +73,15 @@ async def get_epcs():
 
 
 @router.get(
+	'/get_n_epcs/{limit}',
+	summary='Get limited EPCs',
+	description='Returns only the first N detected EPCs from RFID tags.',
+)
+async def get_n_epcs(limit: int = Path(..., ge=0)):
+	return rfid_manager.tags.get_epcs()[:limit]
+
+
+@router.get(
 	'/get_tids',
 	summary='Get all TIDs',
 	description='Returns a list of all detected TIDs from RFID tags.',

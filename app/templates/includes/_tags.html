@@ -2,18 +2,35 @@
 <div class="bg-white rounded-lg shadow border p-4 flex flex-col lg:flex-row gap-4 w-full h-[75vh]" x-data="tagsTable()">
   <!-- Left - EPCs List -->
   <div class="flex-1">
-    <div class="justify-between flex items-center mb-4">
-      <h4 class="text-lg font-semibold mb-4">
+    <div class="mb-4 flex flex-wrap items-center gap-3 justify-between">
+      <div class="flex items-center gap-2 order-1">
+        <span class="bg-blue-600 text-white px-4 py-2 rounded text-sm font-medium">
+          EPCs
+        </span>
+        <a href="{{ url_for('gtin') }}"
+          class="bg-white border border-blue-300 hover:bg-blue-50 text-blue-700 px-4 py-2 rounded text-sm font-medium">
+          GTIN
+        </a>
+        <a href="{{ url_for('tag_details') }}"
+          class="bg-white border border-blue-300 hover:bg-blue-50 text-blue-700 px-4 py-2 rounded text-sm font-medium">
+          All
+        </a>
+      </div>
+
+      <h4 class="text-lg font-semibold order-2">
         EPCs (<span x-text="epcs.length"></span>)
       </h4>
 
-      <a href="{{ url_for('gtin') }}" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded text-sm">
-        View GTIN Summary
-      </a>
-
-      <a href="{{ url_for('tag_details') }}" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded text-sm">
-        View All Details
-      </a>
+      <label class="flex items-center gap-2 text-sm text-gray-600 order-3">
+        <span>Limit</span>
+        <select x-model="selectedLimit" @change="onLimitChange()"
+          class="rounded border border-gray-300 bg-white px-2 py-1 text-sm text-gray-900">
+          <option value="50">50</option>
+          <option value="100">100</option>
+          <option value="200">200</option>
+          <option value="all">All</option>
+        </select>
+      </label>
     </div>
     <div class="border rounded overflow-hidden" style="height: calc(100% - 60px)">
       <div class="bg-gray-50 p-3 border-b">
@@ -90,6 +107,7 @@
       lastEpcsPayload: "",
       detailsCache: {},
       loadingEpcs: false,
+      selectedLimit: "50",
 
       async init() {
         await this.loadEpcs();
@@ -98,6 +116,22 @@
 
       destroy() {
         TemplateUtils.unbindVisibilityPolling(this);
+      },
+
+      getEpcsUrl() {
+        if (this.selectedLimit === "all") {
+          return "{{ url_for('get_epcs') }}";
+        }
+
+        return "{{ url_for('get_n_epcs', limit=999999) }}".replace(
+          "999999",
+          this.selectedLimit,
+        );
+      },
+
+      async onLimitChange() {
+        this.lastEpcsPayload = "";
+        await this.loadEpcs();
       },
 
       async loadEpcs() {
@@ -109,7 +143,7 @@
 
         try {
           const result = await TemplateUtils.fetchJsonIfChanged(
-            "{{ url_for('get_epcs') }}",
+            this.getEpcsUrl(),
             this.lastEpcsPayload,
           );
 
