@@ -6,9 +6,16 @@
     "VID": 1,
     "PID": 1,
     "BUZZER": true,
-    "SESSION": 1,
+    "SESSION": 0,
     "START_READING": true,
-    "READ_POWER": 27,
+    "GPI_START": false,
     "PROTECTED_INVENTORY_ACTIVE": false,
-    "PROTECTED_INVENTORY_PASSWORD": "12345678"
+    "PROTECTED_INVENTORY_PASSWORD": "12345678",
+    "ACTIVE_ANT": [
+        1,
+        2,
+        3,
+        4
+    ],
+    "READ_POWER": 20
 }
