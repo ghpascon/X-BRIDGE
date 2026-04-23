@@ -1,6 +1,6 @@
-# Atenção: o uso de --force pode impactar histórico de tags, avalie se é realmente necessário
-# Otimização: adiciona apenas a pasta do projeto, evitando git add -A que pode ser lento em repositórios grandes
-# Otimização: adiciona apenas a pasta do projeto, evitando git add -A que pode ser lento em repositórios grandes
+# Warning: using --force may impact tag history, evaluate if it is really necessary
+# Optimization: adds only the project folder, avoiding git add -A which can be slow in large repositories
+# Optimization: adds only the project folder, avoiding git add -A which can be slow in large repositories
 name: Test Build on Windows and Linux
 
 on:
@@ -46,7 +46,7 @@ jobs:
           $projectName = $env:GITHUB_REPOSITORY.Split('/')[1]
           $destDir = "executables-repo/windows/$projectName"
 
-          # Remove apenas o projeto antigo
+          # Remove only the old project folder
           Remove-Item -Path $destDir -Recurse -Force -ErrorAction SilentlyContinue
           New-Item -ItemType Directory -Force -Path $destDir
 
@@ -59,7 +59,7 @@ jobs:
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
           git add windows/$projectName
-          git commit -m "Atualiza executáveis Windows para $projectName" || echo "Nenhuma alteração para commitar"
+          git commit -m "Update Windows executables for $projectName" || echo "No changes to commit"
           git push
 
   build-linux:
@@ -103,24 +103,24 @@ jobs:
           build_dir="TEMP"
           dest_dir="executables-repo/linux/$PROJECT_NAME"
 
-          # Remove apenas o projeto antigo
+          # Remove only the old project folder
           rm -rf "$dest_dir"
           mkdir -p "$dest_dir"
 
           if [ -d "$build_dir" ]; then
             rsync -av --exclude=build/ "$build_dir/" "$dest_dir/"
           else
-            echo "Diretório $build_dir não encontrado, build pode ter falhado."
+            echo "Directory $build_dir not found, build may have failed."
             exit 1
           fi
 
-      - name: Commit e push dos executáveis
+      - name: Commit and push executables
         run: |
           cd executables-repo
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
           git add linux/$PROJECT_NAME
-          git commit -m "Atualiza executáveis Linux para $PROJECT_NAME" || echo "Nenhuma alteração para commitar"
+          git commit -m "Update Linux executables for $PROJECT_NAME" || echo "No changes to commit"
           git push
 
   tag-executables:
