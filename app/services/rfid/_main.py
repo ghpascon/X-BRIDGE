@@ -83,3 +83,23 @@ class RfidManager:
 	def on_stop(self, name: str):
 		logging.info(f'[ STOP ] {name}')
 		self.controller.on_stop(device=name)
+
+	# [ X-SCAN]
+	def on_xscan_event(self, device_name: str, event_type: str, event_data):
+		# inventory event with tags
+		logging.info(
+			f'Received X-SCAN event from device {device_name}: {event_type} - {event_data}'
+		)
+		if event_type == 'inventory':
+			for tag in event_data.get('tags', []):
+				self.on_tag(
+					name=device_name,
+					tag_data={
+						'epc': tag.get('epc'),
+						'tid': tag.get('tid'),
+						'ant': tag.get('antenna', 1),
+						'rssi': tag.get('rssi'),
+					},
+				)
+		else:
+			self.on_event(name=device_name, event_type=event_type, event_data=event_data)

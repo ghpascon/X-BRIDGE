@@ -4,7 +4,6 @@ from smartx_rfid.utils.path import get_prefix_from_path
 from smartx_rfid.schemas.tag import TagSchema
 from smartx_rfid.schemas.events import EventSchema
 from app.schemas.events import EventDeviceSchema
-
 from app.services import rfid_manager
 
 router_prefix = get_prefix_from_path(__file__)
@@ -62,7 +61,7 @@ async def receive_x714(events: list[EventDeviceSchema] | EventDeviceSchema):
 
 	for event in events:
 		rfid_manager.on_event(
-			name=event.device,
+			name=event.device_name,
 			event_type=event.event_type,
 			event_data=event.event_data,
 		)
@@ -90,4 +89,22 @@ async def receive_r700(request: Request):
 	return JSONResponse(
 		status_code=200,
 		content={'message': f'{len(events)} events received'},
+	)
+
+
+@router.post(
+	'/x-scan',
+	summary='Receive X-SCAN events',
+	description='Endpoint to receive non-standardized JSON events from X-SCAN devices.',
+)
+async def receive_x_scan(events: list[EventDeviceSchema] | EventDeviceSchema):
+	if isinstance(events, EventDeviceSchema):
+		events = [events]
+
+	for event in events:
+		rfid_manager.on_xscan_event(**event.model_dump())
+
+	return JSONResponse(
+		status_code=200,
+		content={'message': 'X-SCAN events received successfully.', 'received_count': len(events)},
 	)
