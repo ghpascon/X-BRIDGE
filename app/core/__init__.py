@@ -5,9 +5,17 @@ from .build_templates import TemplateManager
 from .indicator import Indicator
 from smartx_rfid.utils.path import get_frozen_path
 from smartx_rfid.utils import AlertsManager
+import sys
+from pathlib import Path
 
 # DEFAULT VARS
-FILES_PATH = 'config'
+if getattr(sys, 'frozen', False):
+	BASE_DIR = Path(sys.executable).parent
+else:
+	BASE_DIR = Path(__file__).resolve().parent.parent.parent
+FILES_PATH = str(BASE_DIR / 'config')
+LICENSE_PATH = str(BASE_DIR / 'license.txt')
+
 DOCS_PATH = get_frozen_path('docs')
 SWAGGER_PATH = f'{DOCS_PATH}/SWAGGER.md'
 CONFIG_PATH = f'{FILES_PATH}/config.json'
@@ -15,7 +23,6 @@ TEMPLATES_PATH = get_frozen_path('app/templates')
 DEVICES_PATH = f'{FILES_PATH}/devices'
 ICON_PATH = get_frozen_path('app/static/icons/logo.ico')
 EXAMPLE_PATH = get_frozen_path('examples')
-LICENSE_PATH = 'license.txt'
 
 ##CONFIG APLICATION
 # settings
