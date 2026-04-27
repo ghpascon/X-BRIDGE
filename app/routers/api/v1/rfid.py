@@ -25,7 +25,7 @@ async def get_tags():
 	description='Returns only the first N detected RFID tags.',
 )
 async def get_n_tags(limit: int = Path(..., ge=0)):
-	return rfid_manager.tags.get_all()[:limit]
+	return rfid_manager.tags.get_all(limit=limit)
 
 
 @router.get(
@@ -78,7 +78,7 @@ async def get_epcs():
 	description='Returns only the first N detected EPCs from RFID tags.',
 )
 async def get_n_epcs(limit: int = Path(..., ge=0)):
-	return rfid_manager.tags.get_epcs()[:limit]
+	return rfid_manager.tags.get_epcs(limit=limit)
 
 
 @router.get(

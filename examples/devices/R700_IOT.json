@@ -12,5 +12,6 @@
   "READ_RSSI": -80,
   "SEARCH_MODE": "single-target",
   "RF_MODE": 4,
-  "GPI_START": false
+  "GPI_START": false,
+  "FIRMWARE_VERSION": "8.4.1"
 }
