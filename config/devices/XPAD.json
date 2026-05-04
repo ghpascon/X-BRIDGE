@@ -8,11 +8,7 @@
     "BUZZER": true,
     "SESSION": 1,
     "START_READING": true,
-    "GPI_START": false,
+    "READ_POWER": 22,
     "PROTECTED_INVENTORY_ACTIVE": false,
-    "PROTECTED_INVENTORY_PASSWORD": "12345678",
-    "ACTIVE_ANT": [
-        1
-    ],
-    "READ_POWER": 25
+    "PROTECTED_INVENTORY_PASSWORD": "12345678"
 }

@@ -984,13 +984,13 @@ reference = "pypi-simple"
 
 [[package]]
 name = "mako"
-version = "1.3.11"
+version = "1.3.12"
 description = "A super-fast templating language that borrows the best ideas from the existing templating languages."
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "mako-1.3.11-py3-none-any.whl", hash = "sha256:e372c6e333cf004aa736a15f425087ec977e1fcbd2966aae7f17c8dc1da27a77"},
-    {file = "mako-1.3.11.tar.gz", hash = "sha256:071eb4ab4c5010443152255d77db7faa6ce5916f35226eb02dc34479b6858069"},
+    {file = "mako-1.3.12-py3-none-any.whl", hash = "sha256:8f61569480282dbf557145ce441e4ba888be453c30989f879f0d652e39f53ea9"},
+    {file = "mako-1.3.12.tar.gz", hash = "sha256:9f778e93289bd410bb35daadeb4fc66d95a746f0b75777b942088b7fd7af550a"},
 ]
 
 [package.dependencies]
@@ -2184,13 +2184,13 @@ reference = "pypi-simple"
 
 [[package]]
 name = "smartx-rfid"
-version = "9.1.0"
+version = "10.0.0"
 description = "SmartX RFID library"
 optional = false
 python-versions = ">=3.11,<4.0"
 files = [
-    {file = "smartx_rfid-9.1.0-py3-none-any.whl", hash = "sha256:edb8a0e584e005f9c2b9d9d124fff0e852bb99affa8e07881b2ccf3c1ca8e8d8"},
-    {file = "smartx_rfid-9.1.0.tar.gz", hash = "sha256:452f107736e21a03af72cff59b11be889aef6ec7831864bba91806ebcf01c650"},
+    {file = "smartx_rfid-10.0.0-py3-none-any.whl", hash = "sha256:e834277a5eb9c0ab27fa3ed188571cd5e1002dc61cb4e8459f8b7b700b6f63db"},
+    {file = "smartx_rfid-10.0.0.tar.gz", hash = "sha256:dedfb4bec5f8e8e37f559813a7afb9e75dfc393ae8183ad00ff47671169abc69"},
 ]
 
 [package.dependencies]
@@ -2813,4 +2813,4 @@ reference = "pypi-simple"
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.11,<3.15"
-content-hash = "f089dcb14950e0e035acac550779caf3da5d3469dd4e6da2a46160654b600776"
+content-hash = "a62e6a71d6a68b02de36086feda522e4439a2500743696ccc8d6e182f3206af7"
