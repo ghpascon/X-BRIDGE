@@ -90,7 +90,7 @@ async def simulate_tag_list(tag_list: TagListSimulator):
 			if not rfid_manager.on_tag(
 				name=device_name,
 				tag_data=tag_data,
-			):
+			)[0]:
 				continue
 			tags_generated.append(tag_data)
 
@@ -181,7 +181,7 @@ async def gtin_list(tag_generator: TagGtinSimulator):
 			if not rfid_manager.on_tag(
 				name=device_name,
 				tag_data=tag_data,
-			):
+			)[0]:
 				continue
 
 			tags_generated.append(tag_data)

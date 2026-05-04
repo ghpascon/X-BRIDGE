@@ -73,7 +73,7 @@ class RfidManager:
 		# EXISTING TAG
 		elif tag is not None:
 			self.controller.on_existing_tag(tag=tag)
-		return tag is not None
+		return new_tag, tag
 
 	def on_start(self, name: str):
 		logging.info(f'[ START ] {name}')
@@ -92,7 +92,7 @@ class RfidManager:
 		)
 		if event_type == 'inventory':
 			for tag in event_data.get('tags', []):
-				self.on_tag(
+				new_tag, tag_data = self.on_tag(
 					name=device_name,
 					tag_data={
 						'epc': tag.get('epc'),
@@ -101,5 +101,9 @@ class RfidManager:
 						'rssi': tag.get('rssi'),
 					},
 				)
+				if tag_data:
+					tag_data['count'] += (
+						tag.get('read_count', 1) - 1
+					)  # Adjust count based on read_count
 		else:
 			self.on_event(name=device_name, event_type=event_type, event_data=event_data)
