@@ -1,149 +1,135 @@
-# SMARTX CONNECTOR v1.2.0
+# SMARTX X-BRIDGE 
 
 ## Overview
-SMARTX CONNECTOR is a robust and scalable RFID reader management platform, built com FastAPI, voltado para integração, monitoramento e automação de dispositivos RFID. O sistema oferece alta performance, flexibilidade e recursos avançados para ambientes industriais, comerciais e laboratoriais.
+
+SMARTX X-BRIDGE is a high-performance RFID device management platform built with FastAPI. It acts as middleware between physical RFID readers and business systems, providing real-time tag processing, multi-device management, flexible integrations, and a built-in web interface.
 
 ---
 
-## Estrutura do Projeto
+## Features
 
-**Principais Pastas:**
-
-- **app/** — Código principal da aplicação:
-  - **async_func/**: Funções assíncronas para operações RFID e tarefas de background.
-  - **core/**: Configuração, middlewares, templates, handlers de exceção e lógica central.
-  - **db/**: Gerenciamento de conexão, sessão e inicialização do banco de dados.
-  - **models/**: Modelos SQLAlchemy para tags, eventos e mixins utilitários.
-  - **routers/**:
-    - **api/v1/**: Endpoints RESTful para dispositivos, tags, simulação e integração.
-    - **pages/**: Rotas da interface web (dashboard, logs, settings, etc).
-  - **schemas/**: Schemas Pydantic para validação de dados e simulação.
-  - **services/**: Lógica de negócio, integração, gerenciamento de dispositivos e eventos.
-    - **rfid/**: Gerenciamento de dispositivos, eventos e integração com banco/webhook.
-    - **settings_service/**: Gerenciamento de configurações dinâmicas.
-    - **tray/**: Integração com área de notificação/sistema.
-  - **static/**: Assets do frontend (CSS, JS, imagens, sons, ícones, docs Swagger).
-  - **templates/**: Templates Jinja2 para páginas, componentes e includes reutilizáveis.
-
-- **config/** — Arquivos de configuração:
-  - `config.json`: Configuração principal do sistema.
-  - **devices/**: Configurações específicas de cada leitor RFID.
-  - **examples/**: Exemplos de configuração para dispositivos.
-
-- **alembic/** — Gerenciamento de migrações do banco de dados:
-  - **versions/**: Scripts de migração.
-
-- **Logs/** — Arquivos de log da aplicação.
-- **scripts/** — Scripts utilitários para build, migração, formatação e inicialização.
-- **tests/** — Testes unitários e de integração.
+- **Multi-device RFID management** — Connect and manage multiple readers simultaneously via TCP/IP, Serial, or USB
+- **Real-time tag processing** — Duplicate filtering, EPC/TID validation, RSSI monitoring, antenna and power control
+- **Tag prefix filtering** — Accept only tags matching configured prefixes
+- **Integrations** — Webhook with retry, MQTT (IoT), XTRACK, and relational database persistence (SQLite, MySQL, PostgreSQL)
+- **Web interface** — Responsive dashboard with live updates, log viewer, and device settings
+- **API** — Full RESTful API with interactive Swagger documentation
+- **Simulation** — Simulate tags and events without physical hardware, including GTIN-14 generation
+- **License management** — Built-in license validation
+- **System tray** — Native tray icon integration
+- **Prometheus metrics** — Built-in observability endpoint
 
 ---
 
-## Ambiente e Dependências
+## Project Structure
 
-- **Linguagem:** Python 3.11
-- **Gerenciador de pacotes:** Poetry
-- **Principais dependências:**
-  - FastAPI, Uvicorn, SQLAlchemy, Alembic, Jinja2, Python-Multipart, SMARTX-RFID, HTTPx, PyGame, GMQTT, Prometheus FastAPI Instrumentator, Cryptography, Passlib[bcrypt]
-- **Dev dependencies:** Tomli, Ruff, PyInstaller, Pytest
+```
+app/
+├── async_func/       Background tasks (RFID polling, etc.)
+├── core/             App factory, config, middlewares, exception handlers
+├── db/               Database session and initialization
+├── models/           SQLAlchemy models (Tag, Event)
+├── routers/
+│   ├── api/v1/       REST API endpoints
+│   └── pages/        Web interface routes (dashboard, logs, settings)
+├── schemas/          Pydantic schemas for validation
+├── services/
+│   ├── rfid/         RFID controller, event handling, integrations
+│   ├── settings_service/  Dynamic config management
+│   ├── license/      License validation
+│   └── tray/         System tray integration
+├── static/           Frontend assets (CSS, JS, images, sounds)
+└── templates/        Jinja2 templates
 
----
+config/
+├── config.json       Main application configuration
+└── devices/          Per-device RFID reader configuration files
 
-## Instalação e Execução
-
-```bash
-# Instalar dependências
-poetry install
-
-# Executar aplicação
-poetry run python main.py
-
-# Gerar executável
-poetry run python build_exe.py
+alembic/              Database migration scripts
+scripts/              Utility scripts (build, format, migrate, startup)
+tests/                Unit and integration tests
+docs/                 API documentation assets
 ```
 
 ---
 
-## Principais Funcionalidades
+## Configuration
 
-- **Gerenciamento RFID:**
-  - Suporte multi-protocolo (TCP/IP, Serial, USB)
-  - Leitura e processamento de tags em tempo real
-  - Controle de antena, potência e RSSI
-  - Filtro automático de tags duplicadas
-  - Validação EPC/TID
+### `config/config.json`
 
-- **Interface Web:**
-  - Dashboard responsivo com atualização em tempo real
-  - Monitoramento de dispositivos e configuração
-  - Visualização de logs com filtros e busca
-  - Simulação de tags para testes e desenvolvimento
-  - Documentação interativa da API (Swagger UI)
+| Field                     | Type        | Default    | Description                                        |
+| ------------------------- | ----------- | ---------- | -------------------------------------------------- |
+| `TITLE`                   | string      | `"SMARTX"` | Application title                                  |
+| `PORT`                    | int         | `5000`     | HTTP server port                                   |
+| `LOG_PATH`                | string      | `"Logs"`   | Directory for log files                            |
+| `DATABASE_URL`            | string      | `null`     | SQLAlchemy DB URL (SQLite/MySQL/PostgreSQL)        |
+| `WEBHOOK_URL`             | string      | `null`     | Webhook endpoint for tag events                    |
+| `XTRACK_URL`              | string      | `null`     | XTRACK integration URL                             |
+| `TAG_PREFIX`              | string/list | `null`     | Accept only tags with this prefix (single or list) |
+| `STORAGE_DAYS`            | int         | `7`        | Days to retain tag/event records                   |
+| `CLEAR_OLD_TAGS_INTERVAL` | int         | `null`     | Seconds between automatic tag memory clears        |
+| `ALWAYS_SEND`             | bool        | `false`    | Forward all tags to integrations, even duplicates  |
+| `BEEP`                    | bool        | `false`    | Play beep sound on new tag read                    |
+| `OPEN_BROWSER`            | bool        | `true`     | Auto-open browser on startup                       |
 
-- **Integração & API:**
-  - API RESTful completa
-  - Integração com banco de dados (SQLAlchemy)
-  - Webhook para sistemas externos
-  - Conectividade MQTT para IoT
-  - Métricas Prometheus
-  - Persistência e políticas de limpeza configuráveis
+### `config/devices/*.json`
 
----
-
-## Configuração
-
-- **config/config.json:**
-  - Título, porta, URL do banco, URLs de integração, configuração de logs, dispositivos, MQTT, políticas de armazenamento.
-- **config/devices/*.json:**
-  - Configuração individual de cada leitor RFID (protocolo, antena, eventos, etc).
-- **app/core/config.py:**
-  - Carregamento dinâmico, variáveis de ambiente, atualização em runtime, validação.
+Each file defines one RFID reader (protocol, antennas, read power, events, etc). See `examples/devices/` for templates covering TCP, Serial, X714, R700, XPAD, ACUPAD, and SATO readers.
 
 ---
 
-## Endpoints Principais
+## Installation & Running
 
-- **Device Management** (`/api/v1/devices`):
-  - `GET /get_devices` — Lista dispositivos registrados
-  - `GET /get_device_config/{name}` — Configuração de dispositivo
-  - `GET /get_device_types_list` — Tipos suportados
-  - `GET /get_device_config_example/{name}` — Exemplos de configuração
+```bash
+# Install dependencies
+poetry install
 
-- **RFID Operations** (`/api/v1/rfid`):
-  - `GET /get_tags` — Tags detectadas
-  - `GET /get_tag_count` — Contagem de tags
-  - `POST /clear_tags` — Limpar tags
-  - `GET /get_epcs` — EPCs detectados
-  - `GET /get_gtin_count` — Estatísticas GTIN
+# Run the application
+poetry run python main.py
 
-- **Simulation & Testing** (`/api/v1/simulator`):
-  - `POST /tag` — Simular tag
-  - `POST /event` — Simular evento
-  - `POST /tag_list` — Simular múltiplas tags
+# Build standalone executable
+poetry run python scripts/build_exe.py
 
-- **Web Interface:**
-  - `/` — Dashboard
-  - `/logs` — Visualização de logs
-  - `/docs` — Documentação interativa
+# Run database migrations
+poetry run python scripts/migrate.py
+
+# Run tests
+poetry run pytest
+```
 
 ---
 
-## Modelos de Banco de Dados
+## API Groups
 
-- **Tag Model** (`app/models/rfid.py`):
-  - Identificação de dispositivo, EPC/TID, antena, RSSI, timestamp, índices.
-- **Event Model** (`app/models/rfid.py`):
-  - Log de eventos, classificação, dados JSON, timestamp automático.
-- **Base Models** (`app/models/mixin.py`):
-  - Funcionalidades comuns, serialização, mixins de timestamp, sessão.
+| Group           | Prefix                | Description                                                     |
+| --------------- | --------------------- | --------------------------------------------------------------- |
+| **RFID**        | `/api/v1/rfid`        | Read tags, EPCs, TIDs, GTIN stats, clear tag memory, write EPC  |
+| **Devices**     | `/api/v1/devices`     | List devices, get/set config, device status and info            |
+| **Application** | `/api/v1/application` | App settings CRUD, device config CRUD, restart/shutdown         |
+| **Simulator**   | `/api/v1/simulator`   | Simulate tags, events, tag lists, GTIN-14 tag generation        |
+| **Receive**     | `/api/v1/receive`     | Ingest tag/event data from external readers (X714, R700, XSCAN) |
+| **License**     | `/api/v1/license`     | Get license info, upload license                                |
+| **Controller**  | `/api/v1/controller`  | RFID controller runtime info                                    |
+
+Full interactive documentation available at `/docs`.
 
 ---
 
-## Desenvolvimento & Build
+## Tech Stack
 
-- **Gerenciador:** Poetry
-- **Qualidade:** Ruff
-- **Testes:** Pytest
-- **Migrações:** Alembic
-- **Build:** PyInstaller (`build_exe.py`)
-- **Recursos:** Todos os diretórios, arquivos estáticos e dependências incluídos no executável.
+| Layer           | Technology                        |
+| --------------- | --------------------------------- |
+| Runtime         | Python ≥3.11                      |
+| Package manager | Poetry                            |
+| Web framework   | FastAPI + Uvicorn                 |
+| Database ORM    | SQLAlchemy + Alembic              |
+| Templates       | Jinja2                            |
+| RFID layer      | smartx-rfid                       |
+| MQTT            | gmqtt                             |
+| Metrics         | prometheus-fastapi-instrumentator |
+| Auth            | passlib[bcrypt] + itsdangerous    |
+| Tray            | pystray + Pillow                  |
+| Audio           | pygame                            |
+| Linter          | Ruff                              |
+| Testing         | Pytest                            |
+| Build           | PyInstaller                       |
