@@ -5,7 +5,7 @@ import logging
 
 from app.services import rfid_manager
 
-from app.schemas.simulator import TagListSimulator, TagGtinSimulator
+from app.schemas.simulator import TagListSimulator, TagGtinSimulator, CustomTagSimulator
 from pyepc import SGTIN
 
 router_prefix = get_prefix_from_path(__file__)
@@ -32,6 +32,29 @@ async def simulate_tag_event():
 	return JSONResponse(
 		status_code=200,
 		content={'message': 'Simulated tag event successfully.'},
+	)
+
+
+@router.post(
+	'/custom_tag',
+	summary='Simulate a custom RFID tag event',
+	description='Simulates the reception of a custom RFID tag event with user-defined data for testing purposes.',
+)
+async def simulate_custom_tag_event(custom_tag: CustomTagSimulator):
+	tag_data = {
+		'epc': custom_tag.epc,
+		'tid': custom_tag.tid,
+		'ant': custom_tag.ant,
+		'rssi': custom_tag.rssi,
+	}
+	rfid_manager.on_event(
+		name='SIMULATOR',
+		event_type='tag',
+		event_data=tag_data,
+	)
+	return JSONResponse(
+		status_code=200,
+		content={'message': 'Simulated custom tag event successfully.', 'tag_data': tag_data},
 	)
 
 
