@@ -24,6 +24,9 @@ DEVICES_PATH = f'{FILES_PATH}/devices'
 ICON_PATH = get_frozen_path('app/static/icons/logo.ico')
 EXAMPLE_PATH = get_frozen_path('examples')
 
+DISPATCHER_PATH = f'{FILES_PATH}/dispatchers'
+EXAMPLES_DISPATCHER_PATH = f'{EXAMPLE_PATH}/dispatchers'
+
 ##CONFIG APLICATION
 # settings
 settings = Settings(CONFIG_PATH)

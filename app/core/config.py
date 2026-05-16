@@ -62,6 +62,9 @@ class Settings:
 
 		self.PORT: int = data.get('PORT', 5000)
 
+		if not os.path.exists(self._config_path):
+			self.save()  # Save default config if file doesn't exist
+
 	def get_current_settings(self):
 		return {
 			key: value

@@ -51,6 +51,12 @@ async def clear_old_tags():
 		removed_tags = rfid_manager.tags.remove_tags_before_timestamp(timestamp)
 		if removed_tags:
 			logging.info(f'Removed {len(removed_tags)} old tags: {removed_tags}')
+			for tag in removed_tags:
+				rfid_manager.on_event(
+					name=tag.get('device', 'unknown'),
+					event_type='tag_removed',
+					event_data=tag,
+				)
 
 
 async def clear_db():
