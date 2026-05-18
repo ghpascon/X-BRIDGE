@@ -1443,7 +1443,7 @@ reference = "pypi-simple"
 
 [[package]]
 name = "smartx-rfid"
-version = "10.1.5"
+version = "10.1.7"
 description = "SmartX RFID library"
 optional = false
 python-versions = "*"
@@ -1715,4 +1715,4 @@ reference = "pypi-simple"
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.11,<3.15"
-content-hash = "0990778e697b8bf58463cc15629a3cde88bbf04a8af1a68dcc2b947987b19e53"
+content-hash = "cc7bd27f0743595c39cdb80e358ab7faa586ad44cf2b4e8e5a5f05d0b7cf6f64"
