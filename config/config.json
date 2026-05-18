@@ -1,8 +1,8 @@
 {
     "TITLE": "SMARTX",
-    "LOG_PATH": "Logs",
+    "LOG_PATH": "/home/gabriel/Desktop/Logs",
     "STORAGE_DAYS": 7,
-    "OPEN_BROWSER": true,
+    "OPEN_BROWSER": false,
     "BEEP": false,
     "CLEAR_OLD_TAGS_INTERVAL": null,
     "TAG_PREFIX": null,

@@ -18,30 +18,26 @@
         ]
     },
     "dispatch_type": "post",
-    "url": "http://localhost:5001/tag/by-ant",
+    "url": "http://localhost:5001",
     "on_event": "tag",
     "allow_batches": true,
     "filters": [
         {
             "_description": "Only dispatch tags read on antenna 1 or 2.",
             "key": "{data[ant]}",
-            "value": [
-                1,
-                2
-            ],
-            "operator": "in"
+            "value": 4,
+            "operator": "eq"
         }
     ],
     "headers": {
         "Content-Type": "application/json"
     },
     "body": {
+        "event": "ant_4_event",
         "device": "{name}",
-        "event_type": "{event_type}",
         "epc": "{data[epc]}",
         "tid": "{data[tid]}",
         "ant": "{data[ant]}",
-        "rssi": "{data[rssi]}",
         "timestamp": "{data[timestamp]}"
     }
 }

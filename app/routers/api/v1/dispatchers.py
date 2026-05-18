@@ -15,10 +15,10 @@ async def get_dispatches_examples():
 
 
 @router.get(
-	'/get_example_dispatch/{name}',
+	'/get_example_dispatch/{dispatch_name}',
 )
-async def get_example_dispatch(name: str):
-	return rfid_manager.controller.dispatcher.get_example_content(name)
+async def get_example_dispatch(dispatch_name: str):
+	return rfid_manager.controller.dispatcher.get_example_content(dispatch_name)
 
 
 @router.get(
@@ -29,22 +29,24 @@ async def get_dispatches():
 
 
 @router.get(
-	'/get_dispatch/{name}',
+	'/get_dispatch/{dispatch_name}',
 )
-async def get_dispatch(name: str):
-	return rfid_manager.controller.dispatcher.get_dispatch_content(name)
+async def get_dispatch(dispatch_name: str):
+	return rfid_manager.controller.dispatcher.get_dispatch_content(dispatch_name)
 
 
 # This route creates or overwrites a dispatch with the provided content. The content should be a dict with the dispatch configuration.
 @router.post(
-	'/add_dispatch/{name}',
+	'/add_dispatch/{dispatch_name}',
 )
-async def add_dispatch(name: str, content: dict = Body(...)):
-	return rfid_manager.controller.dispatcher.create_dispatch(name, content, overwrite=True)
+async def add_dispatch(dispatch_name: str, content: dict = Body(...)):
+	return rfid_manager.controller.dispatcher.create_dispatch(
+		dispatch_name, content, overwrite=True
+	)
 
 
 @router.delete(
-	'/delete_dispatch/{name}',
+	'/delete_dispatch/{dispatch_name}',
 )
-async def delete_dispatch(name: str):
-	return rfid_manager.controller.dispatcher.delete_dispatch(name)
+async def delete_dispatch(dispatch_name: str):
+	return rfid_manager.controller.dispatcher.delete_dispatch(dispatch_name)

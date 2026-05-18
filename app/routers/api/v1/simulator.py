@@ -7,6 +7,7 @@ from app.services import rfid_manager
 
 from app.schemas.simulator import TagListSimulator, TagGtinSimulator, CustomTagSimulator
 from pyepc import SGTIN
+from app.schemas.events import EventDeviceSchema
 
 router_prefix = get_prefix_from_path(__file__)
 router = APIRouter(prefix=router_prefix, tags=[router_prefix])
@@ -76,6 +77,23 @@ async def simulate_generic_event():
 	return JSONResponse(
 		status_code=200,
 		content={'message': 'Simulated generic event successfully.'},
+	)
+
+
+@router.post(
+	'/custom_event',
+	summary='Simulate a custom RFID event',
+	description='Simulates the reception of a custom RFID event with user-defined data for testing purposes.',
+)
+async def simulate_custom_event(event: EventDeviceSchema):
+	rfid_manager.on_event(
+		name=event.device_name,
+		event_type=event.event_type,
+		event_data=event.event_data,
+	)
+	return JSONResponse(
+		status_code=200,
+		content={'message': 'Simulated custom event successfully.', 'event': event.dict()},
 	)
 
 

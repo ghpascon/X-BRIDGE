@@ -22,3 +22,12 @@ async def devices_page(request: Request):
 		{'request': request, 'title': 'Devices', 'alerts': []},
 		media_type='text/html; charset=utf-8',
 	)
+
+
+@router.get('/settings/dispatches', response_class=HTMLResponse)
+async def dispatches_page(request: Request):
+	return templates.TemplateResponse(
+		'pages/dispatches_settings/main.html',
+		{'request': request, 'title': 'Dispatches', 'alerts': []},
+		media_type='text/html; charset=utf-8',
+	)
