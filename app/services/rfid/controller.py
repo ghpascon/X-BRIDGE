@@ -36,11 +36,12 @@ class Controller:
 		)
 
 	# [ Reading Events ]
-	def on_start(self, device: str):
-		pass
+	def on_start(self, name: str):
+		logging.info(f'[ START ] {name}')
+		self.tags.remove_tags_by_device(device=name)
 
-	def on_stop(self, device: str):
-		pass
+	def on_stop(self, name: str):
+		logging.info(f'[ STOP ] {name}')
 
 	# [ Tag Events ]
 	def on_new_tag(self, name: str, tag: dict):
