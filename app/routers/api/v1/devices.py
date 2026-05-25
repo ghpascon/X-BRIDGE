@@ -340,3 +340,27 @@ async def get_serial_number(device_name: str):
 			'error': serial_number,
 		},
 	)
+
+
+@router.post('/create_device/{device_name}', summary='Create a new device configuration')
+async def create_device(device_name: str, data: dict):
+	success, error = await rfid_manager.devices.create_device_config(device_name, data)
+	if success:
+		return JSONResponse(content={'status': 'created', 'device': device_name})
+	return JSONResponse(content={'status': 'error', 'message': error}, status_code=400)
+
+
+@router.put('/update_device/{device_name}', summary='Update an existing device configuration')
+async def update_device(device_name: str, data: dict):
+	success, error = await rfid_manager.devices.update_device_config(device_name, data)
+	if success:
+		return JSONResponse(content={'status': 'updated', 'device': device_name})
+	return JSONResponse(content={'status': 'error', 'message': error}, status_code=400)
+
+
+@router.delete('/delete_device/{device_name}', summary='Delete a device configuration')
+async def delete_device(device_name: str):
+	success, error = await rfid_manager.devices.delete_device_config(device_name)
+	if success:
+		return JSONResponse(content={'status': 'deleted', 'device': device_name})
+	return JSONResponse(content={'status': 'error', 'message': error}, status_code=400)

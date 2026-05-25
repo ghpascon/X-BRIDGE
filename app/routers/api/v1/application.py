@@ -46,30 +46,6 @@ async def update_settings(settings_data: SettingsSchema):  # type: ignore
 	return JSONResponse(content={'status': 'updated', 'settings': settings.get_current_settings()})
 
 
-@router.post('/create_device/{device_name}', summary='Create a new device configuration')
-async def create_device(device_name: str, data: dict):
-	success, error = settings_service.create_device(device_name, data)
-	if success:
-		return JSONResponse(content={'status': 'created', 'device': device_name})
-	return JSONResponse(content={'status': 'error', 'message': error}, status_code=400)
-
-
-@router.put('/update_device/{device_name}', summary='Update an existing device configuration')
-async def update_device(device_name: str, data: dict):
-	success, error = settings_service.update_device(device_name, data)
-	if success:
-		return JSONResponse(content={'status': 'updated', 'device': device_name})
-	return JSONResponse(content={'status': 'error', 'message': error}, status_code=400)
-
-
-@router.delete('/delete_device/{device_name}', summary='Delete a device configuration')
-async def delete_device(device_name: str):
-	success, error = settings_service.delete_device(device_name)
-	if success:
-		return JSONResponse(content={'status': 'deleted', 'device': device_name})
-	return JSONResponse(content={'status': 'error', 'message': error}, status_code=400)
-
-
 @router.get('/has_changes', summary='Check if there are unsaved changes in the settings')
 async def has_changes():
 	return JSONResponse(content={'has_changes': settings_service.has_changes})

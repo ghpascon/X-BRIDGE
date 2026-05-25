@@ -1,11 +1,9 @@
 import json
-import logging
 import os
 from pathlib import Path
 
 from app.core import settings
-from app.core import DEVICES_PATH, EXAMPLE_PATH, FILES_PATH
-from app.services import rfid_manager
+from app.core import EXAMPLE_PATH, FILES_PATH
 import asyncio
 from typing import Any, Dict, Union
 from smartx_rfid.utils import delayed_function
@@ -20,60 +18,6 @@ class SettingsService:
 		settings.load(data)
 		settings.save()
 		self.has_changes = True
-
-	def reload_devices(self):
-		asyncio.create_task(rfid_manager.devices.cancel_connect_tasks())
-
-	def create_device(self, device_name: str, data: dict) -> tuple[bool, str | None]:
-		try:
-			Path(DEVICES_PATH).mkdir(parents=True, exist_ok=True)
-
-			device_path = os.path.join(DEVICES_PATH, f'{device_name}.json')
-
-			if os.path.exists(device_path):
-				return False, 'Device already exists'
-
-			with open(device_path, 'w', encoding='utf-8') as f:
-				json.dump(data, f, indent=4, ensure_ascii=False)
-
-			logging.info(f'Device created: {device_name}')
-
-			self.reload_devices()
-			return True, None
-		except Exception as e:
-			return False, str(e)
-
-	def update_device(self, device_name: str, data: dict) -> tuple[bool, str | None]:
-		try:
-			device_path = os.path.join(DEVICES_PATH, f'{device_name}.json')
-
-			if not os.path.exists(device_path):
-				return False, 'Device does not exist'
-
-			with open(device_path, 'w', encoding='utf-8') as f:
-				json.dump(data, f, indent=4, ensure_ascii=False)
-
-			logging.info(f'Device updated: {device_name}')
-
-			self.reload_devices()
-			return True, None
-		except Exception as e:
-			return False, str(e)
-
-	def delete_device(self, device_name: str) -> tuple[bool, str | None]:
-		try:
-			device_path = os.path.join(DEVICES_PATH, f'{device_name}.json')
-
-			if not os.path.exists(device_path):
-				return False, 'Device does not exist'
-
-			os.remove(device_path)
-			logging.info(f'Device deleted: {device_name}')
-
-			self.reload_devices()
-			return True, None
-		except Exception as e:
-			return False, str(e)
 
 	def _get_example_config(self) -> dict:
 		try:
