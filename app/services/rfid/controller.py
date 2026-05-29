@@ -11,6 +11,7 @@ from .integration import Integration
 import asyncio
 from app.core import settings
 import logging
+from app.services.license import license_manager
 
 
 class Controller:
@@ -26,6 +27,8 @@ class Controller:
 	# [ EVENTS ]
 	def on_event(self, name: str, event_type: str, event_data):
 		logging.info(f'[ EVENT ] {name} - {event_type}: {event_data}')
+		if not license_manager.validate_license():
+			return
 		asyncio.create_task(
 			self.integration.on_event_integration(
 				name=name, event_type=event_type, event_data=event_data
@@ -38,6 +41,8 @@ class Controller:
 	# [ Reading Events ]
 	def on_start(self, name: str):
 		logging.info(f'[ START ] {name}')
+		if not license_manager.validate_license():
+			return
 		self.tags.remove_tags_by_device(device=name)
 
 	def on_stop(self, name: str):
@@ -46,10 +51,14 @@ class Controller:
 	# [ Tag Events ]
 	def on_new_tag(self, name: str, tag: dict):
 		logging.info(f'[ TAG ] {name} - {tag}')
+		if not license_manager.validate_license():
+			return
 		asyncio.create_task(self.integration.on_tag_integration(tag=tag))
 		asyncio.create_task(self.dispatcher.add_async(name=name, event_type='tag', data=tag))
 
 	def on_existing_tag(self, name: str, tag: dict):
 		if settings.ALWAYS_SEND:
+			if not license_manager.validate_license():
+				return
 			asyncio.create_task(self.integration.on_tag_integration(tag=tag))
 			asyncio.create_task(self.dispatcher.add_async(name=name, event_type='tag', data=tag))
