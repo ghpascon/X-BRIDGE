@@ -8,6 +8,7 @@ import os
 
 import PyInstaller.__main__
 from PyInstaller.utils.hooks import collect_all, collect_submodules
+import tomli
 
 # === USER CONFIGURATION ===
 EXE_PATH = 'TEMP'  # Base folder to store builds
@@ -67,16 +68,30 @@ all_manual_hidden = manual_hidden + serial_tools_hidden + serial_asyncio_hidden
 
 # === Helper functions ===
 def read_poetry_dependencies(file_path='pyproject.toml'):
-	import tomli  # Python 3.11+
-
 	with open(file_path, 'rb') as f:
 		data = tomli.load(f)
-	deps = data.get('project', {}).get('dependencies', [])
 	packages = []
-	for dep in deps:
-		# Remove extras and versions, keep only the package name
-		pkg = dep.split(' ', 1)[0].split('[', 1)[0]
-		packages.append(pkg)
+
+	project_deps = data.get('project', {}).get('dependencies', [])
+
+	if project_deps:
+		for dep in project_deps:
+			pkg = dep.split(' ', 1)[0].split('[', 1)[0]
+			packages.append(pkg)
+
+	else:
+		poetry_deps = data.get('tool', {}).get('poetry', {}).get('dependencies', {})
+
+		for pkg in poetry_deps.keys():
+			if pkg.lower() == 'python':
+				continue
+
+			packages.append(pkg)
+
+	print('\n[INFO] Packages found:')
+	for pkg in packages:
+		print(f'  - {pkg}')
+
 	return packages
 
 
