@@ -10,6 +10,13 @@ router = APIRouter(prefix='', tags=['Pages'])
 @router.get('/', response_class=HTMLResponse)
 async def index(request: Request):
 	alerts = []
+	if settings.TAG_PREFIX:
+		alerts.append(
+			{
+				'text': f'Tag prefix is set: {settings.TAG_PREFIX}',
+				'level': 'warning',
+			}
+		)
 	# alerts example
 	# alerts = [
 	# 	{'text': 'Sistema SMARTX RFID iniciado com sucesso!', 'level': 'success'},
