@@ -1,4 +1,4 @@
-# SMARTX X-BRIDGE 
+# SMARTX X-BRIDGE
 
 ## Overview
 
@@ -112,6 +112,79 @@ poetry run pytest
 | **Controller**  | `/api/v1/controller`  | RFID controller runtime info                                    |
 
 Full interactive documentation available at `/docs`.
+
+---
+
+## Dispatchers
+
+Dispatchers are configurable event forwarders. They listen to RFID/runtime events and dispatch payloads to external systems using either HTTP POST or SQL inserts.
+
+### Locations
+
+- **Active dispatchers**: `config/dispatchers/`
+- **Ready-to-use examples**: `examples/dispatchers/`
+
+### Supported dispatch types
+
+| Type   | Purpose                                  |
+| ------ | ---------------------------------------- |
+| `post` | Send events to external HTTP endpoints   |
+| `sql`  | Persist events directly in SQL databases |
+
+### Common event triggers (`on_event`)
+
+- `tag` — tag read events (dict payload with EPC/TID/ANT/RSSI/timestamp)
+- `reading` — reader reading state changes (boolean payload)
+- `connection` — reader connectivity state changes
+- `serial_number` — serial-number oriented events
+
+### Placeholders and filters
+
+- Placeholders are resolved at runtime (examples: `{name}`, `{event_type}`, `{data}`, `{data[epc]}`)
+- For scalar payloads (like `reading`), use `{data}`
+- For dict payloads (like `tag`), use keyed placeholders such as `{data[epc]}`
+- Filters can restrict dispatches by payload/device fields (`eq`, `ne`, `in`, `gt`, `contains`, etc.)
+
+### Example files
+
+- `examples/dispatchers/reading_post.json`
+- `examples/dispatchers/tag_ant_post.json`
+- `examples/dispatchers/reading_sql.json`
+- `examples/dispatchers/serial_number_sql.json`
+
+### Minimal POST example
+
+```json
+{
+  "dispatch_type": "post",
+  "url": "http://localhost:5001/tag",
+  "on_event": "tag",
+  "allow_batches": true,
+  "headers": {
+    "Content-Type": "application/json"
+  },
+  "body": {
+    "device": "{name}",
+    "event_type": "{event_type}",
+    "epc": "{data[epc]}"
+  }
+}
+```
+
+### Minimal SQL example
+
+```json
+{
+  "dispatch_type": "sql",
+  "connection_string": "postgresql+asyncpg://user:password@localhost:5432/mydatabase",
+  "on_event": "reading",
+  "query": "INSERT INTO device_reading_events (device, is_reading) VALUES (:device, :is_reading)",
+  "params": {
+    "device": "{name}",
+    "is_reading": "{data}"
+  }
+}
+```
 
 ---
 
