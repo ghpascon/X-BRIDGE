@@ -47,8 +47,12 @@ class Settings:
 		self.BEEP: bool = data.get('BEEP', False)
 
 		self.CLEAR_OLD_TAGS_INTERVAL: int | None = data.get('CLEAR_OLD_TAGS_INTERVAL', None)
-		if self.CLEAR_OLD_TAGS_INTERVAL is not None and self.CLEAR_OLD_TAGS_INTERVAL <= 0:
-			self.CLEAR_OLD_TAGS_INTERVAL = None
+		if (
+			not isinstance(self.CLEAR_OLD_TAGS_INTERVAL, int)
+			or self.CLEAR_OLD_TAGS_INTERVAL < 0
+			or self.CLEAR_OLD_TAGS_INTERVAL > 3600
+		):
+			self.CLEAR_OLD_TAGS_INTERVAL = 3600  # Default to 1 hour
 
 		self.TAG_PREFIX: str | None | list[str] = data.get('TAG_PREFIX', None)
 
