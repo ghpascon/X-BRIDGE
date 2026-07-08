@@ -50,6 +50,11 @@ manual_hidden = [
 	'uvicorn.loops.auto',
 ]
 
+# Pacotes manuais que às vezes não são detectados automaticamente
+manual_packages = [
+	'smartx_rfid',
+]
+
 
 # === Collect submodules for serial and serial_asyncio ===
 def safe_collect_submodules(pkg_name):
@@ -116,6 +121,16 @@ def collect_all_from_packages(packages):
 # === Read packages from pyproject.toml ===
 packages = get_installed_packages()
 datas, binaries, hiddenimports = collect_all_from_packages(packages)
+
+# Tenta coletar explicitamente pacotes críticos que podem não
+# corresponder exatamente ao nome da distribuição (ex.: smartx-rfid)
+try:
+	m_datas, m_binaries, m_hidden = collect_all_from_packages(manual_packages)
+	datas.extend(m_datas)
+	binaries.extend(m_binaries)
+	hiddenimports = sorted(set(hiddenimports).union(set(m_hidden)))
+except Exception as e:
+	logging.info(f'[WARN] Could not collect manual packages: {e}')
 
 
 # === Add extra folders as data (cross-platform) ===
