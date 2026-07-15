@@ -64,6 +64,7 @@ if __name__ == '__main__':
 		error_html = get_frozen_path('app/templates/start_error.html')
 		url = f'file://{error_html}'
 		webbrowser.open_new(url)
+		asyncio.sleep(1)
 
 	except Exception as e:
 		logging.error(f'Failed to start server: {e}')

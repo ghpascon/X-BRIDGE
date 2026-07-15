@@ -1,5 +1,8 @@
 import logging
 
+from .command import restart_application as _restart_application
+from .command import exit_application as _exit_application
+
 try:
 	from ._main import TrayManager
 	from app.core import settings
@@ -9,27 +12,13 @@ try:
 except Exception as e:
 	logging.warning(f'TrayManager não pôde ser iniciado: {e}\nO sistema continuará sem tray.')
 
-	import os
-	import sys
-	import subprocess
-
 	class DummyTrayManager:
-		def _build_restart_command(self):
-			if getattr(sys, 'frozen', False):
-				return [sys.executable, *sys.argv[1:]]
-			return [sys.executable, *sys.argv]
-
 		def restart_application(self, *args, **kwargs):
 			logging.info('Reiniciando aplicação (dummy, sem tray)')
-			env = os.environ.copy()
-			if getattr(sys, 'frozen', False):
-				env['PYINSTALLER_RESET_ENVIRONMENT'] = '1'
-				env.pop('_MEIPASS2', None)
-			subprocess.Popen(self._build_restart_command(), env=env, cwd=os.getcwd())
-			self.exit_application()
+			_restart_application()
 
 		def exit_application(self, *args, **kwargs):
 			logging.info('Encerrando aplicação (dummy, sem tray)')
-			os._exit(0)
+			_exit_application()
 
 	tray_manager = DummyTrayManager()

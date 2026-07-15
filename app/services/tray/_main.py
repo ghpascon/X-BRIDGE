@@ -1,12 +1,12 @@
 import platform
 from pathlib import Path
-import subprocess
 from threading import Thread
 import time
-import os
 import asyncio
-import sys
 import webbrowser
+
+from .command import restart_application as _restart_application
+from .command import exit_application as _exit_application
 
 try:
 	import pystray
@@ -147,24 +147,10 @@ class TrayManager:
 		url = f'http://localhost:{settings.PORT}'
 		webbrowser.open(url)
 
-	def _build_restart_command(self) -> list[str]:
-		if getattr(sys, 'frozen', False):
-			return [sys.executable, *sys.argv[1:]]
-
-		return [sys.executable, *sys.argv]
-
 	def restart_application(self):
-		env = os.environ.copy()
-
-		if getattr(sys, 'frozen', False):
-			# Force a fresh onefile extraction for the restarted process.
-			env['PYINSTALLER_RESET_ENVIRONMENT'] = '1'
-			env.pop('_MEIPASS2', None)
-
-		subprocess.Popen(self._build_restart_command(), env=env, cwd=os.getcwd())
-		self.exit_application()
+		_restart_application(on_exit=self.exit_application)
 
 	def exit_application(self):
 		if self._icon:
 			self._icon.stop()
-		os._exit(0)
+		_exit_application()
