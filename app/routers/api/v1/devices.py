@@ -364,3 +364,26 @@ async def delete_device(device_name: str):
 	if success:
 		return JSONResponse(content={'status': 'deleted', 'device': device_name})
 	return JSONResponse(content={'status': 'error', 'message': error}, status_code=400)
+
+
+@router.post(
+	'/set_power/{device_name}/{power}',
+	summary='Set device power level',
+	description='Sets the power level of the specified device. Power level should be an integer value.',
+)
+async def set_power(device_name: str, power: int):
+	success, msg = await rfid_manager.devices.set_power(device_name, power)
+	if success:
+		return JSONResponse(
+			status_code=200,
+			content={
+				'message': f"Power level set to {power} for device '{device_name}'.",
+			},
+		)
+	return JSONResponse(
+		status_code=400,
+		content={
+			'message': f"Failed to set power level for device '{device_name}': {msg}",
+			'error': msg,
+		},
+	)
