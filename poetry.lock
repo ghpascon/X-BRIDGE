@@ -85,13 +85,13 @@ reference = "pypi-simple"
 
 [[package]]
 name = "annotated-types"
-version = "0.7.0"
+version = "0.8.0"
 description = "Reusable constraint types to use with typing.Annotated"
 optional = false
-python-versions = ">=3.8"
+python-versions = ">=3.10"
 files = [
-    {file = "annotated_types-0.7.0-py3-none-any.whl", hash = "sha256:1f02e8b43a8fbbc3f3e0d4f0f4bfc8131bcb4eebe8849b8e5c773f3a1c582a53"},
-    {file = "annotated_types-0.7.0.tar.gz", hash = "sha256:aff07c09a53a08bc8cfccb9c85b05f1aa9a2a6f23728d790723543408344ce89"},
+    {file = "annotated_types-0.8.0-py3-none-any.whl", hash = "sha256:f072f4d804ea359e4eaf198b1af7a8b0943881a87f31bb764f8bf219bb9419e0"},
+    {file = "annotated_types-0.8.0.tar.gz", hash = "sha256:13b2beaad985e05e2d6407ee4c4f35590b11f8d693a258a561055cac8f64cab7"},
 ]
 
 [package.source]
@@ -960,17 +960,17 @@ reference = "pypi-simple"
 
 [[package]]
 name = "h2"
-version = "4.3.0"
+version = "4.4.0"
 description = "Pure-Python HTTP/2 protocol implementation"
 optional = false
-python-versions = ">=3.9"
+python-versions = ">=3.10"
 files = [
-    {file = "h2-4.3.0-py3-none-any.whl", hash = "sha256:c438f029a25f7945c69e0ccf0fb951dc3f73a5f6412981daee861431b70e2bdd"},
-    {file = "h2-4.3.0.tar.gz", hash = "sha256:6c59efe4323fa18b47a632221a1888bd7fde6249819beda254aeca909f221bf1"},
+    {file = "h2-4.4.0-py3-none-any.whl", hash = "sha256:6acffe1aeab79098d7eb0f8385c1add11f2c7a94815f6fa2b7060eeddee3d87c"},
+    {file = "h2-4.4.0.tar.gz", hash = "sha256:46b551bdcdc7e83cf5c04d0bf93badb8a939bd2287d9fee1abb23a445b9e0580"},
 ]
 
 [package.dependencies]
-hpack = ">=4.1,<5"
+hpack = ">=4.2,<5"
 hyperframe = ">=6.1,<7"
 
 [package.source]
@@ -1633,13 +1633,13 @@ reference = "pypi-simple"
 
 [[package]]
 name = "prometheus-client"
-version = "0.25.0"
+version = "0.26.0"
 description = "Python client for the Prometheus monitoring system."
 optional = false
 python-versions = ">=3.9"
 files = [
-    {file = "prometheus_client-0.25.0-py3-none-any.whl", hash = "sha256:d5aec89e349a6ec230805d0df882f3807f74fd6c1a2fa86864e3c2279059fed1"},
-    {file = "prometheus_client-0.25.0.tar.gz", hash = "sha256:5e373b75c31afb3c86f1a52fa1ad470c9aace18082d39ec0d2f918d11cc9ba28"},
+    {file = "prometheus_client-0.26.0-py3-none-any.whl", hash = "sha256:fa93d06737aa02bacd05794768508bb97d2fbee28cb3bca04eaae92f0ca953d6"},
+    {file = "prometheus_client-0.26.0.tar.gz", hash = "sha256:04a91bcf94e2cf74a44a1a874d651a2e853ed354b6e822f3b7487751465d5c2b"},
 ]
 
 [package.extras]
@@ -2478,13 +2478,13 @@ reference = "pypi-simple"
 
 [[package]]
 name = "smartx-rfid"
-version = "11.3.0"
+version = "11.3.1"
 description = "SmartX RFID library"
 optional = false
 python-versions = ">=3.11,<4.0"
 files = [
-    {file = "smartx_rfid-11.3.0-py3-none-any.whl", hash = "sha256:c319b41182e540214d6e1948a701cbc2b8d904df9488212d5ca95c764a9fb82e"},
-    {file = "smartx_rfid-11.3.0.tar.gz", hash = "sha256:6239119bc833e06bcf90333e3b686fe2f90805fa92584307592802128c951776"},
+    {file = "smartx_rfid-11.3.1-py3-none-any.whl", hash = "sha256:4d1f179bf875160b7fa35ee8e2e1c883683b6878eebef392d1f31305341a0489"},
+    {file = "smartx_rfid-11.3.1.tar.gz", hash = "sha256:92059bd33e1dd35137abe6ffe90201b02bc3a7231ddbdba8d06ff4f36b5c192e"},
 ]
 
 [package.dependencies]
@@ -3181,4 +3181,4 @@ reference = "pypi-simple"
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.11,<3.15"
-content-hash = "72b1a85be05fcfc7f3aad456b109ee58df828eb59dae6f5172f3d472e478adfe"
+content-hash = "d164d2210d466f8e9a83aaafa2f432aa5e430ce21032a2535793f7cd8cece89e"
