@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 from smartx_rfid.utils.path import get_prefix_from_path
-
+from app.schemas.write_list import WriteListModel
 from app.services import rfid_manager
 
 router_prefix = get_prefix_from_path(__file__)
@@ -25,3 +25,12 @@ async def controller_info():
 		else:
 			info[name] = type(attr).__name__
 	return info
+
+
+@router.post(
+	'/write_list',
+	summary='Write a list of tags to the RFID controller',
+)
+async def write_list(write_list: WriteListModel):
+	rfid_manager.controller.add_list_to_write_list(write_list.epcs, write_list.prefix)
+	return {'message': 'Write list updated successfully'}

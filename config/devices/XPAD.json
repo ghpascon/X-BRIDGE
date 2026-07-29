@@ -5,10 +5,10 @@
   "baudrate": 115200,
   "vid": 1,
   "pid": 1,
-  "buzzer": false,
+  "buzzer": true,
   "session": 0,
   "start_reading": true,
-  "read_power": 27,
+  "read_power": 22,
   "protected_inventory_active": false,
   "protected_inventory_password": "12345678"
 }

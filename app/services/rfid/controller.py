@@ -12,6 +12,7 @@ import asyncio
 from app.core import settings
 import logging
 from app.services.license import license_manager
+from smartx_rfid.schemas.tag import WriteTagValidator
 
 
 class Controller:
@@ -23,6 +24,7 @@ class Controller:
 			dispatches_path=DISPATCHER_PATH,
 			example_path=EXAMPLES_DISPATCHER_PATH,
 		)
+		self.write_list: dict = {}
 
 	# [ EVENTS ]
 	def on_event(self, name: str, event_type: str, event_data):
@@ -57,8 +59,55 @@ class Controller:
 		asyncio.create_task(self.dispatcher.add_async(name=name, event_type='tag', data=tag))
 
 	def on_existing_tag(self, name: str, tag: dict):
+		asyncio.create_task(self.check_target(tag))
 		if settings.ALWAYS_SEND:
 			if not license_manager.validate_license():
 				return
 			asyncio.create_task(self.integration.on_tag_integration(tag=tag))
 			asyncio.create_task(self.dispatcher.add_async(name=name, event_type='tag', data=tag))
+
+	# [ WRITE LIST ]
+	def add_list_to_write_list(self, epcs: list, prefix: str):
+		for epc in epcs:
+			target = f'{prefix}{epc[len(prefix):]}'
+			current_tag = self.tags.get_by_identifier(epc)
+			if current_tag:
+				self.add_to_write_list(current_tag, target)
+			else:
+				logging.error(f'Epc: {epc} not in tags, skipping...')
+
+	def add_to_write_list(self, tag: dict, target: str):
+		self.write_list[tag.get('tid')] = {
+			'target': target,
+		}
+		tag['target'] = target
+		logging.info(f"Added tag {tag.get('tid')} to write list with target {target}")
+
+	def remove_from_write_list(self, tag: dict):
+		tid = tag.get('tid')
+		if tid in self.write_list:
+			del self.write_list[tid]
+			logging.info(f'Removed tag {tid} from write list')
+			if not self.write_list:
+				logging.info('Write list is now empty')
+				return True
+		return False
+
+	async def check_target(self, tag: dict):
+		target = tag.get('target')
+		if not target:
+			return
+		if tag.get('epc') == tag.get('target'):
+			logging.info(f"Tag {tag.get('tid')} already has target EPC, removing from write list")
+			tag['target'] = None
+			self.remove_from_write_list(tag)
+			return
+		await self.devices.write_epc(
+			device_name=tag.get('device'),
+			write_tag=WriteTagValidator(
+				target_identifier='tid',
+				target_value=tag.get('tid'),
+				new_epc=tag.get('target'),
+				password='00000000',
+			),
+		)
