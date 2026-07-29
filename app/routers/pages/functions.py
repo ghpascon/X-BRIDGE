@@ -15,11 +15,20 @@ async def protected_page(request: Request):
 	)
 
 
-@router.get('/write_page', response_class=HTMLResponse)
+@router.get('/write/write_epc', response_class=HTMLResponse)
 async def write_page(request: Request):
 	return templates.TemplateResponse(
 		'pages/write_page/main.html',
 		{'request': request, 'title': 'Write Tags', 'alerts': []},
+		media_type='text/html; charset=utf-8',
+	)
+
+
+@router.get('/write/write_list', response_class=HTMLResponse)
+async def write_list_page(request: Request):
+	return templates.TemplateResponse(
+		'pages/write_page/write_list.html',
+		{'request': request, 'title': 'Write List', 'alerts': []},
 		media_type='text/html; charset=utf-8',
 	)
 
