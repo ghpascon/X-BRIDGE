@@ -82,14 +82,17 @@ class Controller:
 		}
 		tag['target'] = target
 		logging.info(f"Added tag {tag.get('tid')} to write list with target {target}")
+		self.on_event(name='write_list', event_type='add_to_write_list', event_data=tag)
 
 	def remove_from_write_list(self, tag: dict):
 		tid = tag.get('tid')
 		if tid in self.write_list:
 			del self.write_list[tid]
 			logging.info(f'Removed tag {tid} from write list')
+			self.on_event(name='write_list', event_type='remove_from_write_list', event_data=tag)
 			if not self.write_list:
 				logging.info('Write list is now empty')
+				self.on_event(name='write_list', event_type='write_list_empty', event_data={})
 				return True
 		return False
 
