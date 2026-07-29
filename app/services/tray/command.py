@@ -59,6 +59,8 @@ def spawn_detached(cmd: list[str], env: dict | None = None) -> subprocess.Popen:
 		env=env,
 		cwd=os.getcwd(),
 		stdin=subprocess.DEVNULL,
+		stdout=subprocess.DEVNULL,
+		stderr=subprocess.DEVNULL,
 		close_fds=True,
 	)
 
@@ -68,9 +70,11 @@ def spawn_detached(cmd: list[str], env: dict | None = None) -> subprocess.Popen:
 			creationflags |= subprocess.CREATE_NEW_PROCESS_GROUP
 		if hasattr(subprocess, 'DETACHED_PROCESS'):
 			creationflags |= subprocess.DETACHED_PROCESS
+		logging.debug('Spawning detached process on Windows: %s', cmd)
 		return subprocess.Popen(cmd, creationflags=creationflags, **common)
 
 	# POSIX (Linux, macOS)
+	logging.debug('Spawning detached process on POSIX: %s', cmd)
 	return subprocess.Popen(cmd, start_new_session=True, **common)
 
 
