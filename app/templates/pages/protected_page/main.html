@@ -13,15 +13,10 @@
         </h3>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1"
-              >Device <span class="text-red-500">*</span></label
-            >
-            <select
-              x-model="inventoryForm.device_name"
-              @focus="loadDevices"
-              required
-              class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
-            >
+            <label class="block text-sm font-medium text-gray-700 mb-1">Device <span
+                class="text-red-500">*</span></label>
+            <select x-model="inventoryForm.device_name" @focus="loadDevices" required
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
               <option value="">Select device</option>
               <template x-for="device in devices" :key="device">
                 <option :value="device" x-text="device"></option>
@@ -29,14 +24,10 @@
             </select>
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1"
-              >Action <span class="text-red-500">*</span></label
-            >
-            <select
-              x-model="inventoryForm.action"
-              required
-              class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
-            >
+            <label class="block text-sm font-medium text-gray-700 mb-1">Action <span
+                class="text-red-500">*</span></label>
+            <select x-model="inventoryForm.action" required
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
               <option value="">Select action</option>
               <option value="enable">Enable</option>
               <option value="disable">Disable</option>
@@ -44,31 +35,18 @@
           </div>
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1"
-            >Password <span class="text-red-500">*</span></label
-          >
-          <input
-            type="text"
-            x-model="inventoryForm.password"
-            required
-            maxlength="8"
-            class="w-full px-3 py-2 border border-gray-300 rounded-lg font-mono text-sm"
-            placeholder="8 hex chars"
-          />
+          <label class="block text-sm font-medium text-gray-700 mb-1">Password <span
+              class="text-red-500">*</span></label>
+          <input type="text" x-model="inventoryForm.password" required maxlength="8"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg font-mono text-sm" placeholder="8 hex chars" />
         </div>
         <div class="flex gap-3 pt-2">
-          <button
-            type="submit"
-            :disabled="loading"
-            class="flex-1 bg-blue-500 hover:bg-blue-600 disabled:bg-gray-400 text-white font-medium py-2 px-4 rounded-lg text-sm"
-          >
+          <button type="submit" :disabled="loading"
+            class="flex-1 bg-blue-500 hover:bg-blue-600 disabled:bg-gray-400 text-white font-medium py-2 px-4 rounded-lg text-sm">
             <span x-text="loading ? 'Processing...' : 'Send Command'"></span>
           </button>
-          <button
-            type="button"
-            @click="resetInventoryForm"
-            class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium rounded-lg text-sm"
-          >
+          <button type="button" @click="resetInventoryForm"
+            class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium rounded-lg text-sm">
             Reset
           </button>
         </div>
@@ -79,15 +57,10 @@
         <h3 class="text-lg font-semibold mb-2 text-blue-700">Protected Mode</h3>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1"
-              >Device <span class="text-red-500">*</span></label
-            >
-            <select
-              x-model="modeForm.device_name"
-              @focus="loadDevices"
-              required
-              class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
-            >
+            <label class="block text-sm font-medium text-gray-700 mb-1">Device <span
+                class="text-red-500">*</span></label>
+            <select x-model="modeForm.device_name" @focus="loadDevices" required
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
               <option value="">Select device</option>
               <template x-for="device in devices" :key="device">
                 <option :value="device" x-text="device"></option>
@@ -95,15 +68,9 @@
             </select>
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1"
-              >EPC <span class="text-red-500">*</span></label
-            >
-            <select
-              x-model="modeForm.epc"
-              @focus="loadTagsForEpc"
-              required
-              class="w-full px-3 py-2 border border-gray-300 rounded-lg font-mono text-sm"
-            >
+            <label class="block text-sm font-medium text-gray-700 mb-1">EPC <span class="text-red-500">*</span></label>
+            <select x-model="modeForm.epc" @focus="loadTagsForEpc" required
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg font-mono text-sm">
               <option value="">Select EPC</option>
               <template x-for="tag in availableTags" :key="tag">
                 <option :value="tag" x-text="tag"></option>
@@ -111,14 +78,10 @@
             </select>
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1"
-              >Action <span class="text-red-500">*</span></label
-            >
-            <select
-              x-model="modeForm.action"
-              required
-              class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
-            >
+            <label class="block text-sm font-medium text-gray-700 mb-1">Action <span
+                class="text-red-500">*</span></label>
+            <select x-model="modeForm.action" required
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
               <option value="">Select action</option>
               <option value="enable">Enable</option>
               <option value="disable">Disable</option>
@@ -126,31 +89,18 @@
           </div>
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1"
-            >Password <span class="text-red-500">*</span></label
-          >
-          <input
-            type="text"
-            x-model="modeForm.password"
-            required
-            maxlength="8"
-            class="w-full px-3 py-2 border border-gray-300 rounded-lg font-mono text-sm"
-            placeholder="8 hex chars"
-          />
+          <label class="block text-sm font-medium text-gray-700 mb-1">Password <span
+              class="text-red-500">*</span></label>
+          <input type="text" x-model="modeForm.password" required maxlength="8"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg font-mono text-sm" placeholder="8 hex chars" />
         </div>
         <div class="flex gap-3 pt-2">
-          <button
-            type="submit"
-            :disabled="loading"
-            class="flex-1 bg-blue-500 hover:bg-blue-600 disabled:bg-gray-400 text-white font-medium py-2 px-4 rounded-lg text-sm"
-          >
+          <button type="submit" :disabled="loading"
+            class="flex-1 bg-blue-500 hover:bg-blue-600 disabled:bg-gray-400 text-white font-medium py-2 px-4 rounded-lg text-sm">
             <span x-text="loading ? 'Processing...' : 'Send Command'"></span>
           </button>
-          <button
-            type="button"
-            @click="resetModeForm"
-            class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium rounded-lg text-sm"
-          >
+          <button type="button" @click="resetModeForm"
+            class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium rounded-lg text-sm">
             Reset
           </button>
         </div>
@@ -250,7 +200,7 @@
           const data = await res.json();
           showAlert(
             data.message ||
-              (res.ok ? "Command sent!" : "Failed to send command"),
+            (res.ok ? "Command sent!" : "Failed to send command"),
             res.ok ? "success" : "error",
           );
         } catch (e) {
@@ -268,8 +218,8 @@
             showAlert("Password must be 8 hex characters", "error");
             return;
           }
-          if (!/^[0-9a-fA-F]{24}$/.test(this.modeForm.epc)) {
-            showAlert("EPC must be 24 hex characters", "error");
+          if (!/^[0-9a-fA-F]{1,24}$/.test(this.modeForm.epc)) {
+            showAlert("EPC must be 1-24 hex characters", "error");
             return;
           }
           // Converter ação para booleano de forma robusta
@@ -300,7 +250,7 @@
           const data = await res.json();
           showAlert(
             data.message ||
-              (res.ok ? "Command sent!" : "Failed to send command"),
+            (res.ok ? "Command sent!" : "Failed to send command"),
             res.ok ? "success" : "error",
           );
         } catch (e) {

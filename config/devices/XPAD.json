@@ -8,7 +8,7 @@
   "buzzer": true,
   "session": 0,
   "start_reading": true,
-  "read_power": 22,
+  "read_power": 15,
   "protected_inventory_active": false,
   "protected_inventory_password": "12345678"
 }

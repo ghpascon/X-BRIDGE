@@ -1,6 +1,7 @@
 import re
 
 from pydantic import BaseModel, Field, ValidationInfo, field_validator
+from smartx_rfid.utils.regex import regex_hex
 
 
 class TagListSimulator(BaseModel):
@@ -9,9 +10,7 @@ class TagListSimulator(BaseModel):
 
 	@field_validator('start_epc')
 	def validate_epc_length_and_hex(cls, v, info: ValidationInfo):
-		if len(v) != 24:
-			raise ValueError(f'{info.field_name} must have exactly 24 characters')
-		if not re.fullmatch(r'[0-9a-fA-F]{24}', v):
+		if not regex_hex(v):
 			raise ValueError(
 				f'{info.field_name} must contain only hexadecimal characters (0-9, a-f)'
 			)
