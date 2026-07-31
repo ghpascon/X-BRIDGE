@@ -57,47 +57,75 @@ docs/                 API documentation assets
 
 ### `config/config.json`
 
-| Field                     | Type        | Default    | Description                                        |
-| ------------------------- | ----------- | ---------- | -------------------------------------------------- |
-| `TITLE`                   | string      | `"SMARTX"` | Application title                                  |
-| `PORT`                    | int         | `5000`     | HTTP server port                                   |
-| `LOG_PATH`                | string      | `"Logs"`   | Directory for log files                            |
-| `DATABASE_URL`            | string      | `null`     | SQLAlchemy DB URL (SQLite/MySQL/PostgreSQL)        |
-| `WEBHOOK_URL`             | string      | `null`     | Webhook endpoint for tag events                    |
-| `XTRACK_URL`              | string      | `null`     | XTRACK integration URL                             |
-| `TAG_PREFIX`              | string/list | `null`     | Accept only tags with this prefix (single or list) |
-| `STORAGE_DAYS`            | int         | `7`        | Days to retain tag/event records                   |
-| `CLEAR_OLD_TAGS_INTERVAL` | int         | `null`     | Seconds between automatic tag memory clears        |
-| `ALWAYS_SEND`             | bool        | `false`    | Forward all tags to integrations, even duplicates  |
-| `BEEP`                    | bool        | `false`    | Play beep sound on new tag read                    |
-| `OPEN_BROWSER`            | bool        | `true`     | Auto-open browser on startup                       |
+| Field                     | Type        | Default (code) / Example file   | Description                                                                                                                                                                      |
+| ------------------------- | ----------- | ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `TITLE`                   | string      | `SMARTX` / `SMARTX`             | Application title                                                                                                                                                                |
+| `PORT`                    | int         | `5000` / `5000`                 | HTTP server port                                                                                                                                                                 |
+| `LOG_PATH`                | string      | `Logs` / (example path)         | Directory for log files                                                                                                                                                          |
+| `DATABASE_URL`            | string      | `null` / `null`                 | SQLAlchemy DB URL (SQLite/MySQL/PostgreSQL)                                                                                                                                      |
+| `WEBHOOK_URL`             | string      | `null` / `null`                 | Webhook endpoint for tag events                                                                                                                                                  |
+| `XTRACK_URL`              | string      | `null` / `null`                 | XTRACK integration URL                                                                                                                                                           |
+| `TAG_PREFIX`              | string/list | `null` / `null`                 | Accept only tags with this prefix (single or list)                                                                                                                               |
+| `STORAGE_DAYS`            | int         | `7` / `7`                       | Days to retain tag/event records                                                                                                                                                 |
+| `CLEAR_OLD_TAGS_INTERVAL` | int         | `3600 (code) / null (example)`  | Seconds between automatic tag memory clears; if set to `null` or an invalid value the application defaults to `3600` seconds (1 hour).                                           |
+| `ALWAYS_SEND`             | bool        | `false` / `false`               | Forward all tags to integrations, even duplicates                                                                                                                                |
+| `BEEP`                    | bool        | `false` / `false`               | Play beep sound on new tag read                                                                                                                                                  |
+| `OPEN_BROWSER`            | bool        | `true (code) / false (example)` | Auto-open browser on startup. Note: the repository `config/config.json` example sets `OPEN_BROWSER` to `false`; when no config file is present the code-level default is `true`. |
 
 ### `config/devices/*.json`
 
 Each file defines one RFID reader (protocol, antennas, read power, events, etc). See `examples/devices/` for templates covering TCP, Serial, X714, R700, XPAD, ACUPAD, and SATO readers.
 
----
+## Note: The values shown under "Default (code)" are applied when no configuration file is present. The application always loads values from `config/config.json` at runtime, so edit that file to change behavior in your deployment.
+
+## Quickstart
+
+1. Install dependencies and start the application locally:
+
+```bash
+poetry install
+poetry run python main.py
+```
+
+2. Open your browser at `http://localhost:5000` (unless `OPEN_BROWSER` is disabled in `config/config.json`).
 
 ## Installation & Running
+
+Install dependencies and common commands:
 
 ```bash
 # Install dependencies
 poetry install
 
-# Run the application
+# Run the application (recommended)
 poetry run python main.py
 
-# Build standalone executable
+# Alternative (development) using uvicorn with autoreload
+uvicorn main:app --reload --host 0.0.0.0 --port 5000
+
+# Build standalone executable (requires PyInstaller)
 poetry run python scripts/build_exe.py
 
-# Run database migrations
+# Run database migrations (interactive helper)
 poetry run python scripts/migrate.py
 
 # Run tests
 poetry run pytest
 ```
 
----
+### Docker
+
+Build and run using the included `Dockerfile`:
+
+```bash
+# Build image (from repo root)
+docker build -t x-bridge .
+
+# Run container and map port 5000
+docker run -it --rm -p 5000:5000 x-bridge
+```
+
+## When running in Docker you may want to mount a persistent `config/` and `Logs/` folder via `-v` mounts.
 
 ## API Groups
 
@@ -192,7 +220,7 @@ Dispatchers are configurable event forwarders. They listen to RFID/runtime event
 
 | Layer           | Technology                        |
 | --------------- | --------------------------------- |
-| Runtime         | Python ≥3.11                      |
+| Runtime         | Python >=3.11, <3.15              |
 | Package manager | Poetry                            |
 | Web framework   | FastAPI + Uvicorn                 |
 | Database ORM    | SQLAlchemy + Alembic              |
@@ -206,3 +234,9 @@ Dispatchers are configurable event forwarders. They listen to RFID/runtime event
 | Linter          | Ruff                              |
 | Testing         | Pytest                            |
 | Build           | PyInstaller                       |
+
+---
+
+## Contributing
+
+See `CONTRIBUTING.md` for development setup, testing, and code-style guidelines.

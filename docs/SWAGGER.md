@@ -2,72 +2,77 @@
 
 # SMARTX X-BRIDGE
 
+**Versão:** 9.5.0
+
 [**HOME**](/) | [**LOGS**](/logs) | [**API DOCS**](/docs)
 
-**SMARTX X-BRIDGE** is a professional RFID device management platform focused on high performance, real-time monitoring, and seamless integration with business systems.
+SMARTX X-BRIDGE é uma plataforma de gestão de dispositivos RFID orientada para alto desempenho, integração com sistemas externos e operação em tempo real.
 
 ---
 
-## How It Works
+## Visão geral da API
 
-X-BRIDGE acts as middleware between physical RFID readers and your management systems. It connects to one or more readers, processes incoming tag data in real time, applies filtering and validation rules, and forwards events to configured integrations.
+Esta página traz uma visão geral dos grupos de endpoints expostos pela aplicação. A documentação interativa (Swagger UI) gerada automaticamente pelo FastAPI está disponível em `/docs` e inclui esquemas, tipos e exemplos. Aqui mantemos apenas um panorama sem exemplos de payloads.
 
-**Data flow:**
-
-1. **Configuration** — Define devices and application parameters
-2. **Connection** — Automatic connection and reconnection to readers
-3. **Processing** — Real-time tag capture, duplicate filtering, and EPC/TID validation
-4. **Storage** — Persistent records with configurable retention policy
-5. **Integration** — Forward data to webhook endpoints, MQTT broker, XTRACK, or external database
-6. **Monitoring** — Structured logs, Prometheus metrics, and live web dashboard
+Ambiente local padrão: `http://localhost:5000`
 
 ---
 
-## API Groups
+## Acessando a documentação interativa
 
-### RFID — `/api/v1/rfid`
+- Swagger UI: `/docs` — interface interativa para explorar e testar endpoints.
+- ReDoc: `/redoc` — documentação orientada à leitura.
 
-Read and query tag data from memory. Retrieve full tag objects, EPCs, TIDs, GTIN statistics, and tag counts. Supports clearing in-memory tag lists per device or globally, and writing new EPCs directly to tags.
-
-### Devices — `/api/v1/devices`
-
-List and inspect all registered RFID readers. Retrieve individual device configuration, current status, connection info, and supported device type templates.
-
-### Application — `/api/v1/application`
-
-Manage runtime application settings and device configuration files. Supports full CRUD for device configs, reading and updating global settings, checking for unsaved changes, and triggering restart or shutdown.
-
-### Simulator — `/api/v1/simulator`
-
-Inject synthetic tag and event data without physical hardware. Supports single tags, batches, generic events, and GTIN-14 tag generation — useful for development, testing, and demos.
-
-### Receive — `/api/v1/receive`
-
-Ingest tag and event data pushed by external readers or integrations. Supports generic tag/event payloads as well as device-specific formats (X714, R700, XSCAN).
-
-### License — `/api/v1/license`
-
-Retrieve current license information and upload a new license string.
-
-### Controller — `/api/v1/controller`
-
-Expose runtime information about the active RFID controller instance.
+> A documentação automática é gerada a partir dos roteadores em `app/routers/api/v1` e dos schemas Pydantic.
 
 ---
 
-## Integration Options
+## Base da API
 
-- **Webhook** — HTTP POST to a configured URL on every new tag event, with automatic retry
-- **XTRACK** — Send data directly to a SMARTX XTRACK server
-- **Database** — Persist all tags and events to SQLite, MySQL, or PostgreSQL via SQLAlchemy
+- Prefixo base: `/api/v1`
+- Host padrão: `0.0.0.0` (executando localmente)
+- Porta: configurada em `config/config.json` (padrão `5000`)
 
 ---
 
-## Testing & Simulation
+## Grupos de API
 
-The Simulator group lets you validate your full integration pipeline without any RFID hardware:
+- **RFID** — `/api/v1/rfid`
+  - Operações de leitura e consulta de tags em memória: listagem, estatísticas (GTIN), leitura de EPC/TID, limpeza de memória e escrita de EPC.
 
-- Inject individual tags or bulk lists
-- Simulate GPI/GPO events and custom event payloads
-- Generate valid GTIN-14 EPC codes for barcode-to-RFID workflows
-- Run load tests with large tag volumes
+- **Devices** — `/api/v1/devices`
+  - Gerenciamento dos leitores registrados: listagem, visualização e atualização de configurações por dispositivo, status e informações de conexão.
+
+- **Application** — `/api/v1/application`
+  - Endpoints para gerenciar configurações da aplicação, arquivos de configuração de dispositivos, checar alterações não salvas e operações de controle (restart/shutdown).
+
+- **Simulator** — `/api/v1/simulator`
+  - Injeção de dados sintéticos (tags, batches, eventos) e geração de GTIN‑14 para testes e demonstrações sem hardware.
+
+- **Receive** — `/api/v1/receive`
+  - Recepção de eventos enviados por leitores externos ou integrações (formatos genéricos e específicos de dispositivo).
+
+- **License** — `/api/v1/license`
+  - Recuperar informações de licença e enviar/atualizar a licença.
+
+- **Controller** — `/api/v1/controller`
+  - Informações de runtime sobre a instância do controlador RFID e seu estado operacional.
+
+---
+
+## Integrações e dispatchers
+
+- Webhook: encaminhamento via HTTP POST com retry (configurável).
+- XTRACK: integração dedicada com servidor XTRACK.
+- Banco de dados: persistência via SQLAlchemy (SQLite/MySQL/Postgres).
+- Arquivos de configuração de dispatchers: `config/dispatchers/` (exemplos em `examples/dispatchers/`).
+
+---
+
+## Observações
+
+- Esta é uma visão geral; para detalhes (schemas, validação, exemplos) use `/docs`.
+- Autenticação, permissões e middlewares podem ser aplicados a alguns endpoints — verifique `app/routers` e `app/core/middleware.py` quando necessário.
+- Mantenha `pyproject.toml`, `docs/version.txt` e o `README.md` sincronizados com a versão do projeto.
+
+---
