@@ -6,73 +6,55 @@
 
 [**HOME**](/) | [**LOGS**](/logs) | [**API DOCS**](/docs)
 
-SMARTX X-BRIDGE é uma plataforma de gestão de dispositivos RFID orientada para alto desempenho, integração com sistemas externos e operação em tempo real.
+Plataforma de gestão de leitores RFID e roteamento de eventos. Abaixo estão os grupos de endpoints disponíveis expostos pela API REST.
 
 ---
 
-## Visão geral da API
+Base da API
 
-Esta página traz uma visão geral dos grupos de endpoints expostos pela aplicação. A documentação interativa (Swagger UI) gerada automaticamente pelo FastAPI está disponível em `/docs` e inclui esquemas, tipos e exemplos. Aqui mantemos apenas um panorama sem exemplos de payloads.
+- Prefixo: `/api/v1`
+- Host/porta padrão (local): `http://localhost:5000` (porta configurável em `config/config.json`)
 
-Ambiente local padrão: `http://localhost:5000`
+Observações rápidas
 
----
-
-## Acessando a documentação interativa
-
-- Swagger UI: `/docs` — interface interativa para explorar e testar endpoints.
-- ReDoc: `/redoc` — documentação orientada à leitura.
-
-> A documentação automática é gerada a partir dos roteadores em `app/routers/api/v1` e dos schemas Pydantic.
+- Esta descrição é mostrada na página `/docs` (Swagger UI) acima das rotas.
+- Use os schemas e exemplos fornecidos por cada rota para validar entradas/saídas.
+- Alguns endpoints podem exigir autenticação ou permissões — verifique `app/core/middleware.py` e os routers.
 
 ---
 
-## Base da API
-
-- Prefixo base: `/api/v1`
-- Host padrão: `0.0.0.0` (executando localmente)
-- Porta: configurada em `config/config.json` (padrão `5000`)
-
----
-
-## Grupos de API
+Grupos de endpoints
 
 - **RFID** — `/api/v1/rfid`
-  - Operações de leitura e consulta de tags em memória: listagem, estatísticas (GTIN), leitura de EPC/TID, limpeza de memória e escrita de EPC.
+  - Operações de leitura/consulta de tags em memória: listagem, estatísticas (GTIN), EPC/TID, limpeza de memória e escrita de EPC.
 
 - **Devices** — `/api/v1/devices`
-  - Gerenciamento dos leitores registrados: listagem, visualização e atualização de configurações por dispositivo, status e informações de conexão.
+  - Gerenciamento de leitores: listagem, visualização/atualização de configurações, status e informações de conexão.
 
 - **Application** — `/api/v1/application`
-  - Endpoints para gerenciar configurações da aplicação, arquivos de configuração de dispositivos, checar alterações não salvas e operações de controle (restart/shutdown).
+  - Gerenciamento das configurações da aplicação, arquivos de dispositivo e operações de controle (restart/shutdown).
 
 - **Simulator** — `/api/v1/simulator`
-  - Injeção de dados sintéticos (tags, batches, eventos) e geração de GTIN‑14 para testes e demonstrações sem hardware.
+  - Injeção de dados sintéticos (tags, lotes, eventos) e geração de GTIN‑14 para testes sem hardware.
 
 - **Receive** — `/api/v1/receive`
-  - Recepção de eventos enviados por leitores externos ou integrações (formatos genéricos e específicos de dispositivo).
+  - Recepção de eventos enviados por leitores ou integrações externas (formatos genéricos e específicos).
 
 - **License** — `/api/v1/license`
-  - Recuperar informações de licença e enviar/atualizar a licença.
+  - Consulta e envio/atualização de licença.
 
 - **Controller** — `/api/v1/controller`
-  - Informações de runtime sobre a instância do controlador RFID e seu estado operacional.
+  - Informações de runtime e estado do controlador RFID.
 
 ---
 
-## Integrações e dispatchers
+Integrações e dispatchers
 
-- Webhook: encaminhamento via HTTP POST com retry (configurável).
-- XTRACK: integração dedicada com servidor XTRACK.
-- Banco de dados: persistência via SQLAlchemy (SQLite/MySQL/Postgres).
-- Arquivos de configuração de dispatchers: `config/dispatchers/` (exemplos em `examples/dispatchers/`).
-
----
-
-## Observações
-
-- Esta é uma visão geral; para detalhes (schemas, validação, exemplos) use `/docs`.
-- Autenticação, permissões e middlewares podem ser aplicados a alguns endpoints — verifique `app/routers` e `app/core/middleware.py` quando necessário.
-- Mantenha `pyproject.toml`, `docs/version.txt` e o `README.md` sincronizados com a versão do projeto.
+- Webhooks HTTP com retry configurável
+- Integração XTRACK
+- Persistência via SQLAlchemy (SQLite/MySQL/Postgres)
+- Arquivos de dispatcher: `config/dispatchers/` (exemplos em `examples/dispatchers/`)
 
 ---
+
+Para detalhes de schemas, parâmetros e códigos de resposta, utilize a interface interativa em `/docs`.
