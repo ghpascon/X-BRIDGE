@@ -67,7 +67,7 @@ class Controller:
 			asyncio.create_task(self.dispatcher.add_async(name=name, event_type='tag', data=tag))
 
 	# [ WRITE LIST ]
-	def add_list_to_write_list(self, epcs: list, prefix: str):
+	def create_write_list_prefix(self, epcs: list, prefix: str):
 		for epc in epcs:
 			target = f'{prefix}{epc[len(prefix):]}'
 			current_tag = self.tags.get_by_identifier(epc)
@@ -75,6 +75,7 @@ class Controller:
 				self.add_to_write_list(current_tag, target)
 			else:
 				logging.error(f'Epc: {epc} not in tags, skipping...')
+		return self.write_list
 
 	def add_to_write_list(self, tag: dict, target: str):
 		self.write_list[tag.get('tid')] = {
@@ -95,6 +96,11 @@ class Controller:
 				self.on_event(name='write_list', event_type='write_list_empty', event_data={})
 				return True
 		return False
+
+	def clear_write_list(self):
+		self.write_list.clear()
+		logging.info('Cleared write list')
+		self.on_event(name='write_list', event_type='write_list_cleared', event_data={})
 
 	async def check_target(self, tag: dict):
 		target = tag.get('target')

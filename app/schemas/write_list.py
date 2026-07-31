@@ -2,7 +2,7 @@ from pydantic import BaseModel, Field, field_validator
 from smartx_rfid.utils.regex import regex_hex
 
 
-class WriteListModel(BaseModel):
+class WriteListPrefixModel(BaseModel):
 	epcs: list[str] = Field(
 		['000000000000000000000001', '000000000000000000000002'],
 		description='List of tags to be written',
