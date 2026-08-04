@@ -5,7 +5,7 @@
   "baudrate": 115200,
   "vid": 1,
   "pid": 1,
-  "buzzer": true,
+  "buzzer": false,
   "session": 0,
   "start_reading": true,
   "read_power": 15,
