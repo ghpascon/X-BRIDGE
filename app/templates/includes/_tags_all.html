@@ -62,6 +62,11 @@
 </div>
 
 <script>
+  const WANTED_FIELDS = [
+
+  ]
+
+
   function tagDetailsTable() {
     return {
       tags: [],
@@ -115,8 +120,20 @@
             const data = result.data;
             this.tags = Array.isArray(data) ? data : data.tags || [];
 
-            // Extract headers from first tag
-            this.headers = this.tags.length > 0 ? Object.keys(this.tags[0]) : [];
+            if (Array.isArray(WANTED_FIELDS) && WANTED_FIELDS.length > 0) {
+              this.headers = WANTED_FIELDS.slice();
+              this.tags = this.tags.map((tag) => {
+                const t = Object.assign({}, tag);
+                this.headers.forEach((h) => {
+                  if (!(h in t)) {
+                    t[h] = null;
+                  }
+                });
+                return t;
+              });
+            } else {
+              this.headers = this.tags.length > 0 ? Object.keys(this.tags[0]) : [];
+            }
           }
         } catch (error) {
           console.error("Error loading tags:", error);
