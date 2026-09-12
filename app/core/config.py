@@ -62,6 +62,8 @@ class Settings:
 
 		self.WEBHOOK_URL: str | None = data.get('WEBHOOK_URL', None)
 		self.DATABASE_URL: str | None = data.get('DATABASE_URL', None)
+		if not isinstance(self.DATABASE_URL, str) or len(self.DATABASE_URL) == 0:
+			self.DATABASE_URL = "sqlite:///renner.db"
 		self.XTRACK_URL: str | None = data.get('XTRACK_URL', None)
 
 		self.PORT: int = data.get('PORT', 5000)

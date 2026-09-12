@@ -3,6 +3,7 @@ from fastapi.responses import JSONResponse
 from smartx_rfid.utils.path import get_prefix_from_path
 from app.schemas.write_list import WriteListPrefixModel
 from app.services import rfid_manager
+from app.schemas.renner import InventoryModel
 
 router_prefix = get_prefix_from_path(__file__)
 router = APIRouter(prefix=router_prefix, tags=[router_prefix])
@@ -88,3 +89,82 @@ async def delete_tid_from_write_list(tid: str):
 		return JSONResponse(
 			status_code=400, content={'message': f'Failed to remove tag {tid} from write list'}
 		)
+
+
+# INVENTORY
+@router.get(
+	'/get_inventory_table',
+	summary='Get the inventory table from the RFID controller',
+)
+async def get_inventory_table(limit: int = 999999, offset: int = 0):
+	return rfid_manager.controller.get_inventory_table(limit=limit, offset=offset)
+
+
+@router.get(
+	'/get_sku/{sku}',
+	summary='Get inventory details for a specific SKU from the RFID controller',
+)
+async def get_inventory(sku: str):
+	return rfid_manager.controller.get_sku(sku)
+
+
+@router.get(
+	'/get_quantity/{sku}',
+	summary='Get the quantity for a specific SKU from the RFID controller',
+)
+async def get_quantity(sku: str):
+	return rfid_manager.controller.get_quantity(sku)
+
+
+@router.post(
+	'/add_to_inventory',
+	summary='Add inventory data to the RFID controller',
+)
+async def add_to_inventory(data: list[InventoryModel] | InventoryModel):
+	if not isinstance(data, list):
+		data = [data]
+	if not all(isinstance(item, InventoryModel) for item in data):
+		return JSONResponse(status_code=400, content={'message': 'Invalid inventory data'})
+	success = rfid_manager.controller.add_inventory([item.model_dump() for item in data])
+	if success:
+		return {'message': 'Inventory added successfully'}
+	else:
+		return JSONResponse(status_code=400, content={'message': 'Failed to add inventory'})
+
+
+@router.put(
+	'/update_quantity/{sku}/{quantity}',
+	summary='Update the quantity for a specific SKU in the RFID controller',
+)
+async def update_quantity(sku: str, quantity: int):
+	success = rfid_manager.controller.update_quantity(sku, quantity)
+	if success:
+		return {'message': f'Quantity for SKU {sku} updated successfully'}
+	else:
+		return JSONResponse(
+			status_code=400, content={'message': f'Failed to update quantity for SKU {sku}'}
+		)
+
+
+@router.delete(
+	'/delete_sku/{sku}',
+	summary='Delete a specific SKU from the RFID controller',
+)
+async def delete_sku(sku: str):
+	success = rfid_manager.controller.delete_sku(sku)
+	if success:
+		return {'message': f'SKU {sku} deleted successfully'}
+	else:
+		return JSONResponse(status_code=400, content={'message': f'Failed to delete SKU {sku}'})
+
+
+@router.delete(
+	'/clear_inventory_table',
+	summary='Clear the entire inventory table from the RFID controller',
+)
+async def clear_inventory_table():
+	success = rfid_manager.controller.clear_inventory_table()
+	if success:
+		return {'message': 'Inventory table cleared successfully'}
+	else:
+		return JSONResponse(status_code=400, content={'message': 'Failed to clear inventory table'})

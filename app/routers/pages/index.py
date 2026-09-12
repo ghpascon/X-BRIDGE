@@ -37,6 +37,15 @@ async def index(request: Request):
 	)
 
 
+@router.get('/inventory_table', response_class=HTMLResponse)
+async def inventory_table(request: Request):
+	return templates.TemplateResponse(
+		'pages/inventory/main.html',
+		{'request': request, 'title': 'Inventário'},
+		media_type='text/html; charset=utf-8',
+	)
+
+
 @router.get('/docs', response_class=HTMLResponse)
 async def docs():
 	return get_swagger_ui_html(

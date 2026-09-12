@@ -1,0 +1,581 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto p-6">
+  <div class="flex w-full mb-4">
+    <div class="w-full">
+      <div class="bg-white p-4 rounded shadow">
+        <div class="flex items-center justify-end space-x-2">
+          <button id="refreshBtn" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Refresh</button>
+          <button id="clearBtn" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">Clear
+            Inventory</button>
+          <button id="openImportBtn" class="px-4 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700">Import
+            CSV/Excel</button>
+        </div>
+
+        <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <h3 class="font-medium mb-2">Quick Add</h3>
+            <form id="addForm" class="space-y-2" onsubmit="return false;">
+              <div>
+                <label class="block text-sm font-medium">SKU</label>
+                <input id="addSku" class="w-full mt-1 p-2 border rounded" placeholder="e.g. SKU123" />
+              </div>
+              <div>
+                <label class="block text-sm font-medium">Quantity</label>
+                <input id="addQuantity" type="number" min="0" class="w-full mt-1 p-2 border rounded" placeholder="0" />
+              </div>
+              <div class="flex space-x-2">
+                <button id="addBtn" class="px-3 py-2 bg-green-600 text-white rounded">Add</button>
+                <button id="addBulkParse" class="px-3 py-2 bg-gray-200 rounded">Parse Bulk</button>
+              </div>
+              <div>
+                <label class="block text-sm font-medium mt-2">Bulk (one per line: sku,quantity)</label>
+                <textarea id="bulkArea" rows="3" class="w-full mt-1 p-2 border rounded"
+                  placeholder="SKU1,10\nSKU2,5"></textarea>
+              </div>
+            </form>
+          </div>
+
+          <div>
+            <h3 class="font-medium mb-2">Actions & Lookup</h3>
+            <div class="space-y-2">
+              <input id="lookupSku" class="w-full mt-1 p-2 border rounded" placeholder="SKU to lookup" />
+              <div class="flex items-center space-x-2">
+                <button id="btnGetSku" class="px-3 py-2 bg-blue-500 text-white rounded">Get SKU</button>
+                <button id="btnGetQty" class="px-3 py-2 bg-yellow-500 text-white rounded">Get Quantity</button>
+              </div>
+              <div id="infoBox" class="bg-gray-50 p-3 rounded text-sm hidden"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Inventory table (full width, below actions) -->
+  <div class="bg-white p-4 rounded shadow">
+    <h2 class="font-medium mb-2">Inventory Table</h2>
+    <div class="overflow-x-auto">
+      <table id="inventoryTable" class="w-full text-left border-collapse">
+        <thead>
+          <tr class="bg-slate-100">
+            <th class="p-2 border">SKU</th>
+            <th class="p-2 border">Quantity</th>
+            <th class="p-2 border">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="inventoryBody">
+          <tr>
+            <td colspan="3" class="p-4 text-center text-gray-500">Loading...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Import modal & helpers (inserted here) -->
+  <div id="importModal" class="fixed inset-0 z-50 hidden items-center justify-center">
+    <div class="absolute inset-0 bg-black/40"></div>
+    <div class="relative bg-white w-full max-w-3xl p-6 rounded shadow-lg z-10">
+      <div class="flex items-start justify-between">
+        <div>
+          <h3 class="text-lg font-semibold">Import CSV / Excel</h3>
+          <p class="text-sm text-gray-500">Drag & drop or choose a file. Map columns and preview before importing.</p>
+        </div>
+        <button id="closeImportBtn" class="text-gray-500 hover:text-gray-700">Close</button>
+      </div>
+
+      <div class="mt-4 space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium">File</label>
+            <div id="dropZone"
+              class="mt-1 p-4 border-2 border-dashed border-gray-200 rounded text-center text-sm text-gray-600">Drop
+              file here or <label class="text-blue-600 cursor-pointer"><input id="importFile" type="file"
+                  accept=".csv,.txt,.xls,.xlsx" class="hidden" />choose</label></div>
+          </div>
+          <div>
+            <label class="block text-sm font-medium">Detected separator</label>
+            <select id="sepSelect" class="w-full mt-1 p-2 border rounded"></select>
+            <label class="flex items-center mt-2"><input id="hasHeader" type="checkbox" class="mr-2" checked /> First
+              row is header</label>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium">SKU column</label>
+            <select id="colSku" class="w-full mt-1 p-2 border rounded"></select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium">Quantity column</label>
+            <select id="colQty" class="w-full mt-1 p-2 border rounded"></select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium">Preview</label>
+          <div class="overflow-x-auto mt-2 border rounded">
+            <table id="previewTable" class="w-full text-left text-sm">
+              <thead id="previewHead"></thead>
+              <tbody id="previewBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="flex justify-end space-x-2">
+          <button id="doImportBtn" class="px-4 py-2 bg-emerald-600 text-white rounded">Import</button>
+          <button id="cancelImportBtn" class="px-4 py-2 bg-gray-200 rounded">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Include parsing libraries -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+  <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+
+  <div id="message" class="fixed bottom-6 right-6"></div>
+</div>
+
+<script>
+  (function () {
+    const API_BASE = '/api/v1/controller';
+    const $ = sel => document.querySelector(sel);
+    const $$ = sel => document.querySelectorAll(sel);
+    const messageEl = $('#message');
+    const infoBox = $('#infoBox');
+
+    function showMessage(text, type = 'info', timeout = 4000) {
+      const color = type === 'error' ? 'bg-red-500' : (type === 'success' ? 'bg-green-500' : 'bg-blue-500');
+      const el = document.createElement('div');
+      el.className = `${color} text-white px-4 py-2 rounded shadow mb-2`;
+      el.textContent = text;
+      messageEl.appendChild(el);
+      setTimeout(() => {
+        el.remove();
+      }, timeout);
+    }
+
+    async function request(path, opts = {}) {
+      const url = API_BASE + path;
+      const init = Object.assign({ headers: {} }, opts);
+      if (init.body && !(init.body instanceof FormData)) {
+        init.headers['Content-Type'] = 'application/json';
+        init.body = JSON.stringify(init.body);
+      }
+      const res = await fetch(url, init);
+      const contentType = res.headers.get('content-type') || '';
+      if (!res.ok) {
+        const txt = contentType.includes('application/json') ? await res.json() : await res.text();
+        throw new Error((txt && txt.message) ? txt.message : JSON.stringify(txt));
+      }
+      if (contentType.includes('application/json')) {
+        return res.json();
+      }
+      return res.text();
+    }
+
+    async function loadInventory() {
+      try {
+        const data = await request('/get_inventory_table?limit=999999&offset=0');
+        renderTable(data || []);
+      } catch (err) {
+        showMessage('Falha ao carregar inventário: ' + err.message, 'error');
+        renderTable([]);
+      }
+    }
+
+    function renderTable(items) {
+      const body = $('#inventoryBody');
+      body.innerHTML = '';
+      if (!items || items.length === 0) {
+        body.innerHTML = '<tr><td colspan="3" class="p-4 text-center text-gray-500">No items</td></tr>';
+        return;
+      }
+      for (const item of items) {
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-slate-50';
+        const sku = item.sku ?? item['SKU'] ?? item['Sku'] ?? '';
+        const qty = (item.quantity ?? item['quantity'] ?? 0);
+        tr.innerHTML = `
+				<td class="p-2 border align-top">${escapeHtml(sku)}</td>
+				<td class="p-2 border align-top"><span data-sku="${escapeHtml(sku)}">${qty}</span></td>
+				<td class="p-2 border align-top">
+					<div class="flex space-x-2">
+						<button class="btn-edit px-2 py-1 bg-yellow-400 text-white rounded" data-sku="${escapeHtml(sku)}">Edit</button>
+						<button class="btn-delete px-2 py-1 bg-red-500 text-white rounded" data-sku="${escapeHtml(sku)}">Delete</button>
+					</div>
+				</td>
+			`;
+        body.appendChild(tr);
+      }
+
+      // attach handlers
+      $$('.btn-edit').forEach(b => b.addEventListener('click', async (e) => {
+        const sku = e.currentTarget.dataset.sku;
+        const newQty = prompt('New quantity for ' + sku);
+        if (newQty === null) return;
+        const q = parseInt(newQty, 10);
+        if (isNaN(q) || q < 0) { showMessage('Quantidade inválida', 'error'); return; }
+        try {
+          await request(`/update_quantity/${encodeURIComponent(sku)}/${q}`, { method: 'PUT' });
+          showMessage('Quantidade atualizada', 'success');
+          await loadInventory();
+        } catch (err) { showMessage('Erro: ' + err.message, 'error'); }
+      }));
+
+      $$('.btn-delete').forEach(b => b.addEventListener('click', async (e) => {
+        const sku = e.currentTarget.dataset.sku;
+        if (!confirm(`Confirma exclusão do SKU ${sku}?`)) return;
+        try {
+          await request(`/delete_sku/${encodeURIComponent(sku)}`, { method: 'DELETE' });
+          showMessage('SKU deletado', 'success');
+          await loadInventory();
+        } catch (err) { showMessage('Erro: ' + err.message, 'error'); }
+      }));
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str).replace(/[&<>\"']/g, s => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": "&#39;" }[s]));
+    }
+
+    // Form handlers
+    $('#addBtn').addEventListener('click', async (e) => {
+      const sku = $('#addSku').value.trim();
+      const qty = parseInt($('#addQuantity').value.trim() || '0', 10);
+      if (!sku) { showMessage('Informe o SKU', 'error'); return; }
+      if (isNaN(qty)) { showMessage('Quantidade inválida', 'error'); return; }
+      try {
+        await request('/add_to_inventory', { method: 'POST', body: { sku, quantity: qty } });
+        showMessage('Item adicionado', 'success');
+        $('#addSku').value = '';
+        $('#addQuantity').value = '';
+        await loadInventory();
+      } catch (err) { showMessage('Erro ao adicionar: ' + err.message, 'error'); }
+    });
+
+    $('#addBulkParse').addEventListener('click', (e) => {
+      const text = $('#bulkArea').value.trim();
+      if (!text) { showMessage('Bulk vazio', 'error'); return; }
+      const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+      const parsed = [];
+      for (const line of lines) {
+        const parts = line.split(',').map(p => p.trim());
+        if (parts.length < 2) { showMessage('Linha inválida: ' + line, 'error'); return; }
+        const sku = parts[0];
+        const qty = parseInt(parts[1], 10);
+        if (!sku || isNaN(qty)) { showMessage('Linha inválida: ' + line, 'error'); return; }
+        parsed.push({ sku, quantity: qty });
+      }
+      // send bulk
+      (async () => {
+        try {
+          await request('/add_to_inventory', { method: 'POST', body: parsed });
+          showMessage('Bulk adicionado', 'success');
+          $('#bulkArea').value = '';
+          await loadInventory();
+        } catch (err) { showMessage('Erro no bulk: ' + err.message, 'error'); }
+      })();
+    });
+
+    // --- Import modal logic ---
+    const importModal = document.getElementById('importModal');
+    const openImportBtn = document.getElementById('openImportBtn');
+    const closeImportBtn = document.getElementById('closeImportBtn');
+    const cancelImportBtn = document.getElementById('cancelImportBtn');
+    const importFile = document.getElementById('importFile');
+    const dropZone = document.getElementById('dropZone');
+    const sepSelect = document.getElementById('sepSelect');
+    const hasHeader = document.getElementById('hasHeader');
+    const colSku = document.getElementById('colSku');
+    const colQty = document.getElementById('colQty');
+    const previewHead = document.getElementById('previewHead');
+    const previewBody = document.getElementById('previewBody');
+    const doImportBtn = document.getElementById('doImportBtn');
+
+    let parsedRows = [];
+    let currentFields = [];
+
+    function showImport() { importModal.classList.remove('hidden'); }
+    function hideImport() { importModal.classList.add('hidden'); resetImport(); }
+    function resetImport() { parsedRows = []; currentFields = []; sepSelect.innerHTML = ''; colSku.innerHTML = ''; colQty.innerHTML = ''; previewHead.innerHTML = ''; previewBody.innerHTML = ''; importFile.value = ''; }
+
+    openImportBtn.addEventListener('click', () => { resetImport(); showImport(); });
+    closeImportBtn.addEventListener('click', hideImport);
+    cancelImportBtn.addEventListener('click', hideImport);
+
+    dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('border-blue-400'); });
+    dropZone.addEventListener('dragleave', (e) => { dropZone.classList.remove('border-blue-400'); });
+    dropZone.addEventListener('drop', (e) => { e.preventDefault(); dropZone.classList.remove('border-blue-400'); if (e.dataTransfer.files && e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]); });
+    importFile.addEventListener('change', (e) => { if (e.target.files && e.target.files.length) handleFile(e.target.files[0]); });
+
+    function detectSeparatorsFromText(text) {
+      const lines = text.split(/\r?\n/).filter(Boolean).slice(0, 10);
+      const candidates = [',', ';', '\t', '|', ':'];
+      const scores = candidates.map(c => ({ sep: c, count: lines.reduce((acc, ln) => acc + (ln.split(c).length - 1), 0) }));
+      scores.sort((a, b) => b.count - a.count);
+      const list = scores.filter(s => s.count > 0);
+      if (list.length === 0) return [',', ';', '\t', '|', ':'];
+      return list.map(s => s.sep).concat([',', ';', '\t', '|', ':'].filter(x => !list.map(s => s.sep).includes(x)));
+    }
+
+    function guessHeaderFromText(text, sep) {
+      const lines = text.split(/\r?\n/).filter(Boolean);
+      if (lines.length < 2) return true;
+      const first = lines[0].split(sep).map(s => s.trim());
+      const second = lines[1].split(sep).map(s => s.trim());
+      const alpha = arr => arr.reduce((acc, v) => acc + (/\p{L}/u.test(v) ? 1 : 0), 0);
+      const a1 = alpha(first); const a2 = alpha(second);
+      const headerNames = first.join(' ').toLowerCase();
+      const headerLike = /(sku|code|codigo|id|ean|produto|article|artigo|description|qty|quantity|qtd|amount|count|quantidade)/i.test(headerNames);
+      if (headerLike) return true;
+      return a1 > a2;
+    }
+
+    function populateSepOptions(seps) {
+      sepSelect.innerHTML = '';
+      seps.forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s;
+        opt.textContent = (s === '\t') ? 'Tab (\t)' : s;
+        sepSelect.appendChild(opt);
+      });
+    }
+
+    function populateColumnSelects(headersOrCount, hasHeaderFlag) {
+      colSku.innerHTML = '';
+      colQty.innerHTML = '';
+      let opts = [];
+      if (hasHeaderFlag) {
+        opts = headersOrCount.map(h => ({ value: h, label: h }));
+      } else {
+        for (let i = 0; i < headersOrCount; i++) opts.push({ value: i, label: `Column ${i + 1}` });
+      }
+      opts.forEach(o => {
+        const a = document.createElement('option'); a.value = o.value; a.textContent = o.label; colSku.appendChild(a);
+        const b = document.createElement('option'); b.value = o.value; b.textContent = o.label; colQty.appendChild(b);
+      });
+    }
+
+    function updatePreviewTable(rows, fields, hasHeaderFlag, skuKey, qtyKey) {
+      previewHead.innerHTML = '';
+      previewBody.innerHTML = '';
+      const trh = document.createElement('tr');
+      if (hasHeaderFlag) {
+        fields.forEach(h => { const th = document.createElement('th'); th.className = 'p-2 border bg-slate-50 text-left'; th.textContent = h; if (h === skuKey) th.classList.add('bg-amber-100'); if (h === qtyKey) th.classList.add('bg-emerald-100'); trh.appendChild(th); });
+      } else {
+        const max = fields; for (let i = 0; i < max; i++) { const th = document.createElement('th'); th.className = 'p-2 border bg-slate-50 text-left'; th.textContent = `Column ${i + 1}`; if (String(i) === String(skuKey)) th.classList.add('bg-amber-100'); if (String(i) === String(qtyKey)) th.classList.add('bg-emerald-100'); trh.appendChild(th); }
+      }
+      previewHead.appendChild(trh);
+      const previewRows = rows.slice(0, 10);
+      previewRows.forEach(r => {
+        const tr = document.createElement('tr');
+        if (hasHeaderFlag) {
+          fields.forEach(f => { const td = document.createElement('td'); td.className = 'p-2 border'; td.textContent = (r[f] !== undefined && r[f] !== null) ? r[f] : ''; tr.appendChild(td); });
+        } else {
+          const cols = fields; for (let i = 0; i < cols; i++) { const td = document.createElement('td'); td.className = 'p-2 border'; td.textContent = (r[i] !== undefined && r[i] !== null) ? r[i] : ''; tr.appendChild(td); }
+        }
+        previewBody.appendChild(tr);
+      });
+    }
+
+    async function handleFile(file) {
+      resetImport();
+      if (!file) return;
+      const name = file.name || '';
+      const ext = name.split('.').pop().toLowerCase();
+      if (['xls', 'xlsx', 'xlsb', 'ods'].includes(ext)) {
+        // parse excel
+        const ab = await file.arrayBuffer();
+        const wb = XLSX.read(ab, { type: 'array' });
+        const ws = wb.Sheets[wb.SheetNames[0]];
+        const aoa = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
+        // convert aoa to rows
+        const hasH = aoa.length > 0 && aoa[0].some(c => typeof c === 'string' && /[A-Za-z\p{L}]/u.test(c));
+        const headers = hasH ? aoa[0].map(h => String(h)) : aoa[0].map((x, i) => `Column ${i + 1}`);
+        const dataRows = aoa.slice(hasH ? 1 : 0).map(r => r.map(c => c));
+        // build rows as objects if header
+        if (hasH) {
+          const objRows = dataRows.map(r => { const o = {}; headers.forEach((h, i) => o[h] = r[i]); return o; });
+          parsedRows = objRows;
+          currentFields = headers;
+          populateSepOptions([',', ';', '\t', '|', ':']);
+          sepSelect.value = ',';
+          hasHeader.checked = true;
+          populateColumnSelects(currentFields, true);
+          // auto select
+          autoPickColumns(parsedRows, currentFields, true);
+          updatePreviewTable(parsedRows, currentFields, true, colSku.value, colQty.value);
+        } else {
+          parsedRows = dataRows;
+          currentFields = dataRows[0] ? dataRows[0].length : 0;
+          hasHeader.checked = false;
+          populateSepOptions([',', ';', '\t', '|', ':']);
+          populateColumnSelects(currentFields, false);
+          autoPickColumns(parsedRows, currentFields, false);
+          updatePreviewTable(parsedRows, currentFields, false, colSku.value, colQty.value);
+        }
+      } else {
+        // CSV or text
+        const text = await file.text();
+        const seps = detectSeparatorsFromText(text);
+        populateSepOptions(seps);
+        const defaultSep = seps[0] || ',';
+        sepSelect.value = defaultSep;
+        const guessedHeader = guessHeaderFromText(text, defaultSep);
+        hasHeader.checked = guessedHeader;
+        // parse with Papa
+        const papaConfig = { header: guessedHeader, dynamicTyping: true, skipEmptyLines: true, delimiter: defaultSep };
+        const res = Papa.parse(text, papaConfig);
+        parsedRows = res.data;
+        currentFields = guessedHeader ? res.meta.fields : (parsedRows[0] ? parsedRows[0].length : 0);
+        populateColumnSelects(currentFields, guessedHeader);
+        autoPickColumns(parsedRows, currentFields, guessedHeader);
+        updatePreviewTable(parsedRows, currentFields, guessedHeader, colSku.value, colQty.value);
+      }
+    }
+
+    function autoPickColumns(rows, fields, hasH) {
+      // heuristics
+      const skuRegex = /(sku|code|codigo|ean|id|produto|article|artigo|ref|barcode)/i;
+      const qtyRegex = /(quantity|qty|qtd|amount|count|quantidade|quant)/i;
+      if (hasH) {
+        // fields is array of names
+        let skuIdx = fields.findIndex(h => skuRegex.test(String(h)));
+        let qtyIdx = fields.findIndex(h => qtyRegex.test(String(h)));
+        if (skuIdx === -1) { // find first textual column
+          skuIdx = fields.findIndex((h, idx) => rows.some(r => { const v = r[h]; return typeof v === 'string' && String(v).trim().length > 0; }));
+        }
+        if (qtyIdx === -1) { // numeric column
+          const scores = fields.map(h => rows.reduce((acc, r) => acc + (r[h] !== null && r[h] !== '' && !isNaN(Number(r[h])) ? 1 : 0), 0));
+          qtyIdx = scores.indexOf(Math.max(...scores));
+        }
+        if (skuIdx >= 0) colSku.value = fields[skuIdx];
+        if (qtyIdx >= 0) colQty.value = fields[qtyIdx];
+      } else {
+        // fields is count
+        const colCount = fields;
+        const scores = [];
+        for (let c = 0; c < colCount; c++) {
+          const numericCount = rows.reduce((acc, r) => acc + (r[c] !== undefined && r[c] !== '' && !isNaN(Number(r[c])) ? 1 : 0), 0);
+          scores.push(numericCount);
+        }
+        const qtyIdx = scores.indexOf(Math.max(...scores));
+        const skuIdx = (qtyIdx === 0) ? 1 : 0;
+        colSku.value = String(skuIdx);
+        colQty.value = String(qtyIdx);
+      }
+    }
+
+    sepSelect.addEventListener('change', () => {
+      // re-parse when separator changed (if CSV)
+      const fileInput = importFile.files[0];
+      if (!fileInput) return;
+      // fake re-handle by calling handleFile again
+      handleFile(fileInput);
+    });
+
+    hasHeader.addEventListener('change', () => {
+      const fileInput = importFile.files[0];
+      if (!fileInput) return;
+      handleFile(fileInput);
+    });
+
+    colSku.addEventListener('change', () => { updatePreviewTable(parsedRows, currentFields, hasHeader.checked, colSku.value, colQty.value); });
+    colQty.addEventListener('change', () => { updatePreviewTable(parsedRows, currentFields, hasHeader.checked, colSku.value, colQty.value); });
+
+    doImportBtn.addEventListener('click', async () => {
+      if (!parsedRows || parsedRows.length === 0) { showMessage('Nenhum dado para importar', 'error'); return; }
+      const mapped = [];
+      const headerFlag = hasHeader.checked;
+      const skuKey = colSku.value;
+      const qtyKey = colQty.value;
+      for (const r of parsedRows) {
+        let sku = headerFlag ? r[skuKey] : r[Number(skuKey)];
+        let qty = headerFlag ? r[qtyKey] : r[Number(qtyKey)];
+        if (sku === undefined || sku === null) continue;
+        sku = String(sku).trim();
+        const n = Number(String(qty).replace(/[^0-9.-]/g, ''));
+        if (!sku || isNaN(n)) continue;
+        mapped.push({ sku, quantity: Math.trunc(n) });
+      }
+      if (mapped.length === 0) { showMessage('Nenhuma linha válida para importar', 'error'); return; }
+      try {
+        await request('/add_to_inventory', { method: 'POST', body: mapped });
+        showMessage(`Importado ${mapped.length} linhas`, 'success');
+        hideImport();
+        await loadInventory();
+      } catch (err) { showMessage('Erro ao importar: ' + err.message, 'error'); }
+    });
+
+    $('#btnGetSku').addEventListener('click', async () => {
+      const sku = $('#lookupSku').value.trim();
+      if (!sku) { showMessage('Informe o SKU', 'error'); return; }
+      try {
+        const data = await request(`/get_sku/${encodeURIComponent(sku)}`);
+        infoBox.classList.remove('hidden');
+        infoBox.innerHTML = `<pre class="whitespace-pre-wrap text-sm">${escapeHtml(JSON.stringify(data, null, 2))}</pre>`;
+      } catch (err) { showMessage('Erro: ' + err.message, 'error'); }
+    });
+
+    $('#btnGetQty').addEventListener('click', async () => {
+      const sku = $('#lookupSku').value.trim();
+      if (!sku) { showMessage('Informe o SKU', 'error'); return; }
+      try {
+        const data = await request(`/get_quantity/${encodeURIComponent(sku)}`);
+        infoBox.classList.remove('hidden');
+        infoBox.innerHTML = `<div>Quantity for <strong>${escapeHtml(sku)}</strong>: <span class="font-medium">${escapeHtml(String(data))}</span></div>`;
+      } catch (err) { showMessage('Erro: ' + err.message, 'error'); }
+    });
+
+    const btnUpdateQtyEl = $('#btnUpdateQty');
+    if (btnUpdateQtyEl) {
+      btnUpdateQtyEl.addEventListener('click', async () => {
+        const sku = $('#lookupSku').value.trim();
+        const qInput = $('#updateQty');
+        const q = qInput ? parseInt(qInput.value.trim() || '0', 10) : NaN;
+        if (!sku) { showMessage('Informe o SKU', 'error'); return; }
+        if (isNaN(q)) { showMessage('Quantidade inválida', 'error'); return; }
+        try {
+          await request(`/update_quantity/${encodeURIComponent(sku)}/${q}`, { method: 'PUT' });
+          showMessage('Quantidade atualizada', 'success');
+          await loadInventory();
+        } catch (err) { showMessage('Erro: ' + err.message, 'error'); }
+      });
+    }
+
+    const btnDeleteSkuEl = $('#btnDeleteSku');
+    if (btnDeleteSkuEl) {
+      btnDeleteSkuEl.addEventListener('click', async () => {
+        const sku = $('#lookupSku').value.trim();
+        if (!sku) { showMessage('Informe o SKU', 'error'); return; }
+        if (!confirm('Confirma exclusão do SKU ' + sku + '?')) return;
+        try {
+          await request(`/delete_sku/${encodeURIComponent(sku)}`, { method: 'DELETE' });
+          showMessage('SKU deletado', 'success');
+          await loadInventory();
+        } catch (err) { showMessage('Erro: ' + err.message, 'error'); }
+      });
+    }
+
+    $('#clearBtn').addEventListener('click', async () => {
+      if (!confirm('Confirma limpar toda a tabela de inventário?')) return;
+      try {
+        await request('/clear_inventory_table', { method: 'DELETE' });
+        showMessage('Tabela limpa', 'success');
+        await loadInventory();
+      } catch (err) { showMessage('Erro: ' + err.message, 'error'); }
+    });
+
+    $('#refreshBtn').addEventListener('click', loadInventory);
+
+    // initial load
+    loadInventory();
+
+  })();
+</script>
+
+{% endblock %}

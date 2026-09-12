@@ -13,6 +13,7 @@ from app.core import settings
 import logging
 from app.services.license import license_manager
 from smartx_rfid.schemas.tag import WriteTagValidator
+from app.models.renner import Inventory
 
 
 class Controller:
@@ -31,14 +32,14 @@ class Controller:
 		logging.info(f'[ EVENT ] {name} - {event_type}: {event_data}')
 		if not license_manager.validate_license():
 			return
-		asyncio.create_task(
-			self.integration.on_event_integration(
-				name=name, event_type=event_type, event_data=event_data
-			)
-		)
-		asyncio.create_task(
-			self.dispatcher.add_async(name=name, event_type=event_type, data=event_data)
-		)
+		# asyncio.create_task(
+		# 	self.integration.on_event_integration(
+		# 		name=name, event_type=event_type, event_data=event_data
+		# 	)
+		# )
+		# asyncio.create_task(
+		# 	self.dispatcher.add_async(name=name, event_type=event_type, data=event_data)
+		# )
 
 	# [ Reading Events ]
 	def on_start(self, name: str):
@@ -56,16 +57,16 @@ class Controller:
 		logging.info(f'[ TAG ] {name} - {tag}')
 		if not license_manager.validate_license():
 			return
-		asyncio.create_task(self.integration.on_tag_integration(tag=tag))
-		asyncio.create_task(self.dispatcher.add_async(name=name, event_type='tag', data=tag))
+		# asyncio.create_task(self.integration.on_tag_integration(tag=tag))
+		# asyncio.create_task(self.dispatcher.add_async(name=name, event_type='tag', data=tag))
 
 	def on_existing_tag(self, name: str, tag: dict):
 		asyncio.create_task(self.check_target(tag))
-		if settings.ALWAYS_SEND:
-			if not license_manager.validate_license():
-				return
-			asyncio.create_task(self.integration.on_tag_integration(tag=tag))
-			asyncio.create_task(self.dispatcher.add_async(name=name, event_type='tag', data=tag))
+		# if settings.ALWAYS_SEND:
+		# 	if not license_manager.validate_license():
+		# 		return
+		# 	asyncio.create_task(self.integration.on_tag_integration(tag=tag))
+		# 	asyncio.create_task(self.dispatcher.add_async(name=name, event_type='tag', data=tag))
 
 	# [ WRITE LIST ]
 	def create_write_list_prefix(self, epcs: list, prefix: str):
@@ -127,3 +128,68 @@ class Controller:
 				password='00000000',
 			),
 		)
+
+	# INVENTORY
+	def add_inventory(self, data: list | dict):
+		try:
+			if isinstance(data, dict):
+				data = [data]
+			if not isinstance(data, list):
+				logging.error('Data must be a list or a dictionary')
+				return False
+
+			self.integration.db_manager.bulk_insert(Inventory, data)
+			return True
+		except Exception as e:
+			logging.error(f'Error adding inventory: {e}')
+			return False
+
+	def get_inventory_table(self, limit: int = 999999, offset: int = 0):
+		try:
+			return self.integration.db_manager.get_all(Inventory, limit=limit, offset=offset)
+		except Exception as e:
+			logging.error(f'Error fetching inventory: {e}')
+			return []
+
+	def get_sku(self, sku: str):
+		try:
+			record = self.integration.db_manager.get_by_field(Inventory, 'sku', sku)
+			if record:
+				return record.to_dict()
+			return None
+		except Exception as e:
+			logging.error(f'Error fetching SKU {sku}: {e}')
+			return None
+
+	def get_quantity(self, sku: str):
+		sku_record = self.get_sku(sku)
+		if sku_record:
+			return sku_record.get('quantity', 0)
+		return 0
+
+	def update_quantity(self, sku: str, quantity: int):
+		try:
+			with self.integration.db_manager.get_session() as session:
+				record = session.query(Inventory).filter_by(sku=sku).first()
+				if record:
+					record.quantity = quantity
+					return True
+			return False
+		except Exception as e:
+			logging.error(f'Error updating quantity for SKU {sku}: {e}')
+			return False
+
+	def delete_sku(self, sku: str):
+		try:
+			return self.integration.db_manager.delete_by_field(Inventory, 'sku', sku) > 0
+		except Exception as e:
+			logging.error(f'Error deleting SKU {sku}: {e}')
+			return False
+
+	def clear_inventory_table(self):
+		try:
+			self.integration.db_manager.clear_table(Inventory)
+			return True
+		except Exception as e:
+			logging.error(f'Error clearing inventory: {e}')
+			return False

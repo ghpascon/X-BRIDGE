@@ -164,3 +164,4 @@ Logs*
 logs*
 TEMP*
 config*
+*.db
