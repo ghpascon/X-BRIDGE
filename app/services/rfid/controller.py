@@ -71,6 +71,9 @@ class Controller:
 					settings.GṔO_TIME,
 				)
 			)
+			tag['agrupar'] = True
+		else:
+			tag['agrupar'] = False
 		# asyncio.create_task(self.integration.on_tag_integration(tag=tag))
 		# asyncio.create_task(self.dispatcher.add_async(name=name, event_type='tag', data=tag))
 

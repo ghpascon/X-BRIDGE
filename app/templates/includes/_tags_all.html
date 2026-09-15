@@ -51,7 +51,7 @@
         </thead>
         <tbody>
           <template x-for="(tag, index) in tags" :key="`tag-${index}`">
-            <tr :class="(tag.target ? 'bg-red-400' : 'bg-gray-50') + ' border-b border-gray-200'">
+            <tr :class="(tag.agrupar ? 'bg-green-400' : 'bg-gray-50') + ' border-b border-gray-200'">
               <template x-for="(header, headerIndex) in headers" :key="`cell-${index}-${headerIndex}`">
                 <td class="px-2 py-2 font-mono text-xs sm:text-sm whitespace-nowrap text-gray-900" :title="tag[header]"
                   x-text="formatValue(tag[header], header)"></td>
@@ -70,7 +70,7 @@
 
 <script>
   const WANTED_FIELDS = [
-    "epc", "sku", "ant"
+    "epc", "sku", "ant", "agrupar"
   ]
 
 
