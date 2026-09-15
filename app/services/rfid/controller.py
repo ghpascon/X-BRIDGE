@@ -14,6 +14,7 @@ import logging
 from app.services.license import license_manager
 from smartx_rfid.schemas.tag import WriteTagValidator
 from app.models.renner import Inventory
+from smartx_rfid.clients.renner import get_renner_sku
 
 
 class Controller:
@@ -57,6 +58,19 @@ class Controller:
 		logging.info(f'[ TAG ] {name} - {tag}')
 		if not license_manager.validate_license():
 			return
+		tag['sku'] = get_renner_sku(tag.get('epc'))
+
+		if self.get_sku(tag.get('sku')):
+			logging.info(f"Tag {tag.get('sku')} has a valid SKU")
+			asyncio.create_task(
+				self.devices.write_gpo(
+					name,
+					settings.GPO_PIN if settings.GPO_PIN else tag.get('ant'),
+					True,
+					'pulsed',
+					settings.GṔO_TIME,
+				)
+			)
 		# asyncio.create_task(self.integration.on_tag_integration(tag=tag))
 		# asyncio.create_task(self.dispatcher.add_async(name=name, event_type='tag', data=tag))
 

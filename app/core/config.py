@@ -74,6 +74,11 @@ class Settings:
 		if not isinstance(self.ALLOW_EXTERNAL_CONNECTIONS, bool):
 			self.ALLOW_EXTERNAL_CONNECTIONS = True
 
+		self.GPO_PIN: int | None = data.get('GPO_PIN', None)
+		self.GṔO_TIME: int | None = data.get('GPO_TIME', None)
+		if not isinstance(self.GṔO_TIME, int) or self.GṔO_TIME < 0:
+			self.GṔO_TIME = 3000  # Default to 3000 ms
+
 		if not os.path.exists(self._config_path):
 			self.save()  # Save default config if file doesn't exist
 

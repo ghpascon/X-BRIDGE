@@ -27,13 +27,8 @@
               </div>
               <div class="flex space-x-2">
                 <button id="addBtn" class="px-3 py-2 bg-green-600 text-white rounded">Add</button>
-                <button id="addBulkParse" class="px-3 py-2 bg-gray-200 rounded">Parse Bulk</button>
               </div>
-              <div>
-                <label class="block text-sm font-medium mt-2">Bulk (one per line: sku,quantity)</label>
-                <textarea id="bulkArea" rows="3" class="w-full mt-1 p-2 border rounded"
-                  placeholder="SKU1,10\nSKU2,5"></textarea>
-              </div>
+              <!-- Bulk textarea removed — single add remains. -->
             </form>
           </div>
 
@@ -257,29 +252,7 @@
       } catch (err) { showMessage('Erro ao adicionar: ' + err.message, 'error'); }
     });
 
-    $('#addBulkParse').addEventListener('click', (e) => {
-      const text = $('#bulkArea').value.trim();
-      if (!text) { showMessage('Bulk vazio', 'error'); return; }
-      const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
-      const parsed = [];
-      for (const line of lines) {
-        const parts = line.split(',').map(p => p.trim());
-        if (parts.length < 2) { showMessage('Linha inválida: ' + line, 'error'); return; }
-        const sku = parts[0];
-        const qty = parseInt(parts[1], 10);
-        if (!sku || isNaN(qty)) { showMessage('Linha inválida: ' + line, 'error'); return; }
-        parsed.push({ sku, quantity: qty });
-      }
-      // send bulk
-      (async () => {
-        try {
-          await request('/add_to_inventory', { method: 'POST', body: parsed });
-          showMessage('Bulk adicionado', 'success');
-          $('#bulkArea').value = '';
-          await loadInventory();
-        } catch (err) { showMessage('Erro no bulk: ' + err.message, 'error'); }
-      })();
-    });
+    // bulk parse removed — imports now handled via Import modal and single Add
 
     // --- Import modal logic ---
     const importModal = document.getElementById('importModal');
@@ -348,16 +321,24 @@
     function populateColumnSelects(headersOrCount, hasHeaderFlag) {
       colSku.innerHTML = '';
       colQty.innerHTML = '';
-      let opts = [];
+      const skuOpts = [];
+      const qtyOpts = [];
       if (hasHeaderFlag) {
-        opts = headersOrCount.map(h => ({ value: h, label: h }));
+        // headersOrCount is array of field names
+        headersOrCount.forEach(h => { skuOpts.push({ value: h, label: h }); qtyOpts.push({ value: h, label: h }); });
+        if (headersOrCount.length === 1) {
+          qtyOpts.push({ value: '__fixed_1', label: 'Fixed 1 (count=1)' });
+        }
       } else {
-        for (let i = 0; i < headersOrCount; i++) opts.push({ value: i, label: `Column ${i + 1}` });
+        // headersOrCount is a number (column count)
+        for (let i = 0; i < headersOrCount; i++) {
+          skuOpts.push({ value: String(i), label: `Column ${i + 1}` });
+          qtyOpts.push({ value: String(i), label: `Column ${i + 1}` });
+        }
+        if (headersOrCount === 1) qtyOpts.push({ value: '__fixed_1', label: 'Fixed 1 (count=1)' });
       }
-      opts.forEach(o => {
-        const a = document.createElement('option'); a.value = o.value; a.textContent = o.label; colSku.appendChild(a);
-        const b = document.createElement('option'); b.value = o.value; b.textContent = o.label; colQty.appendChild(b);
-      });
+      skuOpts.forEach(o => { const a = document.createElement('option'); a.value = o.value; a.textContent = o.label; colSku.appendChild(a); });
+      qtyOpts.forEach(o => { const b = document.createElement('option'); b.value = o.value; b.textContent = o.label; colQty.appendChild(b); });
     }
 
     function updatePreviewTable(rows, fields, hasHeaderFlag, skuKey, qtyKey) {
@@ -439,34 +420,18 @@
     }
 
     function autoPickColumns(rows, fields, hasH) {
-      // heuristics
-      const skuRegex = /(sku|code|codigo|ean|id|produto|article|artigo|ref|barcode)/i;
-      const qtyRegex = /(quantity|qty|qtd|amount|count|quantidade|quant)/i;
+      // Default: SKU = first column, QTY = second column (or fixed 1 if only one column)
       if (hasH) {
-        // fields is array of names
-        let skuIdx = fields.findIndex(h => skuRegex.test(String(h)));
-        let qtyIdx = fields.findIndex(h => qtyRegex.test(String(h)));
-        if (skuIdx === -1) { // find first textual column
-          skuIdx = fields.findIndex((h, idx) => rows.some(r => { const v = r[h]; return typeof v === 'string' && String(v).trim().length > 0; }));
-        }
-        if (qtyIdx === -1) { // numeric column
-          const scores = fields.map(h => rows.reduce((acc, r) => acc + (r[h] !== null && r[h] !== '' && !isNaN(Number(r[h])) ? 1 : 0), 0));
-          qtyIdx = scores.indexOf(Math.max(...scores));
-        }
-        if (skuIdx >= 0) colSku.value = fields[skuIdx];
-        if (qtyIdx >= 0) colQty.value = fields[qtyIdx];
+        colSku.value = fields[0] || colSku.options[0]?.value;
+        if (fields.length >= 2) colQty.value = fields[1];
+        else if ([...colQty.options].some(o => o.value === '__fixed_1')) colQty.value = '__fixed_1';
+        else colQty.value = colQty.options[0]?.value;
       } else {
-        // fields is count
         const colCount = fields;
-        const scores = [];
-        for (let c = 0; c < colCount; c++) {
-          const numericCount = rows.reduce((acc, r) => acc + (r[c] !== undefined && r[c] !== '' && !isNaN(Number(r[c])) ? 1 : 0), 0);
-          scores.push(numericCount);
-        }
-        const qtyIdx = scores.indexOf(Math.max(...scores));
-        const skuIdx = (qtyIdx === 0) ? 1 : 0;
-        colSku.value = String(skuIdx);
-        colQty.value = String(qtyIdx);
+        colSku.value = '0';
+        if (colCount >= 2) colQty.value = '1';
+        else if ([...colQty.options].some(o => o.value === '__fixed_1')) colQty.value = '__fixed_1';
+        else colQty.value = colQty.options[0]?.value;
       }
     }
 
@@ -494,12 +459,24 @@
       const skuKey = colSku.value;
       const qtyKey = colQty.value;
       for (const r of parsedRows) {
-        let sku = headerFlag ? r[skuKey] : r[Number(skuKey)];
-        let qty = headerFlag ? r[qtyKey] : r[Number(qtyKey)];
-        if (sku === undefined || sku === null) continue;
-        sku = String(sku).trim();
-        const n = Number(String(qty).replace(/[^0-9.-]/g, ''));
-        if (!sku || isNaN(n)) continue;
+        // determine SKU
+        let skuRaw = headerFlag ? r[skuKey] : r[Number(skuKey)];
+        if (skuRaw === undefined || skuRaw === null) continue;
+        const sku = String(skuRaw).trim();
+        if (!sku) continue;
+        // determine quantity
+        let n;
+        if (qtyKey === '__fixed_1') {
+          n = 1;
+        } else {
+          let qtyRaw = headerFlag ? r[qtyKey] : r[Number(qtyKey)];
+          if (qtyRaw === undefined || qtyRaw === null || String(qtyRaw).trim() === '') {
+            n = 1;
+          } else {
+            n = Number(String(qtyRaw).replace(/[^0-9.-]/g, ''));
+            if (isNaN(n)) n = 1;
+          }
+        }
         mapped.push({ sku, quantity: Math.trunc(n) });
       }
       if (mapped.length === 0) { showMessage('Nenhuma linha válida para importar', 'error'); return; }
