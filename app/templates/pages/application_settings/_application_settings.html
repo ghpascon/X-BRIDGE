@@ -182,8 +182,17 @@
       handleNumberInput(event, key) {
         const raw = event.target.value;
         const normalized = String(raw).replace(/,/g, '.').trim();
+        // empty input => preserve as null
         if (normalized === '') {
-          this.settings[key] = '';
+          this.settings[key] = null;
+          event.target.value = '';
+          return;
+        }
+        // user typed explicit 'null' or 'None'
+        const lower = normalized.toLowerCase();
+        if (lower === 'null' || lower === 'none') {
+          this.settings[key] = null;
+          event.target.value = '';
           return;
         }
         // Accept simple decimal numbers like -12.34 or 123
@@ -220,7 +229,8 @@
           let t = null;
 
           // Prefer real typed values, but if string contains a JSON array/object, detect it
-          const detectFrom = (v !== null && v !== undefined) ? v : ex;
+          // prefer an existing value (including explicit null) over examples only when value is undefined
+          const detectFrom = (v !== undefined) ? v : ex;
 
           if (detectFrom !== null && detectFrom !== undefined) {
             if (Array.isArray(detectFrom)) t = 'array';
@@ -397,12 +407,23 @@
           try {
             for (const k of (this.groups.numbers || [])) {
               const v = this.settings[k];
-              if (v === null || v === undefined || v === '') continue;
+              if (v === null || v === undefined) continue;
+
               if (typeof v === 'string') {
-                const n = this.parseLocalizedNumber(v);
+                const s = v.trim();
+                if (s === '' || s.toLowerCase() === 'null' || s === 'None') {
+                  this.settings[k] = null;
+                  continue;
+                }
+                const n = this.parseLocalizedNumber(s);
                 if (n !== null) this.settings[k] = n;
               } else if (typeof v !== 'number') {
-                const n = this.parseLocalizedNumber(String(v));
+                const s = String(v).trim();
+                if (s === '' || s.toLowerCase() === 'null' || s === 'None') {
+                  this.settings[k] = null;
+                  continue;
+                }
+                const n = this.parseLocalizedNumber(s);
                 if (n !== null) this.settings[k] = n;
               }
             }

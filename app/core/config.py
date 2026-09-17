@@ -55,6 +55,8 @@ class Settings:
 			self.CLEAR_OLD_TAGS_INTERVAL = 3600  # Default to 1 hour
 
 		self.TAG_PREFIX: str | None | list[str] = data.get('TAG_PREFIX', None)
+		if not isinstance(self.TAG_PREFIX, (str, list)):
+			self.TAG_PREFIX = None
 
 		self.ALWAYS_SEND: bool = data.get('ALWAYS_SEND', False)
 		if not isinstance(self.ALWAYS_SEND, bool):
@@ -74,6 +76,7 @@ class Settings:
 
 		if not os.path.exists(self._config_path):
 			self.save()  # Save default config if file doesn't exist
+
 
 	def get_current_settings(self):
 		return {
