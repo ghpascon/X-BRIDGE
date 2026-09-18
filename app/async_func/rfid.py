@@ -97,10 +97,10 @@ async def clear_db():
 			for model in models:
 				# Determine which timestamp column to use (prefer updated_at, fallback to created_at)
 				timestamp_column = None
-				if hasattr(model, 'updated_at'):
-					timestamp_column = model.updated_at
-				elif hasattr(model, 'created_at'):
+				if hasattr(model, 'created_at'):
 					timestamp_column = model.created_at
+				elif hasattr(model, 'updated_at'):
+					timestamp_column = model.updated_at
 				else:
 					logging.info(
 						f"Model {model.__tablename__} does not have 'updated_at' or 'created_at' column. Skipping."
