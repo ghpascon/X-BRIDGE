@@ -95,6 +95,8 @@ async def clear_db():
 
 		with rfid_manager.integration.db_manager.get_session() as session:
 			for model in models:
+				if not getattr(model, '__cleanup__', False):
+					continue
 				# Determine which timestamp column to use (prefer updated_at, fallback to created_at)
 				timestamp_column = None
 				if hasattr(model, 'created_at'):

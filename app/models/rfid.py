@@ -19,6 +19,7 @@ class Tag(Base, BaseMixin):
 	"""
 
 	__tablename__ = 'tags'
+	__cleanup__ = True
 
 	# Primary key
 	id = Column(Integer, primary_key=True, autoincrement=True)
@@ -44,6 +45,7 @@ class Event(Base, BaseMixin):
 	"""
 
 	__tablename__ = 'events'
+	__cleanup__ = True
 
 	# Primary key
 	id = Column(Integer, primary_key=True, autoincrement=True)
