@@ -74,8 +74,7 @@ class Settings:
 		if not isinstance(self.ALLOW_EXTERNAL_CONNECTIONS, bool):
 			self.ALLOW_EXTERNAL_CONNECTIONS = True
 
-		if not os.path.exists(self._config_path):
-			self.save()  # Save default config if file doesn't exist
+		self.save()  # Save default config if file doesn't exist
 
 
 	def get_current_settings(self):
