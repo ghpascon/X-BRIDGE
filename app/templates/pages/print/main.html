@@ -30,10 +30,22 @@
       </div>
 
       <div id="fileTab" class="hidden space-y-3">
-        <div class="flex gap-3 items-center">
-          <input id="fileInput" type="file" accept=".csv,.xls,.xlsx" class="" />
+        <div class="flex flex-col gap-3 md:flex-row md:items-center">
+          <input id="fileInput" type="file" accept=".csv,.tsv,.txt,.zpl,.xls,.xlsx" class="hidden" />
+          <button id="pickFileBtn" type="button"
+            class="inline-flex items-center justify-center px-4 py-2 bg-slate-800 text-white rounded-md shadow hover:bg-slate-900 transition-colors">
+            Select file
+          </button>
+          <p id="fileNameLabel" class="text-sm text-gray-600 truncate">No file selected</p>
+          <button id="clearFileBtn" type="button"
+            class="hidden px-3 py-2 text-sm bg-white border rounded-md hover:bg-gray-50">
+            Clear
+          </button>
+        </div>
+        <div class="flex flex-col gap-3 md:flex-row md:items-center">
           <select id="separatorSelect" class="border rounded p-2">
             <option value="auto">Auto-detect</option>
+            <option value="none">No separator (full line = ZPL)</option>
             <option value=",">Comma (,)</option>
             <option value=";">Semicolon (;)</option>
             <option value="tab">Tab (\t)</option>
@@ -42,6 +54,8 @@
           <label class="inline-flex items-center"><input type="checkbox" id="hasHeader" checked class="mr-2"> First row
             is header</label>
         </div>
+        <p class="text-xs text-gray-500">Tip: if your ZPL contains commas, use "No separator" or upload one ZPL per
+          line.</p>
         <div>
           <label class="block text-sm font-medium">Column for ZPL</label>
           <select id="columnSelect" class="border rounded p-2 w-full"></select>
@@ -75,9 +89,11 @@
   const tabPasteBtn = document.getElementById('tabPasteBtn');
   const tabFileBtn = document.getElementById('tabFileBtn');
   const zplText = document.getElementById('zplText');
-  const printNowBtn = document.getElementById('printNowBtn');
   const addQueueBtn = document.getElementById('addQueueBtn');
   const fileInput = document.getElementById('fileInput');
+  const pickFileBtn = document.getElementById('pickFileBtn');
+  const clearFileBtn = document.getElementById('clearFileBtn');
+  const fileNameLabel = document.getElementById('fileNameLabel');
   const separatorSelect = document.getElementById('separatorSelect');
   const hasHeaderCheckbox = document.getElementById('hasHeader');
   const columnSelect = document.getElementById('columnSelect');
@@ -88,6 +104,9 @@
 
   let devices = [];
   let parsedRows = [];
+  let lastLoadedFile = null;
+  let lastLoadedText = null;
+  let lastLoadedType = null;
 
   function showMessage(text, type = 'info') {
     // prefer global showAlert if available
@@ -151,12 +170,22 @@
   // tabs
   tabPasteBtn.addEventListener('click', () => {
     pasteTab.classList.remove('hidden'); fileTab.classList.add('hidden');
-    tabPasteBtn.classList.add('bg-blue-600', 'text-white'); tabFileBtn.classList.remove('bg-blue-600', 'text-white');
+
+    // active = paste
+    tabPasteBtn.classList.remove('bg-gray-100');
+    tabPasteBtn.classList.add('bg-blue-600', 'text-white');
+
+    tabFileBtn.classList.remove('bg-blue-600', 'text-white');
     tabFileBtn.classList.add('bg-gray-100');
   });
   tabFileBtn.addEventListener('click', () => {
     pasteTab.classList.add('hidden'); fileTab.classList.remove('hidden');
-    tabFileBtn.classList.add('bg-blue-600', 'text-white'); tabPasteBtn.classList.remove('bg-blue-600', 'text-white');
+
+    // active = file
+    tabFileBtn.classList.remove('bg-gray-100');
+    tabFileBtn.classList.add('bg-blue-600', 'text-white');
+
+    tabPasteBtn.classList.remove('bg-blue-600', 'text-white');
     tabPasteBtn.classList.add('bg-gray-100');
   });
 
@@ -191,14 +220,57 @@
   });
 
   // File parsing helpers
-  function detectSeparator(line) {
-    const candidates = [',', ';', '\t', '|'];
-    const counts = candidates.map(c => (line.match(new RegExp(`\\${c}`, 'g')) || []).length);
-    let max = counts[0], idx = 0;
-    for (let i = 1; i < counts.length; i++) {
-      if (counts[i] > max) { max = counts[i]; idx = i; }
+  function escapeHtml(value) {
+    return String(value ?? '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  function normalizeText(text) {
+    return String(text || '').replace(/^\uFEFF/, '').replace(/\r\n?/g, '\n');
+  }
+
+  function countSeparatorOutsideQuotes(line, sep) {
+    let inQuotes = false;
+    let count = 0;
+    for (let i = 0; i < line.length; i++) {
+      const ch = line[i];
+      if (ch === '"') {
+        if (inQuotes && line[i + 1] === '"') {
+          i++;
+        } else {
+          inQuotes = !inQuotes;
+        }
+        continue;
+      }
+      if (!inQuotes && ch === sep) count++;
     }
-    return candidates[idx];
+    return count;
+  }
+
+  function detectSeparatorFromSample(lines) {
+    const candidates = [',', ';', '\t', '|'];
+    const sample = lines.filter(l => l.trim() !== '').slice(0, 30);
+    if (sample.length === 0) return null;
+
+    let best = { sep: null, score: -Infinity, rowsWithSep: 0 };
+    for (const sep of candidates) {
+      const counts = sample.map(line => countSeparatorOutsideQuotes(line, sep));
+      const rowsWithSep = counts.filter(c => c > 0).length;
+      if (rowsWithSep === 0) continue;
+
+      const mean = counts.reduce((a, b) => a + b, 0) / counts.length;
+      const variance = counts.reduce((acc, n) => acc + Math.pow(n - mean, 2), 0) / counts.length;
+      const score = rowsWithSep * 4 + mean - variance;
+      if (score > best.score) {
+        best = { sep, score, rowsWithSep };
+      }
+    }
+
+    return best.rowsWithSep > 0 ? best.sep : null;
   }
 
   function previewRowsAsTable(rows, headers) {
@@ -206,7 +278,7 @@
     const max = Math.min(rows.length, 10);
     let html = '<div class="overflow-auto border rounded p-2"><table class="min-w-full text-sm"><thead><tr>';
     if (headers) {
-      for (const h of headers) { html += `<th class="px-2 py-1 text-left font-medium">${h}</th>`; }
+      for (const h of headers) { html += `<th class="px-2 py-1 text-left font-medium">${escapeHtml(h)}</th>`; }
     } else {
       for (let i = 0; i < rows[0].length; i++) html += `<th class="px-2 py-1 text-left font-medium">Col ${i + 1}</th>`;
     }
@@ -215,9 +287,9 @@
       const r = rows[i];
       html += '<tr>';
       if (headers) {
-        for (const h of headers) html += `<td class="px-2 py-1">${(r[h] ?? '')}</td>`;
+        for (const h of headers) html += `<td class="px-2 py-1">${escapeHtml(r[h] ?? '')}</td>`;
       } else {
-        for (let c = 0; c < r.length; c++) html += `<td class="px-2 py-1">${r[c] ?? ''}</td>`;
+        for (let c = 0; c < r.length; c++) html += `<td class="px-2 py-1">${escapeHtml(r[c] ?? '')}</td>`;
       }
       html += '</tr>';
     }
@@ -226,6 +298,27 @@
   }
 
   async function handleCsvText(text, separator, header) {
+    // store normalized text for re-parsing when separator/header changes
+    const normalized = normalizeText(text);
+    lastLoadedText = normalized;
+    const lines = normalized.split('\n').filter(l => l.trim() !== '');
+
+    // If user selected 'none' as separator, treat entire line as single ZPL field
+    if (separator === 'none') {
+      if (lines.length === 0) { parsedRows = []; fillColumnSelect([]); previewArea.innerHTML = 'No data'; return; }
+      if (header) {
+        const headerName = lines[0] || 'ZPL';
+        parsedRows = lines.slice(1).map(l => { const obj = {}; obj[headerName] = l; return obj; });
+        fillColumnSelect([headerName]);
+        previewRowsAsTable(parsedRows, [headerName]);
+      } else {
+        parsedRows = lines.map(l => [l]);
+        fillColumnSelect(['Col 1']);
+        previewRowsAsTable(parsedRows, null);
+      }
+      return;
+    }
+
     // lazy-load PapaParse for robust CSV parsing
     if (typeof window.Papa === 'undefined') {
       try {
@@ -234,8 +327,17 @@
         console.warn('Failed to load PapaParse, falling back to simple parser', e);
       }
     }
+
+    const selectedDelimiter = separator === 'auto'
+      ? detectSeparatorFromSample(lines)
+      : (separator === 'tab' ? '\t' : separator);
+
     if (window.Papa) {
-      const results = window.Papa.parse(text, { header: header, skipEmptyLines: true });
+      const results = window.Papa.parse(normalized, {
+        header: header,
+        skipEmptyLines: true,
+        delimiter: selectedDelimiter || undefined
+      });
       if (results.errors && results.errors.length) console.warn('CSV parse errors', results.errors);
       if (header) {
         parsedRows = results.data;
@@ -249,10 +351,18 @@
       }
       return;
     }
+
     // fallback simple CSV split
-    const lines = text.split(/\r\n|\n/).filter(l => l.trim() !== '');
     if (lines.length === 0) { parsedRows = []; fillColumnSelect([]); previewArea.innerHTML = 'No data'; return; }
-    const sepChar = separator === 'auto' ? detectSeparator(lines[0]) : (separator === 'tab' ? '\t' : separator);
+
+    const sepChar = selectedDelimiter;
+    if (!sepChar) {
+      parsedRows = lines.map(l => [l]);
+      fillColumnSelect(['Col 1']);
+      previewRowsAsTable(parsedRows, null);
+      return;
+    }
+
     const rows = lines.map(line => parseSimpleCsvLine(line, sepChar));
     if (header) {
       const headers = rows[0];
@@ -295,11 +405,18 @@
 
   async function handleFile(file) {
     const name = file.name.toLowerCase();
-    if (name.endsWith('.csv')) {
+    if (name.endsWith('.zpl')) {
+      separatorSelect.value = 'none';
+      hasHeaderCheckbox.checked = false;
+    }
+    if (name.endsWith('.csv') || name.endsWith('.txt') || name.endsWith('.tsv') || name.endsWith('.zpl')) {
       const text = await file.text();
+      lastLoadedType = 'text';
       const sep = separatorSelect.value;
       await handleCsvText(text, sep, hasHeaderCheckbox.checked);
     } else if (name.endsWith('.xls') || name.endsWith('.xlsx')) {
+      lastLoadedType = 'excel';
+      lastLoadedText = null;
       // load SheetJS dynamically
       if (typeof window.XLSX === 'undefined') {
         try {
@@ -313,6 +430,12 @@
       const wb = window.XLSX.read(data, { type: 'array' });
       const sheetName = wb.SheetNames[0];
       const sheet = wb.Sheets[sheetName];
+      if (!sheet) {
+        parsedRows = [];
+        fillColumnSelect([]);
+        previewArea.innerHTML = '<div class="text-sm text-gray-600">Empty sheet</div>';
+        return;
+      }
       const jsonOpts = { header: hasHeaderCheckbox.checked ? 0 : 1, defval: '' };
       const json = window.XLSX.utils.sheet_to_json(sheet, jsonOpts);
       if (hasHeaderCheckbox.checked) {
@@ -328,12 +451,71 @@
     } else {
       showMessage('Unsupported file type', 'error');
     }
+
+    const loaded = Array.isArray(parsedRows) ? parsedRows.length : 0;
+    showMessage(`Loaded ${loaded} row(s) from ${file.name}`, 'success');
   }
+
+  function resetLoadedFile() {
+    fileInput.value = '';
+    lastLoadedFile = null;
+    lastLoadedText = null;
+    lastLoadedType = null;
+    parsedRows = [];
+    fillColumnSelect([]);
+    previewArea.innerHTML = '';
+    fileNameLabel.textContent = 'No file selected';
+    clearFileBtn.classList.add('hidden');
+  }
+
+  function setLoadedFileUI(file) {
+    fileNameLabel.textContent = file ? file.name : 'No file selected';
+    if (file) clearFileBtn.classList.remove('hidden');
+    else clearFileBtn.classList.add('hidden');
+  }
+
+  pickFileBtn.addEventListener('click', () => fileInput.click());
+
+  clearFileBtn.addEventListener('click', () => {
+    resetLoadedFile();
+    showMessage('File selection cleared', 'info');
+  });
 
   fileInput.addEventListener('change', async (evt) => {
     const f = evt.target.files[0];
     if (!f) return;
+    lastLoadedFile = f;
+    setLoadedFileUI(f);
     await handleFile(f);
+  });
+
+  // re-parse when separator or header option changes
+  separatorSelect.addEventListener('change', async () => {
+    if (!lastLoadedFile || !lastLoadedType) return;
+    try {
+      if (lastLoadedType === 'text') {
+        // re-run CSV parser using stored text
+        await handleCsvText(lastLoadedText || '', separatorSelect.value, hasHeaderCheckbox.checked);
+        showMessage('Separator reapplied to current file', 'success');
+      }
+    } catch (e) {
+      console.error(e);
+      if (window.showAlert) showAlert('Error reloading file: ' + e.message, 'error');
+    }
+  });
+
+  hasHeaderCheckbox.addEventListener('change', async () => {
+    if (!lastLoadedFile || !lastLoadedType) return;
+    try {
+      if (lastLoadedType === 'text') {
+        await handleCsvText(lastLoadedText || '', separatorSelect.value, hasHeaderCheckbox.checked);
+      } else if (lastLoadedType === 'excel') {
+        await handleFile(lastLoadedFile);
+      }
+    } catch (e) {
+      console.error(e);
+      if (window.showAlert) showAlert('Error reloading file: ' + e.message, 'error');
+    }
   });
 
   previewBtn.addEventListener('click', () => {

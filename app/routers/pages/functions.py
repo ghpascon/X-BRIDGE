@@ -42,10 +42,19 @@ async def gpo_page(request: Request):
 	)
 
 
-@router.get('/print', response_class=HTMLResponse)
+@router.get('/print/printer', response_class=HTMLResponse)
 async def print_page(request: Request):
 	return templates.TemplateResponse(
 		'pages/print/main.html',
 		{'request': request, 'title': 'Print', 'alerts': []},
+		media_type='text/html; charset=utf-8',
+	)
+
+
+@router.get('/print/helpers', response_class=HTMLResponse)
+async def print_helpers_page(request: Request):
+	return templates.TemplateResponse(
+		'pages/print/helpers.html',
+		{'request': request, 'title': 'Print Helpers', 'alerts': []},
 		media_type='text/html; charset=utf-8',
 	)
