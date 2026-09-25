@@ -1,0 +1,388 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="max-w-6xl mx-auto px-4 py-6">
+  <div class="bg-white p-6 rounded-lg shadow">
+    <h2 class="text-2xl font-semibold mb-4">Print</h2>
+
+    <div id="devices-section" class="mb-6">
+      <label class="block text-sm font-medium text-gray-700 mb-2">Select Printer Device</label>
+      <div class="flex gap-3 items-center">
+        <select id="deviceSelect" class="border rounded p-2 w-full"></select>
+        <button id="refreshDevicesBtn" class="px-3 py-2 bg-white border rounded hover:bg-gray-100">Refresh</button>
+      </div>
+      <p id="deviceInfo" class="text-sm text-gray-600 mt-2"></p>
+    </div>
+
+    <div class="mb-6 border-t pt-6">
+      <div class="flex gap-4 mb-4">
+        <button id="tabPasteBtn" class="px-4 py-2 bg-blue-600 text-white rounded">Paste ZPL</button>
+        <button id="tabFileBtn" class="px-4 py-2 bg-gray-100 rounded">Upload CSV / Excel</button>
+      </div>
+
+      <div id="pasteTab" class="space-y-3">
+        <label for="zplText" class="block text-sm font-medium text-gray-700">ZPL to Print</label>
+        <textarea id="zplText" rows="10" class="w-full border rounded p-2 font-mono text-xs"></textarea>
+        <div class="flex gap-3">
+          <button id="addQueueBtn" class="px-4 py-2 bg-indigo-600 text-white rounded shadow hover:bg-indigo-700">Add to
+            Queue</button>
+        </div>
+      </div>
+
+      <div id="fileTab" class="hidden space-y-3">
+        <div class="flex gap-3 items-center">
+          <input id="fileInput" type="file" accept=".csv,.xls,.xlsx" class="" />
+          <select id="separatorSelect" class="border rounded p-2">
+            <option value="auto">Auto-detect</option>
+            <option value=",">Comma (,)</option>
+            <option value=";">Semicolon (;)</option>
+            <option value="tab">Tab (\t)</option>
+            <option value="|">Pipe (|)</option>
+          </select>
+          <label class="inline-flex items-center"><input type="checkbox" id="hasHeader" checked class="mr-2"> First row
+            is header</label>
+        </div>
+        <div>
+          <label class="block text-sm font-medium">Column for ZPL</label>
+          <select id="columnSelect" class="border rounded p-2 w-full"></select>
+        </div>
+        <div>
+          <button id="previewBtn" class="px-4 py-2 bg-blue-600 text-white rounded">Preview</button>
+          <button id="sendFileBtn" class="px-4 py-2 bg-yellow-600 text-white rounded">Add All to Queue</button>
+        </div>
+        <div id="previewArea" class="mt-3"></div>
+      </div>
+    </div>
+
+    <div id="messages" class="mt-4"></div>
+  </div>
+</div>
+
+<script>
+  // Inline script: uses server endpoints via `url_for`
+  const URLS = {
+    getDevices: "{{ url_for('get_devices_info') }}",
+    print: "{{ url_for('print_to_device', device_name='__DEVICE__') }}",
+    addToQueue: "{{ url_for('add_to_print_queue', device_name='__DEVICE__') }}"
+  };
+
+  // DOM refs
+  const deviceSelect = document.getElementById('deviceSelect');
+  const deviceInfo = document.getElementById('deviceInfo');
+  const refreshDevicesBtn = document.getElementById('refreshDevicesBtn');
+  const pasteTab = document.getElementById('pasteTab');
+  const fileTab = document.getElementById('fileTab');
+  const tabPasteBtn = document.getElementById('tabPasteBtn');
+  const tabFileBtn = document.getElementById('tabFileBtn');
+  const zplText = document.getElementById('zplText');
+  const printNowBtn = document.getElementById('printNowBtn');
+  const addQueueBtn = document.getElementById('addQueueBtn');
+  const fileInput = document.getElementById('fileInput');
+  const separatorSelect = document.getElementById('separatorSelect');
+  const hasHeaderCheckbox = document.getElementById('hasHeader');
+  const columnSelect = document.getElementById('columnSelect');
+  const previewBtn = document.getElementById('previewBtn');
+  const sendFileBtn = document.getElementById('sendFileBtn');
+  const previewArea = document.getElementById('previewArea');
+  const messages = document.getElementById('messages');
+
+  let devices = [];
+  let parsedRows = [];
+
+  function showMessage(text, type = 'info') {
+    // prefer global showAlert if available
+    if (window.showAlert) {
+      window.showAlert(text, type === 'error' ? 'error' : (type === 'success' ? 'success' : 'info'));
+      return;
+    }
+    const color = type === 'error' ? 'red' : 'green';
+    messages.innerHTML = `<div class="p-2 rounded text-sm bg-${color}-100 text-${color}-800">${text}</div>`;
+    setTimeout(() => messages.innerHTML = '', 5000);
+  }
+
+  async function fetchDevices() {
+    try {
+      const resp = await fetch(URLS.getDevices, { headers: { 'Accept': 'application/json' } });
+      if (!resp.ok) throw new Error('Failed to fetch devices');
+      const list = await resp.json();
+      // filter by device_type == 'printer'
+      devices = (Array.isArray(list) ? list : []).filter(d => (d.device_type || '').toLowerCase() === 'printer');
+      populateDeviceSelect();
+    } catch (err) {
+      console.error(err);
+      if (window.showAlert) showAlert('Error loading devices: ' + err.message, 'error');
+    }
+  }
+
+  function populateDeviceSelect() {
+    const prev = deviceSelect.value;
+    deviceSelect.innerHTML = '';
+    devices.forEach(d => {
+      const opt = document.createElement('option');
+      opt.value = d.name;
+      // show only device name per user request
+      opt.textContent = d.name;
+      deviceSelect.appendChild(opt);
+    });
+    if (devices.length === 0) {
+      deviceSelect.innerHTML = '<option value="">No printers available</option>';
+      deviceInfo.textContent = '';
+      return;
+    }
+    if (prev) {
+      const hasPrev = Array.from(deviceSelect.options).some(o => o.value === prev);
+      deviceSelect.value = hasPrev ? prev : devices[0].name;
+    } else {
+      deviceSelect.value = devices[0].name;
+    }
+    updateDeviceInfo();
+  }
+
+  function updateDeviceInfo() {
+    const d = devices.find(dd => dd.name === deviceSelect.value);
+    if (!d) { deviceInfo.textContent = ''; return; }
+    // display only the device name on the page
+    deviceInfo.textContent = d.name || '';
+  }
+
+  deviceSelect.addEventListener('change', updateDeviceInfo);
+  refreshDevicesBtn.addEventListener('click', fetchDevices);
+
+  // tabs
+  tabPasteBtn.addEventListener('click', () => {
+    pasteTab.classList.remove('hidden'); fileTab.classList.add('hidden');
+    tabPasteBtn.classList.add('bg-blue-600', 'text-white'); tabFileBtn.classList.remove('bg-blue-600', 'text-white');
+    tabFileBtn.classList.add('bg-gray-100');
+  });
+  tabFileBtn.addEventListener('click', () => {
+    pasteTab.classList.add('hidden'); fileTab.classList.remove('hidden');
+    tabFileBtn.classList.add('bg-blue-600', 'text-white'); tabPasteBtn.classList.remove('bg-blue-600', 'text-white');
+    tabPasteBtn.classList.add('bg-gray-100');
+  });
+
+  // print actions
+  // Print now removed: use Add to Queue only
+
+  async function postAddToQueue(zplArray) {
+    const device = deviceSelect.value;
+    if (!device) { showMessage('Select a printer.', 'error'); return; }
+    try {
+      const url = URLS.addToQueue.replace('__DEVICE__', encodeURIComponent(device));
+      const body = Array.isArray(zplArray) ? zplArray.map(z => ({ zpl: z })) : [{ zpl: zplArray }];
+      const resp = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      const data = await resp.json();
+      if (!resp.ok) throw new Error(data?.message || JSON.stringify(data) || 'Add to queue failed');
+      showMessage('Added to print queue');
+      fetchDevices();
+    } catch (err) {
+      console.error(err);
+      showMessage('Queue error: ' + err.message, 'error');
+    }
+  }
+
+  addQueueBtn.addEventListener('click', () => {
+    const zpl = zplText.value.trim();
+    if (!zpl) { showMessage('ZPL is empty', 'error'); return; }
+    postAddToQueue(zpl);
+  });
+
+  // File parsing helpers
+  function detectSeparator(line) {
+    const candidates = [',', ';', '\t', '|'];
+    const counts = candidates.map(c => (line.match(new RegExp(`\\${c}`, 'g')) || []).length);
+    let max = counts[0], idx = 0;
+    for (let i = 1; i < counts.length; i++) {
+      if (counts[i] > max) { max = counts[i]; idx = i; }
+    }
+    return candidates[idx];
+  }
+
+  function previewRowsAsTable(rows, headers) {
+    if (!rows || rows.length === 0) { previewArea.innerHTML = '<div class="text-sm text-gray-600">No preview available</div>'; return; }
+    const max = Math.min(rows.length, 10);
+    let html = '<div class="overflow-auto border rounded p-2"><table class="min-w-full text-sm"><thead><tr>';
+    if (headers) {
+      for (const h of headers) { html += `<th class="px-2 py-1 text-left font-medium">${h}</th>`; }
+    } else {
+      for (let i = 0; i < rows[0].length; i++) html += `<th class="px-2 py-1 text-left font-medium">Col ${i + 1}</th>`;
+    }
+    html += '</tr></thead><tbody>';
+    for (let i = 0; i < max; i++) {
+      const r = rows[i];
+      html += '<tr>';
+      if (headers) {
+        for (const h of headers) html += `<td class="px-2 py-1">${(r[h] ?? '')}</td>`;
+      } else {
+        for (let c = 0; c < r.length; c++) html += `<td class="px-2 py-1">${r[c] ?? ''}</td>`;
+      }
+      html += '</tr>';
+    }
+    html += '</tbody></table></div>';
+    previewArea.innerHTML = html;
+  }
+
+  async function handleCsvText(text, separator, header) {
+    // lazy-load PapaParse for robust CSV parsing
+    if (typeof window.Papa === 'undefined') {
+      try {
+        await loadScript('https://unpkg.com/papaparse@5.3.2/papaparse.min.js');
+      } catch (e) {
+        console.warn('Failed to load PapaParse, falling back to simple parser', e);
+      }
+    }
+    if (window.Papa) {
+      const results = window.Papa.parse(text, { header: header, skipEmptyLines: true });
+      if (results.errors && results.errors.length) console.warn('CSV parse errors', results.errors);
+      if (header) {
+        parsedRows = results.data;
+        const cols = Object.keys(parsedRows[0] || {});
+        fillColumnSelect(cols);
+        previewRowsAsTable(parsedRows, cols);
+      } else {
+        parsedRows = results.data.map(r => Object.values(r));
+        fillColumnSelect(parsedRows[0] ? parsedRows[0].map((_, i) => `Col ${i + 1}`) : []);
+        previewRowsAsTable(parsedRows, null);
+      }
+      return;
+    }
+    // fallback simple CSV split
+    const lines = text.split(/\r\n|\n/).filter(l => l.trim() !== '');
+    if (lines.length === 0) { parsedRows = []; fillColumnSelect([]); previewArea.innerHTML = 'No data'; return; }
+    const sepChar = separator === 'auto' ? detectSeparator(lines[0]) : (separator === 'tab' ? '\t' : separator);
+    const rows = lines.map(line => parseSimpleCsvLine(line, sepChar));
+    if (header) {
+      const headers = rows[0];
+      parsedRows = rows.slice(1).map(r => {
+        const obj = {};
+        headers.forEach((h, i) => obj[h] = r[i] ?? '');
+        return obj;
+      });
+      fillColumnSelect(headers);
+      previewRowsAsTable(parsedRows, headers);
+    } else {
+      parsedRows = rows;
+      fillColumnSelect(rows[0] ? rows[0].map((_, i) => `Col ${i + 1}`) : []);
+      previewRowsAsTable(parsedRows, null);
+    }
+  }
+
+  function parseSimpleCsvLine(line, sep) {
+    const res = [];
+    let cur = '', inQuotes = false;
+    for (let i = 0; i < line.length; i++) {
+      const ch = line[i];
+      if (ch === '"') { if (inQuotes && line[i + 1] === '"') { cur += '"'; i++; } else { inQuotes = !inQuotes; } continue; }
+      if (!inQuotes && ch === sep) { res.push(cur); cur = ''; continue; }
+      cur += ch;
+    }
+    res.push(cur);
+    return res;
+  }
+
+  function fillColumnSelect(cols) {
+    columnSelect.innerHTML = '';
+    cols.forEach((c, idx) => {
+      const o = document.createElement('option');
+      o.value = idx;
+      o.textContent = c;
+      columnSelect.appendChild(o);
+    });
+  }
+
+  async function handleFile(file) {
+    const name = file.name.toLowerCase();
+    if (name.endsWith('.csv')) {
+      const text = await file.text();
+      const sep = separatorSelect.value;
+      await handleCsvText(text, sep, hasHeaderCheckbox.checked);
+    } else if (name.endsWith('.xls') || name.endsWith('.xlsx')) {
+      // load SheetJS dynamically
+      if (typeof window.XLSX === 'undefined') {
+        try {
+          await loadScript('https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js');
+        } catch (e) {
+          showMessage('Failed to load XLSX parser: ' + e.message, 'error');
+          return;
+        }
+      }
+      const data = await file.arrayBuffer();
+      const wb = window.XLSX.read(data, { type: 'array' });
+      const sheetName = wb.SheetNames[0];
+      const sheet = wb.Sheets[sheetName];
+      const jsonOpts = { header: hasHeaderCheckbox.checked ? 0 : 1, defval: '' };
+      const json = window.XLSX.utils.sheet_to_json(sheet, jsonOpts);
+      if (hasHeaderCheckbox.checked) {
+        parsedRows = json;
+        const cols = Object.keys(parsedRows[0] || {});
+        fillColumnSelect(cols);
+        previewRowsAsTable(parsedRows, cols);
+      } else {
+        parsedRows = json;
+        fillColumnSelect(parsedRows[0] ? parsedRows[0].map((_, i) => `Col ${i + 1}`) : []);
+        previewRowsAsTable(parsedRows, null);
+      }
+    } else {
+      showMessage('Unsupported file type', 'error');
+    }
+  }
+
+  fileInput.addEventListener('change', async (evt) => {
+    const f = evt.target.files[0];
+    if (!f) return;
+    await handleFile(f);
+  });
+
+  previewBtn.addEventListener('click', () => {
+    if (!parsedRows || parsedRows.length === 0) { showMessage('No parsed data to preview', 'error'); return; }
+    if (Array.isArray(parsedRows) && parsedRows.length > 0) {
+      if (typeof parsedRows[0] === 'object' && !Array.isArray(parsedRows[0])) {
+        previewRowsAsTable(parsedRows, Object.keys(parsedRows[0]));
+      } else {
+        previewRowsAsTable(parsedRows, null);
+      }
+    }
+  });
+
+  sendFileBtn.addEventListener('click', async () => {
+    if (!parsedRows || parsedRows.length === 0) { showMessage('No data parsed', 'error'); return; }
+    const colIndex = parseInt(columnSelect.value, 10);
+    const body = [];
+    if (typeof parsedRows[0] === 'object' && !Array.isArray(parsedRows[0])) {
+      const colName = Object.keys(parsedRows[0])[colIndex];
+      for (const r of parsedRows) {
+        const z = r[colName] ?? '';
+        if (z && z.trim()) body.push({ zpl: String(z) });
+      }
+    } else {
+      for (const r of parsedRows) {
+        const z = r[colIndex] ?? '';
+        if (z && String(z).trim()) body.push({ zpl: String(z) });
+      }
+    }
+    if (body.length === 0) { showMessage('No ZPL values found in chosen column', 'error'); return; }
+    await postAddToQueue(body.map(b => b.zpl));
+  });
+
+  // dynamic script loader
+  function loadScript(src) {
+    return new Promise((resolve, reject) => {
+      if (document.querySelector(`script[src="${src}"]`)) { resolve(); return; }
+      const s = document.createElement('script');
+      s.src = src;
+      s.onload = () => resolve();
+      s.onerror = (e) => reject(new Error('Failed to load ' + src));
+      document.head.appendChild(s);
+    });
+  }
+
+  // init
+  fetchDevices();
+  setInterval(fetchDevices, 3000);
+
+</script>
+
+{% endblock %}
