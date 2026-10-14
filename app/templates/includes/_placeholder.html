@@ -1,17 +1,88 @@
 <!-- Placeholder Control Widget -->
 <div class="bg-white rounded-lg shadow border p-4 mb-4" x-data="placeholderControl()">
-    <div class="max-h-44 overflow-auto pr-1 mb-4">
+    <div class="max-h-96 overflow-auto pr-1 mb-4">
         <template x-if="Object.keys(currentData).length === 0">
             <div class="text-sm font-medium text-slate-600">No data available.</div>
         </template>
 
         <template x-if="Object.keys(currentData).length > 0">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <template x-for="(itemValue, itemKey) in currentData" :key="itemKey">
-                    <div class="rounded-md border border-blue-100 bg-blue-50 p-2">
-                        <div class="text-xs font-bold uppercase tracking-wide text-blue-700" x-text="itemKey"></div>
-                        <pre class="mt-1 text-sm font-semibold text-slate-800 whitespace-pre-wrap break-words"
-                            x-text="serializeValue(itemValue)"></pre>
+                    <div :class="{'md:col-span-2': Array.isArray(itemValue) && itemValue.length > 0 && typeof itemValue[0] === 'object'}"
+                        class="rounded-lg border border-blue-200 bg-blue-50 p-3">
+
+                        <!-- Título do card (escondido para valores primitivos) -->
+                        <div x-show="!isPrimitive(itemValue)"
+                            class="text-xs font-bold uppercase tracking-wide text-blue-800 mb-2" x-text="itemKey">
+                        </div>
+
+                        <!-- Array of objects (table format) -->
+                        <template
+                            x-if="Array.isArray(itemValue) && itemValue.length > 0 && typeof itemValue[0] === 'object'">
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-xs border-collapse">
+                                    <thead>
+                                        <tr class="bg-blue-100 border-b border-blue-200">
+                                            <template x-for="key in getObjectKeys(itemValue[0])" :key="key">
+                                                <th class="px-2 py-1 text-left font-semibold text-blue-900"
+                                                    x-text="key"></th>
+                                            </template>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <template x-for="(row, idx) in itemValue" :key="idx">
+                                            <tr class="border-b border-blue-100 hover:bg-blue-100"
+                                                :class="{'bg-white': idx % 2 === 0, 'bg-blue-50': idx % 2 === 1}">
+                                                <template x-for="key in getObjectKeys(itemValue[0])" :key="key">
+                                                    <td class="px-2 py-1 text-slate-700 break-words"
+                                                        x-text="formatSimpleValue(row[key])"></td>
+                                                </template>
+                                            </tr>
+                                        </template>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </template>
+
+                        <!-- Simple object (key left, value right) -->
+                        <template
+                            x-if="typeof itemValue === 'object' && !Array.isArray(itemValue) && itemValue !== null">
+                            <template x-for="(entry, idx) in dictToArray(itemValue)" :key="idx">
+                                <div class="flex justify-between items-start gap-3 py-1">
+                                    <span class="font-semibold text-blue-700" x-text="entry.key"></span>
+                                    <span class="text-slate-700 break-words text-right"
+                                        x-text="formatSimpleValue(entry.value)"></span>
+                                </div>
+                            </template>
+                        </template>
+
+                        <!-- Simple array (table without header) -->
+                        <template
+                            x-if="Array.isArray(itemValue) && itemValue.length > 0 && typeof itemValue[0] !== 'object'">
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-xs border-collapse">
+                                    <tbody>
+                                        <template x-for="(item, idx) in itemValue" :key="idx">
+                                            <tr class="border-b border-blue-100 hover:bg-blue-100"
+                                                :class="{'bg-white': idx % 2 === 0, 'bg-blue-50': idx % 2 === 1}">
+                                                <td class="px-2 py-1 text-slate-700 break-words"
+                                                    x-text="formatSimpleValue(item)"></td>
+                                            </tr>
+                                        </template>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </template>
+
+                        <!-- Primitive value (key left, value right, no white box) -->
+                        <template x-if="isPrimitive(itemValue)">
+                            <div class="flex justify-between items-start gap-3">
+                                <span class="text-xs font-bold uppercase tracking-wide text-blue-800"
+                                    x-text="itemKey"></span>
+                                <span class="text-sm font-semibold text-slate-700 whitespace-pre-wrap break-words text-right"
+                                    x-text="serializeValue(itemValue)"></span>
+                            </div>
+                        </template>
                     </div>
                 </template>
             </div>
@@ -48,6 +119,12 @@
             currentData: {},
             loading: false,
 
+            isPrimitive(value) {
+                return value === null
+                    || (typeof value !== "object")
+                    || (Array.isArray(value) && value.length === 0);
+            },
+
             serializeValue(value) {
                 if (value === null) {
                     return "null";
@@ -62,6 +139,40 @@
                 }
 
                 return String(value);
+            },
+
+            formatSimpleValue(value) {
+                if (value === null || value === undefined) {
+                    return "—";
+                }
+
+                if (typeof value === "object") {
+                    try {
+                        return JSON.stringify(value);
+                    } catch {
+                        return String(value);
+                    }
+                }
+
+                if (typeof value === "boolean") {
+                    return value ? "Yes" : "No";
+                }
+
+                return String(value);
+            },
+
+            getObjectKeys(obj) {
+                if (typeof obj !== "object" || obj === null) {
+                    return [];
+                }
+                return Object.keys(obj);
+            },
+
+            dictToArray(obj) {
+                if (typeof obj !== "object" || obj === null) {
+                    return [];
+                }
+                return Object.entries(obj).map(([key, value]) => ({ key, value }));
             },
 
             extractErrorMessage(error) {

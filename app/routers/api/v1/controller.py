@@ -100,7 +100,12 @@ async def get_value_placeholder():
 		'value': 'ABC',
 		'description': 'This is a placeholder value',
 		'qty': 10,
-		'dict': {'key': 'value'},
+		'dict': {'key1': 'value1', 'key2': 'value2'},
+		'list': [1, 2, 3],
+		'table': [
+			{'column1': 'value1', 'column2': 'value2'},
+			{'column1': 'value3', 'column2': 'value4'},
+		],
 	}
 
 
