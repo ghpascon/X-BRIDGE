@@ -88,3 +88,51 @@ async def delete_tid_from_write_list(tid: str):
 		return JSONResponse(
 			status_code=400, content={'message': f'Failed to remove tag {tid} from write list'}
 		)
+
+
+# HELPER FUNCTIONS - Placeholder
+@router.get(
+	'/get_value_placeholder',
+	summary='Get a value for placeholder',
+)
+async def get_value_placeholder():
+	return {
+		'value': 'ABC',
+		'description': 'This is a placeholder value',
+		'qty': 10,
+		'dict': {'key': 'value'},
+	}
+
+
+@router.delete(
+	'/delete_value_placeholder',
+	summary='Delete the value for placeholder',
+)
+async def delete_value_placeholder():
+	return {'message': 'Value for placeholder deleted successfully'}
+
+
+@router.post(
+	'/set_value_placeholder/{value}',
+	summary='Set a value for placeholder',
+)
+async def set_value_placeholder(value: str):
+	if not value:
+		return JSONResponse(status_code=400, content={'message': 'Value cannot be empty'})
+	return {'message': f'Value set to {value} successfully'}
+
+
+@router.post(
+	'/receive_from_file',
+	summary='Set values for placeholder from uploaded file',
+)
+async def receive_from_file(items: list[dict]):
+	if not items:
+		return JSONResponse(status_code=400, content={'message': 'Payload cannot be empty'})
+
+	print(f'Received items from file: {items}')
+	return {
+		'message': 'Values received successfully',
+		'received_count': len(items),
+		'preview': items[:5],
+	}

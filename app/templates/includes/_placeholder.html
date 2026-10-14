@@ -1,0 +1,136 @@
+<!-- Placeholder Control Widget -->
+<div class="bg-white rounded-lg shadow border p-4 mb-4" x-data="placeholderControl()">
+    <div class="max-h-44 overflow-auto pr-1 mb-4">
+        <template x-if="Object.keys(currentData).length === 0">
+            <div class="text-sm font-medium text-slate-600">No data available.</div>
+        </template>
+
+        <template x-if="Object.keys(currentData).length > 0">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                <template x-for="(itemValue, itemKey) in currentData" :key="itemKey">
+                    <div class="rounded-md border border-blue-100 bg-blue-50 p-2">
+                        <div class="text-xs font-bold uppercase tracking-wide text-blue-700" x-text="itemKey"></div>
+                        <pre class="mt-1 text-sm font-semibold text-slate-800 whitespace-pre-wrap break-words"
+                            x-text="serializeValue(itemValue)"></pre>
+                    </div>
+                </template>
+            </div>
+        </template>
+    </div>
+
+    <div class="overflow-x-auto">
+        <div class="min-w-[680px]">
+            <form class="flex items-center gap-2" @submit.prevent="sendValue()">
+                <span class="text-sm text-slate-700 font-semibold">Value:</span>
+                <input x-model="draftValue" type="text" autofocus placeholder="placeholder"
+                    class="w-72 rounded border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200" />
+                <button type="submit" :disabled="loading || !draftValue.trim()" :class="{
+						'bg-blue-600 hover:bg-blue-700': !loading && draftValue.trim(),
+						'bg-slate-300 cursor-not-allowed': loading || !draftValue.trim(),
+					}" class="text-white px-4 py-2 rounded text-sm font-semibold transition-colors shadow-sm">
+                    <span x-text="loading ? 'Sending...' : 'Send'"></span>
+                </button>
+                <button type="button" @click="clearValue()" :disabled="loading" :class="{
+						'bg-red-500 hover:bg-red-600': !loading,
+						'bg-slate-300 cursor-not-allowed': loading,
+					}" class="text-white px-4 py-2 rounded text-sm font-semibold transition-colors shadow-sm">
+                    Clear
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function placeholderControl() {
+        return {
+            draftValue: "",
+            currentData: {},
+            loading: false,
+
+            serializeValue(value) {
+                if (value === null) {
+                    return "null";
+                }
+
+                if (typeof value === "object") {
+                    try {
+                        return JSON.stringify(value, null, 2);
+                    } catch (error) {
+                        return String(value);
+                    }
+                }
+
+                return String(value);
+            },
+
+            async init() {
+                await this.loadCurrentValue();
+            },
+
+            async loadCurrentValue() {
+                try {
+                    const data = await TemplateUtils.fetchJson(
+                        "{{ url_for('get_value_placeholder') }}",
+                    );
+                    if (data && typeof data === "object" && !Array.isArray(data)) {
+                        this.currentData = data;
+                    } else if (Array.isArray(data)) {
+                        this.currentData = { data };
+                    } else {
+                        this.currentData = { value: data };
+                    }
+                } catch (error) {
+                    this.currentData = {};
+                    console.error("Error loading placeholder value:", error);
+                }
+            },
+
+            async sendValue() {
+                const value = this.draftValue.trim();
+                if (!value || this.loading) {
+                    return;
+                }
+
+                this.loading = true;
+
+                try {
+                    const endpoint = "{{ url_for('set_value_placeholder', value='PLACEHOLDER_VALUE') }}".replace(
+                        "PLACEHOLDER_VALUE",
+                        encodeURIComponent(value),
+                    );
+
+                    await TemplateUtils.fetchJson(endpoint, { method: "POST" });
+
+                    this.draftValue = "";
+                    await this.loadCurrentValue();
+                } catch (error) {
+                    console.error("Error setting placeholder value:", error);
+                } finally {
+                    this.loading = false;
+                }
+            },
+
+            async clearValue() {
+                if (this.loading) {
+                    return;
+                }
+
+                this.loading = true;
+
+                try {
+                    await TemplateUtils.fetchJson("{{ url_for('delete_value_placeholder') }}", {
+                        method: "DELETE",
+                    });
+
+                    this.draftValue = "";
+                    await this.loadCurrentValue();
+                } catch (error) {
+                    console.error("Error clearing placeholder value:", error);
+                } finally {
+                    this.loading = false;
+                }
+            },
+        };
+    }
+</script>

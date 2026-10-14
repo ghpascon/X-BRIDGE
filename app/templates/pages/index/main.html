@@ -5,12 +5,14 @@
     {% include 'includes/_events.html' %} {% include 'includes/_devices.html' %}
   </div>
   <div class="lg:col-span-9">
-    {% if table == "complete" or only_complete_table %} 
-    {% include 'includes/_tags_all.html' %} 
-    {% elif table == "gtin" %} 
-    {% include 'includes/_tags_gtin.html' %} 
-    {% else %} 
-    {% include 'includes/_tags.html' %} 
+    {# {% include 'includes/_placeholder.html' %} #}
+    {# {% include 'includes/_file_uploader.html' %} #}
+    {% if table == "complete" or only_complete_table %}
+    {% include 'includes/_tags_all.html' %}
+    {% elif table == "gtin" %}
+    {% include 'includes/_tags_gtin.html' %}
+    {% else %}
+    {% include 'includes/_tags.html' %}
     {% endif %}
   </div>
 </div>
