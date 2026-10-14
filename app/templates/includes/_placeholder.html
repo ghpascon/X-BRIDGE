@@ -64,15 +64,31 @@
                 return String(value);
             },
 
+            extractErrorMessage(error) {
+                if (typeof error === "string") {
+                    return error;
+                }
+
+                if (error && typeof error === "object") {
+                    return error.message || error.msg || error.menssagem || error.detail || JSON.stringify(error);
+                }
+
+                return "An error occurred. Please try again.";
+            },
+
             async init() {
                 await this.loadCurrentValue();
             },
 
             async loadCurrentValue() {
                 try {
-                    const data = await TemplateUtils.fetchJson(
-                        "{{ url_for('get_value_placeholder') }}",
-                    );
+                    const response = await fetch("{{ url_for('get_value_placeholder') }}");
+                    const data = await response.json();
+
+                    if (!response.ok) {
+                        throw new Error(data.message || `HTTP ${response.status}`);
+                    }
+
                     if (data && typeof data === "object" && !Array.isArray(data)) {
                         this.currentData = data;
                     } else if (Array.isArray(data)) {
@@ -82,7 +98,11 @@
                     }
                 } catch (error) {
                     this.currentData = {};
+                    const errorMessage = this.extractErrorMessage(error);
                     console.error("Error loading placeholder value:", error);
+                    if (typeof window.showAlert === "function") {
+                        window.showAlert(errorMessage, "error", 5000, "toast");
+                    }
                 }
             },
 
@@ -100,18 +120,26 @@
                         encodeURIComponent(value),
                     );
 
-                    await TemplateUtils.fetchJson(endpoint, { method: "POST" });
+                    const response = await fetch(endpoint, { method: "POST" });
+                    const data = await response.json();
+
+                    if (!response.ok) {
+                        throw new Error(data.message || `HTTP ${response.status}`);
+                    }
 
                     this.draftValue = "";
                     await this.loadCurrentValue();
 
+                    const successMessage = data.message || `Value set successfully: ${value}`;
                     if (typeof window.showAlert === "function") {
-                        window.showAlert(`Value set successfully: ${value}`, "success", 5000, "toast");
+                        window.showAlert(successMessage, "success", 5000, "toast");
                     }
                 } catch (error) {
+                    this.draftValue = "";
+                    const errorMessage = this.extractErrorMessage(error);
                     console.error("Error setting placeholder value:", error);
                     if (typeof window.showAlert === "function") {
-                        window.showAlert("Failed to set value. Please try again.", "error", 5000, "toast");
+                        window.showAlert(errorMessage, "error", 5000, "toast");
                     }
                 } finally {
                     this.loading = false;
@@ -126,20 +154,27 @@
                 this.loading = true;
 
                 try {
-                    await TemplateUtils.fetchJson("{{ url_for('delete_value_placeholder') }}", {
+                    const response = await fetch("{{ url_for('delete_value_placeholder') }}", {
                         method: "DELETE",
                     });
+                    const data = await response.json();
+
+                    if (!response.ok) {
+                        throw new Error(data.message || `HTTP ${response.status}`);
+                    }
 
                     this.draftValue = "";
                     await this.loadCurrentValue();
 
+                    const successMessage = data.message || "Value cleared successfully.";
                     if (typeof window.showAlert === "function") {
-                        window.showAlert("Value cleared successfully.", "success", 5000, "toast");
+                        window.showAlert(successMessage, "success", 5000, "toast");
                     }
                 } catch (error) {
+                    const errorMessage = this.extractErrorMessage(error);
                     console.error("Error clearing placeholder value:", error);
                     if (typeof window.showAlert === "function") {
-                        window.showAlert("Failed to clear value. Please try again.", "error", 5000, "toast");
+                        window.showAlert(errorMessage, "error", 5000, "toast");
                     }
                 } finally {
                     this.loading = false;
