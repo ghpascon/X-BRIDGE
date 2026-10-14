@@ -104,8 +104,15 @@
 
                     this.draftValue = "";
                     await this.loadCurrentValue();
+
+                    if (typeof window.showAlert === "function") {
+                        window.showAlert(`Value set successfully: ${value}`, "success", 5000, "toast");
+                    }
                 } catch (error) {
                     console.error("Error setting placeholder value:", error);
+                    if (typeof window.showAlert === "function") {
+                        window.showAlert("Failed to set value. Please try again.", "error", 5000, "toast");
+                    }
                 } finally {
                     this.loading = false;
                 }
@@ -125,8 +132,15 @@
 
                     this.draftValue = "";
                     await this.loadCurrentValue();
+
+                    if (typeof window.showAlert === "function") {
+                        window.showAlert("Value cleared successfully.", "success", 5000, "toast");
+                    }
                 } catch (error) {
                     console.error("Error clearing placeholder value:", error);
+                    if (typeof window.showAlert === "function") {
+                        window.showAlert("Failed to clear value. Please try again.", "error", 5000, "toast");
+                    }
                 } finally {
                     this.loading = false;
                 }
