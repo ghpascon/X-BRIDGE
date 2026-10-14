@@ -21,7 +21,7 @@
             <div class="p-5 space-y-4">
                 <div class="rounded-lg border border-slate-200 p-4">
                     <label class="block text-sm font-semibold text-slate-800 mb-2">Arquivo (.csv, .xls, .xlsx)</label>
-                    <input type="file" accept=".csv,.xls,.xlsx" @change="onFileChange($event)"
+                    <input type="file" accept=".csv,.xls,.xlsx" @change="onFileChange($event)" x-ref="fileInput"
                         class="block w-full text-sm text-slate-700 file:mr-4 file:py-2 file:px-3 file:rounded file:border-0 file:bg-slate-200 file:text-slate-900 hover:file:bg-slate-300" />
                     <div class="mt-2 text-xs text-slate-600"
                         x-text="fileName ? `Arquivo: ${fileName}` : 'Nenhum arquivo selecionado'"></div>
@@ -177,6 +177,10 @@
 
             closeModal() {
                 this.isOpen = false;
+                this.fileName = "";
+                if (this.$refs.fileInput) {
+                    this.$refs.fileInput.value = "";
+                }
             },
 
             clearStatus() {
