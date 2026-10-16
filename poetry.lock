@@ -2724,14 +2724,36 @@ url = "https://pypi.org/simple"
 reference = "pypi-simple"
 
 [[package]]
+name = "sllurp"
+version = "3.0.5"
+description = "RFID reader control library"
+optional = false
+python-versions = ">=3.10"
+files = [
+    {file = "sllurp-3.0.5-py3-none-any.whl", hash = "sha256:0c013b530e9759d9cc64f917b07ab72faf4c0e6eb1aa34ab77407ed8f00b7a08"},
+    {file = "sllurp-3.0.5.tar.gz", hash = "sha256:3360079a0804989e249f039fddb9ee9f9a32dec0bd77d48ca50a02382605d367"},
+]
+
+[package.dependencies]
+click = "*"
+
+[package.extras]
+test = ["pytest"]
+
+[package.source]
+type = "legacy"
+url = "https://pypi.org/simple"
+reference = "pypi-simple"
+
+[[package]]
 name = "smartx-rfid"
-version = "12.7.3"
+version = "12.8.1"
 description = "SmartX RFID library"
 optional = false
 python-versions = ">=3.11,<4.0"
 files = [
-    {file = "smartx_rfid-12.7.3-py3-none-any.whl", hash = "sha256:13bacf80d03a1243346806b2c01da05a847f6de4b63025c63d8c5dc9d66da98d"},
-    {file = "smartx_rfid-12.7.3.tar.gz", hash = "sha256:192f6071a525b49b412ebce0b72d21248dbc3a408a2e0399b197a9f1eccd0e13"},
+    {file = "smartx_rfid-12.8.1-py3-none-any.whl", hash = "sha256:6e9c8752ec0d8bc6ef646f5e1da6c942c3c39d8dfa40bad4f661ee98af37abef"},
+    {file = "smartx_rfid-12.8.1.tar.gz", hash = "sha256:bdcbba8e76ab9465867be896a79b16d7a5d4fdc518b18c849b98d2461257938e"},
 ]
 
 [package.dependencies]
@@ -2755,6 +2777,7 @@ pymongo = ">=4.13.2,<5.0.0"
 pymysql = "1.1.1"
 pyserial = "3.5"
 pyserial-asyncio = "0.6"
+sllurp = ">=3.0.5,<4.0.0"
 sqlalchemy = "2.0.29"
 uvloop = {version = ">=0.22.1,<0.23.0", markers = "sys_platform != \"win32\""}
 
@@ -3448,4 +3471,4 @@ reference = "pypi-simple"
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.11,<3.15"
-content-hash = "2685da925c016f5ff7d20fa3218c3a54e5dbff99f3fcfab716308720ea1ec5e5"
+content-hash = "2e9ffcac6ad9fdcfba50e217b28a1a54526ef20a94b3f97a0ac02aa396f54abf"
