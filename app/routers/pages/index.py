@@ -66,6 +66,15 @@ async def gtin(request: Request):
 	)
 
 
+@router.get('/by_ant', response_class=HTMLResponse)
+async def by_ant(request: Request):
+	return templates.TemplateResponse(
+		'pages/index/main.html',
+		{'request': request, 'title': settings.TITLE, 'alerts': [], 'table': 'by_ant'},
+		media_type='text/html; charset=utf-8',
+	)
+
+
 @router.get('/license', response_class=HTMLResponse)
 async def license(request: Request):
 	return templates.TemplateResponse(

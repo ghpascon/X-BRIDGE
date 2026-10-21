@@ -3,18 +3,10 @@
   <!-- Left - EPCs List -->
   <div class="flex-1">
     <div class="mb-4 flex flex-wrap items-center gap-3 justify-between">
-      <div class="flex items-center gap-2 order-1">
-        <span class="bg-blue-600 text-white px-4 py-2 rounded text-sm font-medium">
-          EPCs
-        </span>
-        <a href="{{ url_for('gtin') }}"
-          class="bg-white border border-blue-300 hover:bg-blue-50 text-blue-700 px-4 py-2 rounded text-sm font-medium">
-          GTIN
-        </a>
-        <a href="{{ url_for('tag_details') }}"
-          class="bg-white border border-blue-300 hover:bg-blue-50 text-blue-700 px-4 py-2 rounded text-sm font-medium">
-          All
-        </a>
+      <div class="order-1">
+        {% with selected_table='epcs' %}
+        {% include 'includes/_table_selector.html' %}
+        {% endwith %}
       </div>
 
       <h4 class="text-lg font-semibold order-2">
