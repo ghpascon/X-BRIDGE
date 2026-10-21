@@ -39,6 +39,9 @@
                                 <div class="font-mono text-sm text-gray-800 break-all" x-text="tag.epc || '-' "></div>
                             </li>
                         </template>
+                        <li x-show="group.tags.length === 0" class="px-3 py-2 text-sm text-gray-400">
+                            No EPCs in this antenna
+                        </li>
                     </ul>
                 </section>
             </template>
@@ -69,6 +72,11 @@
 
             get antennaGroups() {
                 const grouped = new Map();
+
+                Object.keys(ant_name).forEach((key) => {
+                    grouped.set(key, []);
+                });
+
                 this.tags.forEach((tag) => {
                     const key = tag.ant === null || tag.ant === undefined || tag.ant === "" ? "unknown" : String(tag.ant);
                     if (!grouped.has(key)) {
