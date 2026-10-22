@@ -85,11 +85,6 @@
             <span id="previewCount" class="text-xs text-gray-500"></span>
         </div>
         <div id="previewTable" class="overflow-auto"></div>
-        <div>
-            <label for="csvOutput" class="block text-sm font-medium text-gray-700 mb-1">Generated CSV</label>
-            <textarea id="csvOutput" rows="8" readonly
-                class="w-full border border-gray-300 rounded-lg p-2 font-mono text-xs bg-gray-50"></textarea>
-        </div>
     </section>
 
     <div id="messages"></div>
@@ -109,11 +104,10 @@
     const copyBtn = document.getElementById('copyBtn');
     const previewTable = document.getElementById('previewTable');
     const previewCount = document.getElementById('previewCount');
-    const csvOutput = document.getElementById('csvOutput');
     const messages = document.getElementById('messages');
 
     let detectedKeys = [];
-    let generatedLines = [];
+    let generatedCsv = '';
 
     function showMessage(text, type = 'info') {
         if (window.showAlert) {
@@ -370,12 +364,10 @@
             lines.push(buildZplRow(template, configs, i));
         }
 
-        generatedLines = lines;
-        const csv = lines.map(csvEscape).join('\n');
-        csvOutput.value = csv;
+        generatedCsv = lines.map(csvEscape).join('\n');
         renderPreview(lines);
         showMessage(`Generated successfully: ${lines.length} line(s).`, 'success');
-        return csv;
+        return generatedCsv;
     }
 
     function sanitizeFilename(name) {
@@ -404,7 +396,7 @@
     });
 
     downloadBtn.addEventListener('click', () => {
-        const csv = csvOutput.value || generateData();
+        const csv = generatedCsv || generateData();
         if (!csv) return;
 
         const fileName = `${sanitizeFilename(fileNameInput.value)}.csv`;
@@ -423,7 +415,7 @@
     });
 
     copyBtn.addEventListener('click', async () => {
-        const csv = csvOutput.value || generateData();
+        const csv = generatedCsv || generateData();
         if (!csv) return;
 
         try {
