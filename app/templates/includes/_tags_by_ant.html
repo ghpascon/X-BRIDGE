@@ -33,10 +33,10 @@
                     </header>
 
                     <ul class="divide-y divide-gray-100 max-h-40 overflow-y-auto">
-                        <template x-for="(tag, tagIndex) in group.tags"
-                            :key="`antenna-${group.key}-epc-${tag.epc || tagIndex}`">
+                        <template x-for="(tag, tagIndex) in group.tags" :key="`antenna-${group.key}-epc-${tagIndex}`">
                             <li class="px-3 py-2 hover:bg-gray-50">
-                                <div class="font-mono text-sm text-gray-800 break-all" x-text="tag.epc || '-' "></div>
+                                <div class="font-mono text-sm text-gray-800 break-all"
+                                    x-text="tag.epc || tag.EPC || tag.epcHex || tag.epc_hex || '-' "></div>
                             </li>
                         </template>
                         <li x-show="group.tags.length === 0" class="px-3 py-2 text-sm text-gray-400">
@@ -65,27 +65,29 @@
     function tagsByAntennaTable() {
         return {
             tags: [],
+            antennaGroups: [],
             loadingTags: false,
             lastTagsPayload: "",
             selectedLimit: "all",
             colors: ["#2563eb", "#059669", "#d97706", "#7c3aed", "#db2777", "#0891b2"],
 
-            get antennaGroups() {
+            groupTagsByAntenna() {
                 const grouped = new Map();
 
-                Object.keys(ant_name).forEach((key) => {
-                    grouped.set(key, []);
-                });
+                Object.keys(ant_name).forEach((key) => grouped.set(key, []));
 
                 this.tags.forEach((tag) => {
-                    const key = tag.ant === null || tag.ant === undefined || tag.ant === "" ? "unknown" : String(tag.ant);
+                    const antenna = tag.ant ?? tag.antenna ?? tag.antennaPort ?? tag.antenna_port;
+                    const key = antenna === null || antenna === undefined || antenna === ""
+                        ? "unknown"
+                        : String(antenna);
                     if (!grouped.has(key)) {
                         grouped.set(key, []);
                     }
                     grouped.get(key).push(tag);
                 });
 
-                return Array.from(grouped, ([key, tags]) => ({ key, tags })).sort((left, right) => {
+                this.antennaGroups = Array.from(grouped, ([key, tags]) => ({ key, tags })).sort((left, right) => {
                     if (left.key === "unknown") return 1;
                     if (right.key === "unknown") return -1;
                     const leftNumber = Number(left.key);
@@ -125,7 +127,12 @@
                     if (result.changed) {
                         this.lastTagsPayload = result.payload;
                         const data = result.data;
-                        this.tags = Array.isArray(data) ? data : data.tags || [];
+                        this.tags = Array.isArray(data)
+                            ? data
+                            : Array.isArray(data?.tags)
+                                ? data.tags
+                                : [];
+                        this.groupTagsByAntenna();
                     }
                 } catch (error) {
                     console.error("Error loading antenna EPCs:", error);
