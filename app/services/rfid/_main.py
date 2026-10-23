@@ -65,6 +65,9 @@ class RfidManager:
 
 	def on_tag(self, name: str, tag_data: dict):
 		new_tag, tag = self.tags.add(tag_data, device=name)
+		success, device_serial_number = self.devices.get_serial_number(name)
+		if success and device_serial_number:
+			tag['device_serial_number'] = device_serial_number
 
 		# NEW TAG
 		if new_tag:
