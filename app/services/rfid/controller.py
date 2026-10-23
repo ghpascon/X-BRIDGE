@@ -15,6 +15,11 @@ from app.services.license import license_manager
 from smartx_rfid.schemas.tag import WriteTagValidator
 
 
+def _system_device(name: str) -> dict:
+	"""Device descriptor for events that do not originate from a physical device."""
+	return {'name': name, 'serial_number': None}
+
+
 class Controller:
 	def __init__(self, devices: DeviceManager, tags: TagList, integration: Integration):
 		self.tags = tags
@@ -27,45 +32,58 @@ class Controller:
 		self.write_list: dict = {}
 
 	# [ EVENTS ]
-	def on_event(self, name: str, event_type: str, event_data):
-		logging.info(f'[ EVENT ] {name} - {event_type}: {event_data}')
+	def on_event(self, device: dict, event_type: str, event_data):
+		"""
+		Handle a generic event.
+
+		Args:
+		    device: Device descriptor ``{'name': ..., 'serial_number': ...}``.
+		    event_type: Event type.
+		    event_data: Event payload.
+		"""
+		logging.info(
+			f"[ EVENT ] {device.get('name')} (SN: {device.get('serial_number')}) - "
+			f'{event_type}: {event_data}'
+		)
 		if not license_manager.validate_license():
 			return
 		asyncio.create_task(
 			self.integration.on_event_integration(
-				name=name, event_type=event_type, event_data=event_data
+				device=device, event_type=event_type, event_data=event_data
 			)
 		)
 		asyncio.create_task(
-			self.dispatcher.add_async(name=name, event_type=event_type, data=event_data)
+			self.dispatcher.add_async(device=device, event_type=event_type, data=event_data)
 		)
 
 	# [ Reading Events ]
-	def on_start(self, name: str):
-		logging.info(f'[ START ] {name}')
+	def on_start(self, device: dict):
+		logging.info(f"[ START ] {device.get('name')}")
 		if not license_manager.validate_license():
 			return
 		if settings.CLEAR_ON_START:
-			self.tags.remove_tags_by_device(device=name)
+			self.tags.remove_tags_by_device(device=device)
 
-	def on_stop(self, name: str):
-		logging.info(f'[ STOP ] {name}')
+	def on_stop(self, device: dict):
+		logging.info(f"[ STOP ] {device.get('name')}")
 
 	# [ Tag Events ]
-	def on_new_tag(self, name: str, tag: dict):
-		logging.info(f'[ TAG ] {name} - {tag}')
+	def on_new_tag(self, device: dict, tag: dict):
+		logging.info(f"[ TAG ] {device.get('name')} - {tag}")
 		if not license_manager.validate_license():
 			return
 		asyncio.create_task(self.integration.on_tag_integration(tag=tag))
-		asyncio.create_task(self.dispatcher.add_async(name=name, event_type='tag', data=tag))
+		asyncio.create_task(self.dispatcher.add_async(device=device, event_type='tag', data=tag))
 
-	def on_existing_tag(self, name: str, tag: dict):
+	def on_existing_tag(self, device: dict, tag: dict):
 		asyncio.create_task(self.check_target(tag))
 		if settings.ALWAYS_SEND:
 			if not license_manager.validate_license():
 				return
 			asyncio.create_task(self.integration.on_tag_integration(tag=tag))
-			asyncio.create_task(self.dispatcher.add_async(name=name, event_type='tag', data=tag))
+			asyncio.create_task(
+				self.dispatcher.add_async(device=device, event_type='tag', data=tag)
+			)
 
 	# [ WRITE LIST ]
 	def create_write_list_prefix(self, epcs: list, prefix: str):
@@ -86,28 +104,40 @@ class Controller:
 		}
 		tag['target'] = target
 		logging.info(f"Added tag {tag.get('tid')} to write list with target {tag.get('target')}")
-		self.on_event(name='write_list', event_type='add_to_write_list', event_data=tag)
+		self.on_event(
+			device=_system_device('write_list'),
+			event_type='add_to_write_list',
+			event_data=tag,
+		)
 
 	def remove_from_write_list(self, tag: dict):
 		tid = tag.get('tid')
 		if tid in self.write_list:
 			logging.info(f'Removed tag {tid} from write list')
 			self.on_event(
-				name='write_list',
+				device=_system_device('write_list'),
 				event_type='remove_from_write_list',
 				event_data={**tag, 'original_epc': self.write_list[tid]['original_epc']},
 			)
 			del self.write_list[tid]
 			if not self.write_list:
 				logging.info('Write list is now empty')
-				self.on_event(name='write_list', event_type='write_list_empty', event_data={})
+				self.on_event(
+					device=_system_device('write_list'),
+					event_type='write_list_empty',
+					event_data={},
+				)
 				return True
 		return False
 
 	def clear_write_list(self):
 		self.write_list.clear()
 		logging.info('Cleared write list')
-		self.on_event(name='write_list', event_type='write_list_cleared', event_data={})
+		self.on_event(
+			device=_system_device('write_list'),
+			event_type='write_list_cleared',
+			event_data={},
+		)
 
 	async def check_target(self, tag: dict):
 		target = tag.get('target')

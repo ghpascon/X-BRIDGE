@@ -34,9 +34,14 @@ Todos os tipos usam uma base parecida:
 - `retry_backoff_seconds`: intervalo entre tentativas
 - `filters`: filtros para restringir o envio
 
+Todo evento possui tres partes: `device` (dict com `name` e `serial_number`), `event_type` e `event_data`. O `serial_number` e `null` enquanto o leitor ainda nao o informou.
+
 Placeholders suportados (templates):
 
 - `{name}`: nome do device
+- `{serial_number}`: numero de serie do device (`null` se desconhecido)
+- `{device}`: dict completo do device (`{"name": ..., "serial_number": ...}`)
+- `{device[chave]}`: campo especifico do device (ex.: `{device[serial_number]}`)
 - `{event_type}`: tipo do evento
 - `{data}`: payload bruto do evento
 - `{data[chave]}`: campo especifico quando `data` é um objeto/dict (ex.: `{data[epc]}`)
@@ -126,6 +131,7 @@ Exemplo minimo:
   },
   "body": {
     "device": "{name}",
+    "device_serial_number": "{device[serial_number]}",
     "epc": "{data[epc]}"
   }
 }
@@ -165,9 +171,10 @@ Exemplo minimo:
   "retry_attempts": 3,
   "retry_backoff_seconds": 0.25,
   "filters": [],
-  "query": "INSERT INTO events (device, epc) VALUES (:device, :epc)",
+  "query": "INSERT INTO events (device, device_serial_number, epc) VALUES (:device, :device_serial_number, :epc)",
   "params": {
     "device": "{name}",
+    "device_serial_number": "{device[serial_number]}",
     "epc": "{data[epc]}"
   }
 }
@@ -215,6 +222,7 @@ Exemplo minimo:
   "filters": [],
   "payload": {
     "device": "{name}",
+    "device_serial_number": "{device[serial_number]}",
     "epc": "{data[epc]}"
   }
 }
@@ -261,6 +269,7 @@ Exemplo minimo:
   "filters": [],
   "document": {
     "device": "{name}",
+    "device_serial_number": "{device[serial_number]}",
     "event_type": "{event_type}",
     "epc": "{data[epc]}"
   }
@@ -296,12 +305,14 @@ Dependendo da origem do evento, os nomes podem variar. Alguns comuns no sistema:
 
 - `tag`
 - `reading`
+- `connection`
+- `serial_number`
 - `add_to_write_list`
 - `remove_from_write_list`
 - `write_list_empty`
 - `write_list_cleared`
 
-Tambem e possivel receber eventos customizados por endpoints de entrada (`/api/v1/receive/*`).
+Tambem e possivel receber eventos customizados por endpoints de entrada (`/api/v1/receive/*`). Nesses endpoints, o `serial_number` pode ser informado no campo opcional `device_serial_number`; se omitido, e obtido do device conectado com o mesmo nome (quando existir).
 
 ## Checklist rapido de validacao
 

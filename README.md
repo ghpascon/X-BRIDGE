@@ -12,6 +12,7 @@ SMARTX X-BRIDGE is a high-performance RFID device management platform built with
 - **Real-time tag processing** — Duplicate filtering, EPC/TID validation, RSSI monitoring, antenna and power control
 - **Tag prefix filtering** — Accept only tags matching configured prefixes
 - **Integrations** — Webhook with retry, MQTT (IoT), XTRACK, and relational database persistence (SQLite, MySQL, PostgreSQL)
+- **Device-aware events** — Every event carries a device descriptor (`name` and `serial_number`) plus `event_type` and `event_data`
 - **Web interface** — Responsive dashboard with live updates, log viewer, and device settings
 - **API** — Full RESTful API with interactive Swagger documentation
 - **Simulation** — Simulate tags and events without physical hardware, including GTIN-14 generation
@@ -135,7 +136,7 @@ docker run -it --rm -p 5000:5000 x-bridge
 | **Devices**     | `/api/v1/devices`     | List devices, get/set config, device status and info                                                     |
 | **Application** | `/api/v1/application` | App settings CRUD, device config CRUD, restart/shutdown                                                  |
 | **Simulator**   | `/api/v1/simulator`   | Simulate tags, events, tag lists, GTIN-14 tag generation                                                 |
-| **Receive**     | `/api/v1/receive`     | Ingest tag/event data from external readers (X714, R700, XSCAN)                                          |
+| **Receive**     | `/api/v1/receive`     | Ingest tag/event data from external readers (X714, R700, XSCAN); accepts optional `device_serial_number` |
 | **License**     | `/api/v1/license`     | Get license info, upload license                                                                         |
 | **Controller**  | `/api/v1/controller`  | RFID controller runtime info                                                                             |
 | **Dispatchers** | `/api/v1/dispatchers` | Manage dispatchers: list examples, get example content, create/update and delete dispatch configurations |
@@ -146,7 +147,7 @@ Full interactive documentation available at `/docs`.
 
 ## Dispatchers
 
-Dispatchers are configurable event forwarders. They listen to RFID/runtime events and dispatch payloads to external systems using either HTTP POST or SQL inserts.
+Dispatchers are configurable event forwarders. They listen to RFID/runtime events and dispatch payloads to external systems using HTTP POST, SQL inserts, MQTT publishing, or MongoDB inserts.
 
 API endpoints available at `/api/v1/dispatchers` allow listing example dispatches, retrieving example content, creating/updating, and deleting dispatch configurations at runtime.
 
@@ -157,10 +158,38 @@ API endpoints available at `/api/v1/dispatchers` allow listing example dispatche
 
 ### Supported dispatch types
 
-| Type   | Purpose                                  |
-| ------ | ---------------------------------------- |
-| `post` | Send events to external HTTP endpoints   |
-| `sql`  | Persist events directly in SQL databases |
+| Type      | Purpose                                  |
+| --------- | ---------------------------------------- |
+| `post`    | Send events to external HTTP endpoints   |
+| `sql`     | Persist events directly in SQL databases |
+| `mqtt`    | Publish events to MQTT topics            |
+| `mongodb` | Insert events into MongoDB collections   |
+
+### Event model
+
+Every event emitted by a device (or injected through the API) carries three parts:
+
+| Part         | Type   | Description                                                      |
+| ------------ | ------ | ---------------------------------------------------------------- |
+| `device`     | dict   | Device descriptor: `{"name": str, "serial_number": str \| null}` |
+| `event_type` | string | Event type (`tag`, `reading`, `connection`, ...)                 |
+| `event_data` | any    | Event payload (dict, bool, string, number, list)                 |
+
+The `serial_number` is `null` until the reader reports it. For events received through `/api/v1/receive/*` or `/api/v1/simulator/*`, it is taken from the request (`device_serial_number`) or, when omitted, resolved from the connected device with the same name.
+
+Tags stored in memory also expose `device` (name) and `device_serial_number`.
+
+The built-in webhook (`WEBHOOK_URL`) posts the same structure:
+
+```json
+{
+  "device": { "name": "reader-01", "serial_number": "37100000001" },
+  "event_type": "tag",
+  "event_data": { "epc": "...", "tid": "...", "ant": 1, "rssi": -50 }
+}
+```
+
+> **Note:** `device` is an object (previously a plain device name string). Update external consumers of the webhook accordingly.
 
 ### Common event triggers (`on_event`)
 
@@ -168,20 +197,29 @@ API endpoints available at `/api/v1/dispatchers` allow listing example dispatche
 - `reading` — reader reading state changes (boolean payload)
 - `connection` — reader connectivity state changes
 - `serial_number` — serial-number oriented events
+- `add_to_write_list`, `remove_from_write_list`, `write_list_empty`, `write_list_cleared` — write list events (emitted with the `write_list` system device)
 
 ### Placeholders and filters
 
-- Placeholders are resolved at runtime (examples: `{name}`, `{event_type}`, `{data}`, `{data[epc]}`)
+- Placeholders are resolved at runtime:
+  - `{name}` — device name
+  - `{serial_number}` — device serial number
+  - `{device}` — full device dict
+  - `{device[key]}` — a key of the device dict (e.g. `{device[serial_number]}`)
+  - `{event_type}` — event type
+  - `{data}` — raw event payload
+  - `{data[key]}` — a payload field (e.g. `{data[epc]}`)
 - For scalar payloads (like `reading`), use `{data}`
 - For dict payloads (like `tag`), use keyed placeholders such as `{data[epc]}`
-- Filters can restrict dispatches by payload/device fields (`eq`, `ne`, `in`, `gt`, `contains`, etc.)
+- Filters can restrict dispatches by payload/device fields (`eq`, `ne`, `in`, `not_in`, `gt`, `lt`, `gte`, `lte`, `contains`)
 
 ### Example files
 
-- `examples/dispatchers/reading_post.json`
-- `examples/dispatchers/tag_ant_post.json`
-- `examples/dispatchers/reading_sql.json`
-- `examples/dispatchers/serial_number_sql.json`
+- `examples/dispatchers/base_post.json`, `base_sql.json`, `base_mqtt.json`, `base_mongodb.json` — annotated templates
+- `examples/dispatchers/reading_post.json`, `reading_sql.json`
+- `examples/dispatchers/connection_post.json`, `connection_sql.json`
+- `examples/dispatchers/serial_number_post.json`, `serial_number_sql.json`
+- `examples/dispatchers/write_list_empty_post.json`, `write_list_remove_post.json`
 
 ### Minimal POST example
 
@@ -196,6 +234,7 @@ API endpoints available at `/api/v1/dispatchers` allow listing example dispatche
   },
   "body": {
     "device": "{name}",
+    "device_serial_number": "{device[serial_number]}",
     "event_type": "{event_type}",
     "epc": "{data[epc]}"
   }
@@ -209,9 +248,10 @@ API endpoints available at `/api/v1/dispatchers` allow listing example dispatche
   "dispatch_type": "sql",
   "connection_string": "postgresql+asyncpg://user:password@localhost:5432/mydatabase",
   "on_event": "reading",
-  "query": "INSERT INTO device_reading_events (device, is_reading) VALUES (:device, :is_reading)",
+  "query": "INSERT INTO device_reading_events (device, device_serial_number, is_reading) VALUES (:device, :device_serial_number, :is_reading)",
   "params": {
     "device": "{name}",
+    "device_serial_number": "{device[serial_number]}",
     "is_reading": "{data}"
   }
 }
@@ -228,7 +268,7 @@ API endpoints available at `/api/v1/dispatchers` allow listing example dispatche
 | Web framework   | FastAPI + Uvicorn                 |
 | Database ORM    | SQLAlchemy + Alembic              |
 | Templates       | Jinja2                            |
-| RFID layer      | smartx-rfid                       |
+| RFID layer      | smartx-rfid (13.0.0)              |
 | MQTT            | gmqtt                             |
 | Metrics         | prometheus-fastapi-instrumentator |
 | Auth            | passlib[bcrypt] + itsdangerous    |

@@ -26,7 +26,7 @@ async def simulate_tag_event():
 		'rssi': -50,
 	}
 	rfid_manager.on_event(
-		name='SIMULATOR',
+		device=rfid_manager.build_device('SIMULATOR'),
 		event_type='tag',
 		event_data=sample_tag,
 	)
@@ -49,7 +49,7 @@ async def simulate_custom_tag_event(custom_tag: CustomTagSimulator):
 		'rssi': custom_tag.rssi,
 	}
 	rfid_manager.on_event(
-		name='SIMULATOR',
+		device=rfid_manager.build_device('SIMULATOR'),
 		event_type='tag',
 		event_data=tag_data,
 	)
@@ -70,7 +70,7 @@ async def simulate_generic_event():
 		'event_data': {'info': 'This is a simulated event for testing.'},
 	}
 	rfid_manager.on_event(
-		name='SIMULATOR',
+		device=rfid_manager.build_device('SIMULATOR'),
 		event_type=sample_event['event_type'],
 		event_data=sample_event['event_data'],
 	)
@@ -87,7 +87,7 @@ async def simulate_generic_event():
 )
 async def simulate_custom_event(event: EventDeviceSchema):
 	rfid_manager.on_event(
-		name=event.device_name,
+		device=rfid_manager.build_device(event.device_name, event.device_serial_number),
 		event_type=event.event_type,
 		event_data=event.event_data,
 	)
@@ -104,6 +104,7 @@ async def simulate_custom_event(event: EventDeviceSchema):
 )
 async def simulate_tag_list(tag_list: TagListSimulator):
 	device_name = 'SIMULATOR'
+	device = rfid_manager.build_device(device_name)
 	try:
 		# Converte o EPC inicial para int para fazer incremento sequencial
 		start_epc_int = int(tag_list.start_epc, 16)  # Adicionar base 16 para conversão hex
@@ -129,7 +130,7 @@ async def simulate_tag_list(tag_list: TagListSimulator):
 
 			# Envia o evento para o sistema
 			if not rfid_manager.on_tag(
-				name=device_name,
+				device=device,
 				tag_data=tag_data,
 			)[0]:
 				continue
@@ -165,6 +166,7 @@ async def simulate_tag_list(tag_list: TagListSimulator):
 )
 async def gtin_list(tag_generator: TagGtinSimulator):
 	device_name = 'SIMULATOR'
+	device = rfid_manager.build_device(device_name)
 	gtin = tag_generator.gtin
 	qtd = tag_generator.qtd
 	start_serial = tag_generator.start_serial
@@ -220,7 +222,7 @@ async def gtin_list(tag_generator: TagGtinSimulator):
 
 			# Send tag event to processing pipeline
 			if not rfid_manager.on_tag(
-				name=device_name,
+				device=device,
 				tag_data=tag_data,
 			)[0]:
 				continue

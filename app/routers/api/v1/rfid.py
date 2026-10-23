@@ -137,7 +137,7 @@ async def delete_by_epc(epc: str):
 		)
 
 	rfid_manager.on_event(
-		name='delete_tag',
+		device=rfid_manager.build_device('delete_tag'),
 		event_type='tag_deleted',
 		event_data=result[0],
 	)
@@ -161,7 +161,7 @@ async def delete_by_tid(tid: str):
 			content={'message': f'Tag with TID {tid} not found.'},
 		)
 	rfid_manager.on_event(
-		name='delete_tag',
+		device=rfid_manager.build_device('delete_tag'),
 		event_type='tag_deleted',
 		event_data=result[0],
 	)

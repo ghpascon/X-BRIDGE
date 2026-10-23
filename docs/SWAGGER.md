@@ -32,7 +32,7 @@ Grupos de endpoints
   - Injeção de dados sintéticos (tags, lotes, eventos) e geração de GTIN‑14 para testes sem hardware.
 
 - **Receive** — `/api/v1/receive`
-  - Recepção de eventos enviados por leitores ou integrações externas (formatos genéricos e específicos).
+  - Recepção de eventos enviados por leitores ou integrações externas (formatos genéricos e específicos). Os endpoints baseados em `EventDeviceSchema` (`x714`, `x-scan`) aceitam `device_serial_number` opcional; se omitido, é resolvido a partir do device conectado com o mesmo nome.
 
 - **License** — `/api/v1/license`
   - Consulta e envio/atualização de licença.
@@ -41,13 +41,13 @@ Grupos de endpoints
   - Informações de runtime e estado do controlador RFID.
 
 - **Dispatchers** — `/api/v1/dispatchers`
-  - Gerenciamento de dispatchers: listar exemplos, obter conteúdo de exemplo, criar/atualizar e deletar dispatches de roteamento (POST/SQL).
+  - Gerenciamento de dispatchers: listar exemplos, obter conteúdo de exemplo, criar/atualizar e deletar dispatches de roteamento (POST/SQL/MQTT/MongoDB).
 
 ---
 
 Integrações e dispatchers
 
-- Webhooks HTTP com retry configurável
+- Webhooks HTTP com retry configurável (payload: `{"device": {"name", "serial_number"}, "event_type", "event_data"}`)
 - Integração XTRACK
 - Persistência via SQLAlchemy (SQLite/MySQL/Postgres)
 - Arquivos de dispatcher: `config/dispatchers/` (exemplos em `examples/dispatchers/`)

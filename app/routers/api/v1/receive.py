@@ -20,7 +20,11 @@ async def receive_tags(device_name: str, tags: list[TagSchema] | TagSchema):
 		tags = [tags]
 
 	for tag in tags:
-		rfid_manager.on_event(name=device_name, event_type='tag', event_data=tag.model_dump())
+		rfid_manager.on_event(
+			device=rfid_manager.build_device(device_name),
+			event_type='tag',
+			event_data=tag.model_dump(),
+		)
 
 	return JSONResponse(
 		status_code=200,
@@ -39,7 +43,7 @@ async def receive_events(device_name: str, events: list[EventSchema] | EventSche
 
 	for event in events:
 		rfid_manager.on_event(
-			name=device_name,
+			device=rfid_manager.build_device(device_name),
 			event_type=event.event_type,
 			event_data=event.event_data,
 		)
@@ -61,7 +65,7 @@ async def receive_x714(events: list[EventDeviceSchema] | EventDeviceSchema):
 
 	for event in events:
 		rfid_manager.on_event(
-			name=event.device_name,
+			device=rfid_manager.build_device(event.device_name, event.device_serial_number),
 			event_type=event.event_type,
 			event_data=event.event_data,
 		)

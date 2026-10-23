@@ -89,12 +89,12 @@ class Integration:
 			return False
 
 	# [ EVENT ]
-	async def on_event_integration(self, name: str, event_type: str, event_data: Any):
+	async def on_event_integration(self, device: dict, event_type: str, event_data: Any):
 		"""
-		Handle integration of events into the database.
+		Handle integration of events into the database and webhook.
 
 		Args:
-		    name: Name of the device
+		    device: Device descriptor ``{'name': ..., 'serial_number': ...}``
 		    event_type: Type of event
 		    event_data: Data of the event
 		"""
@@ -106,7 +106,7 @@ class Integration:
 			tasks.append(
 				asyncio.to_thread(
 					self._event_database_integration,
-					name=name,
+					device=device,
 					event_type=event_type,
 					event_data=event_data,
 				)
@@ -117,18 +117,18 @@ class Integration:
 			logging.info('[ EVENT INTEGRATION ] WEBHOOK')
 			tasks.append(
 				self.webhook_manager.post_event(
-					device=name, event_type=event_type, event_data=event_data
+					device=device, event_type=event_type, event_data=event_data
 				)
 			)
 
 		await self._run_integration_tasks('EVENT INTEGRATION', tasks)
 
-	def _event_database_integration(self, name: str, event_type: str, event_data: dict):
+	def _event_database_integration(self, device: dict, event_type: str, event_data: Any):
 		"""Save event to database."""
 		with self.db_manager.get_session() as session:
 			session.add(
 				Event(
-					device=name,
+					device=device.get('name'),
 					event_type=event_type,
 					event_data=str(event_data),  # Convert dict to string for Text field
 				)
@@ -156,7 +156,12 @@ class Integration:
 			logging.info('[ TAG INTEGRATION ] WEBHOOK')
 			tasks.append(
 				self.webhook_manager.post_event(
-					device=tag.get('device'), event_type='tag', event_data=tag
+					device={
+						'name': tag.get('device'),
+						'serial_number': tag.get('device_serial_number'),
+					},
+					event_type='tag',
+					event_data=tag,
 				)
 			)
 
